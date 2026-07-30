@@ -26,6 +26,8 @@
         .btn-login:hover { background: #475569; }
         .btn-primary { background: #3b82f6; color: #fff; }
         .btn-primary:hover { background: #2563eb; }
+        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-warning:hover { background: #d97706; }
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
 
@@ -37,7 +39,7 @@
         /* FILTER & SEARCH */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .filter-box { background: #1e293b; padding: 20px; border-radius: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; border: 1px solid #334155; }
-        .filter-box select, .filter-box input { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; outline: none; }
+        .filter-box select, .filter-box input, .form-input { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; outline: none; width: 100%; }
 
         /* GRID SHOP ACC */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; }
@@ -51,12 +53,17 @@
         .acc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 10px; }
         .price { font-size: 18px; font-weight: 800; color: #22c55e; }
 
-        /* MODAL POPUP AUTH */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: #1e293b; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid #334155; position: relative; text-align: center; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 20px; color: #94a3b8; cursor: pointer; }
-        .modal-content h3 { margin-bottom: 20px; color: #3b82f6; }
-        .modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none; }
+        /* MODAL POPUP AUTH & ADMIN */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
+        .admin-modal-content { max-width: 900px; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
+        .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
+        
+        /* ADMIN TABLE */
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .admin-table th, .admin-table td { border: 1px solid #334155; padding: 10px; text-align: left; }
+        .admin-table th { background: #0f172a; color: #3b82f6; }
 
         /* FOOTER */
         footer { background: #090d16; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; font-size: 14px; }
@@ -93,113 +100,100 @@
         
         <!-- BỘ LỌC TÌM KIẾM -->
         <div class="filter-box">
-            <select>
+            <select id="filterGame">
                 <option value="">-- Chọn Game --</option>
-                <option value="ff">Free Fire</option>
-                <option value="lq">Liên Quân Mobile</option>
-                <option value="genshin">Genshin Impact</option>
+                <option value="Free Fire">Free Fire</option>
+                <option value="Liên Quân">Liên Quân Mobile</option>
+                <option value="Genshin">Genshin Impact</option>
             </select>
-            <select>
+            <select id="filterPrice">
                 <option value="">-- Mức giá --</option>
-                <option value="1">Dưới 100.000đ</option>
-                <option value="2">100.000đ - 500.000đ</option>
+                <option value="1">Dưới 200.000đ</option>
+                <option value="2">200.000đ - 500.000đ</option>
                 <option value="3">Trên 500.000đ</option>
             </select>
-            <input type="text" placeholder="Nhập mã acc hoặc từ khóa...">
-            <button class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+            <input type="text" id="searchInput" placeholder="Nhập mã acc hoặc từ khóa...">
+            <button class="btn btn-primary" onclick="renderShopAcc()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
         </div>
 
         <!-- DANH SÁCH ACC GAME -->
         <h2 style="margin-bottom: 20px; border-left: 4px solid #3b82f6; padding-left: 10px;">ACC GAME MỚI NHẤT</h2>
         
-        <div class="shop-grid">
-
-            <!-- Card Acc 1 -->
-            <div class="acc-card">
-                <span class="acc-tag">GIẢM 20%</span>
-                <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400" class="acc-img" alt="Acc Game">
-                <div class="acc-body">
-                    <div class="acc-title">Acc Free Fire #FF998 - Full Skin Súng VIP</div>
-                    <div class="acc-info">
-                        <span><i class="fa-solid fa-shield"></i> Rank: Huyền Thoại</span>
-                        <span><i class="fa-solid fa-shirt"></i> Trang phục: 120</span>
-                        <span><i class="fa-solid fa-gun"></i> Skin súng: 150</span>
-                        <span><i class="fa-solid fa-check"></i> Đăng ký: Facebook</span>
-                    </div>
-                    <div class="acc-footer">
-                        <div class="price">150.000 đ</div>
-                        <button class="btn btn-primary" style="font-size: 12px;">Xem Chi Tiết</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card Acc 2 -->
-            <div class="acc-card">
-                <span class="acc-tag">MỚI</span>
-                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400" class="acc-img" alt="Acc Game">
-                <div class="acc-body">
-                    <div class="acc-title">Acc Liên Quân #LQ552 - 110 Tướng 200 Skin</div>
-                    <div class="acc-info">
-                        <span><i class="fa-solid fa-shield"></i> Rank: Cao Thủ</span>
-                        <span><i class="fa-solid fa-shirt"></i> Skin S+: 15</span>
-                        <span><i class="fa-solid fa-gem"></i> Ngọc: Full 90</span>
-                        <span><i class="fa-solid fa-check"></i> Đăng ký: Garena trắng</span>
-                    </div>
-                    <div class="acc-footer">
-                        <div class="price">350.000 đ</div>
-                        <button class="btn btn-primary" style="font-size: 12px;">Xem Chi Tiết</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card Acc 3 -->
-            <div class="acc-card">
-                <img src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=400" class="acc-img" alt="Acc Game">
-                <div class="acc-body">
-                    <div class="acc-title">Acc Genshin Impact AR56 - 8 Nhân Vật 5 Sao</div>
-                    <div class="acc-info">
-                        <span><i class="fa-solid fa-shield"></i> AR: 56</span>
-                        <span><i class="fa-solid fa-star"></i> Tướng 5*: 8</span>
-                        <span><i class="fa-solid fa-wand-magic-sparkles"></i> Bảo hiểm: Có</span>
-                        <span><i class="fa-solid fa-check"></i> Đăng ký: Mihoyo trắng</span>
-                    </div>
-                    <div class="acc-footer">
-                        <div class="price">500.000 đ</div>
-                        <button class="btn btn-primary" style="font-size: 12px;">Xem Chi Tiết</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card Acc 4 -->
-            <div class="acc-card">
-                <span class="acc-tag">VIP</span>
-                <img src="https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?q=80&w=400" class="acc-img" alt="Acc Game">
-                <div class="acc-body">
-                    <div class="acc-title">Acc Roblox Blox Fruit - Max Level + V4</div>
-                    <div class="acc-info">
-                        <span><i class="fa-solid fa-bolt"></i> Level: 2550</span>
-                        <span><i class="fa-solid fa-apple-whole"></i> Trái: Mochi V2</span>
-                        <span><i class="fa-solid fa-khanda"></i> Melee: Full</span>
-                        <span><i class="fa-solid fa-check"></i> Đăng ký: Trắng thông tin</span>
-                    </div>
-                    <div class="acc-footer">
-                        <div class="price">200.000 đ</div>
-                        <button class="btn btn-primary" style="font-size: 12px;">Xem Chi Tiết</button>
-                    </div>
-                </div>
-            </div>
-
+        <div class="shop-grid" id="accGrid">
+            <!-- Render dữ liệu từ JavaScript -->
         </div>
     </div>
 
-    <!-- POPUP MODAL AUTH -->
+    <!-- POPUP AUTH (ĐĂNG NHẬP / ĐĂNG KÝ) -->
     <div class="modal" id="authModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
             <h3 id="modalTitle">ĐĂNG NHẬP</h3>
-            <input type="email" id="email" placeholder="Nhập Email...">
-            <input type="password" id="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)...">
+            <input type="email" id="email" class="form-input" style="margin-bottom:15px;" placeholder="Nhập Email...">
+            <input type="password" id="password" class="form-input" style="margin-bottom:15px;" placeholder="Mật khẩu (tối thiểu 6 ký tự)...">
             <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px;">XÁC NHẬN</button>
+        </div>
+    </div>
+
+    <!-- POPUP ADMIN DASHBOARD -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content admin-modal-content">
+            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
+            <h3><i class="fa-solid fa-user-gear"></i> QUẢN LÝ HỆ THỐNG SHOP GAME</h3>
+            
+            <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="openAddAccModal()"><i class="fa-solid fa-plus"></i> Thêm Acc Game Mới</button>
+            </div>
+
+            <h4 style="color: #94a3b8; margin-bottom: 10px;">Danh sách Acc Game hiện tại:</h4>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã/ID</th>
+                            <th>Tên Tiêu Đề</th>
+                            <th>Loại Game</th>
+                            <th>Giá Bán</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminAccTableBody">
+                        <!-- Render danh sách quản lý acc -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP THÊM/SỬA ACC GAME (ADMIN) -->
+    <div class="modal" id="addAccModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('addAccModal')">&times;</span>
+            <h3 id="accFormTitle">THÊM ACC GAME MỚI</h3>
+            <form id="accForm" onsubmit="handleSaveAcc(event)">
+                <input type="hidden" id="accId">
+                <label style="font-size:12px; color:#94a3b8;">Tên Tiêu Đề Acc:</label>
+                <input type="text" id="accTitle" class="form-input" style="margin-bottom:10px;" required placeholder="Ví dụ: Acc Free Fire #FF998 - Full Skin">
+                
+                <label style="font-size:12px; color:#94a3b8;">Loại Game:</label>
+                <select id="accGameType" class="form-input" style="margin-bottom:10px;" required>
+                    <option value="Free Fire">Free Fire</option>
+                    <option value="Liên Quân">Liên Quân Mobile</option>
+                    <option value="Genshin">Genshin Impact</option>
+                    <option value="Roblox">Roblox</option>
+                </select>
+
+                <label style="font-size:12px; color:#94a3b8;">Giá bán (VNĐ):</label>
+                <input type="number" id="accPrice" class="form-input" style="margin-bottom:10px;" required placeholder="150000">
+
+                <label style="font-size:12px; color:#94a3b8;">Link Hình Ảnh:</label>
+                <input type="text" id="accImg" class="form-input" style="margin-bottom:10px;" required placeholder="https://images.unsplash.com/photo-...">
+
+                <label style="font-size:12px; color:#94a3b8;">Nhãn / Tag (VD: GIẢM 20%, VIP, MỚI):</label>
+                <input type="text" id="accTag" class="form-input" style="margin-bottom:15px;" placeholder="GIẢM 20%">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">LƯU TÀI KHOẢN</button>
+            </form>
         </div>
     </div>
 
@@ -208,39 +202,86 @@
         <p>&copy; 2026 SHOPGAME24H. All rights reserved. Hệ thống bán tài khoản game tự động uy tín hàng đầu.</p>
     </footer>
 
-    <!-- JAVASCRIPT XỬ LÝ SUPABASE -->
+    <!-- JAVASCRIPT XỬ LÝ SYSTEM & ADMIN -->
     <script>
-        // 🛠️ DÁN MÃ ANON PUBLIC BẠN CỦA BẠN VÀO DÒNG DƯỚI DÂY:
+        // 🛠️ DÁN MÃ ANON PUBLIC CỦA BẠN VÀO DÒNG DƯỚI DÂY:
         const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU'; 
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentMode = 'login';
+        // Kho dữ liệu Acc Game mặc định
+        let defaultAccs = [
+            { id: '1', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%' },
+            { id: '2', title: 'Acc Liên Quân #LQ552 - 110 Tướng 200 Skin', game: 'Liên Quân', price: 350000, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400', tag: 'MỚI' },
+            { id: '3', title: 'Acc Genshin Impact AR56 - 8 Nhân Vật 5 Sao', game: 'Genshin', price: 500000, img: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=400', tag: '' },
+            { id: '4', title: 'Acc Roblox Blox Fruit - Max Level + V4', game: 'Roblox', price: 200000, img: 'https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?q=80&w=400', tag: 'VIP' }
+        ];
 
-        function openModal(mode) {
-            currentMode = mode;
-            const modal = document.getElementById('authModal');
-            const title = document.getElementById('modalTitle');
-            const btn = document.getElementById('modalSubmitBtn');
-            
-            if(mode === 'login') {
-                title.innerText = 'ĐĂNG NHẬP TÀI KHOẢN';
-                btn.innerText = 'ĐĂNG NHẬP';
-                btn.onclick = handleLogin;
-            } else {
-                title.innerText = 'ĐĂNG KÝ TÀI KHOẢN MỚI';
-                btn.innerText = 'ĐĂNG KÝ';
-                btn.onclick = handleRegister;
+        // Đọc dữ liệu từ LocalStorage nếu có
+        let accList = JSON.parse(localStorage.getItem('shop_acc_list')) || defaultAccs;
+
+        function saveAccsToStorage() {
+            localStorage.setItem('shop_acc_list', JSON.stringify(accList));
+        }
+
+        // Render danh sách Acc Game lên trang chủ
+        function renderShopAcc() {
+            const accGrid = document.getElementById('accGrid');
+            const gameFilter = document.getElementById('filterGame').value;
+            const priceFilter = document.getElementById('filterPrice').value;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            let filteredList = accList.filter(item => {
+                let matchGame = gameFilter === "" || item.game === gameFilter;
+                let matchSearch = item.title.toLowerCase().includes(searchVal);
+                let matchPrice = true;
+
+                if (priceFilter === "1") matchPrice = item.price < 200000;
+                else if (priceFilter === "2") matchPrice = item.price >= 200000 && item.price <= 500000;
+                else if (priceFilter === "3") matchPrice = item.price > 500000;
+
+                return matchGame && matchSearch && matchPrice;
+            });
+
+            accGrid.innerHTML = '';
+
+            if (filteredList.length === 0) {
+                accGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding:30px;">Không tìm thấy tài khoản nào phù hợp!</p>';
+                return;
             }
-            modal.style.display = 'flex';
+
+            filteredList.forEach(acc => {
+                accGrid.innerHTML += `
+                    <div class="acc-card">
+                        ${acc.tag ? `<span class="acc-tag">${acc.tag}</span>` : ''}
+                        <img src="${acc.img}" class="acc-img" alt="${acc.title}">
+                        <div class="acc-body">
+                            <div class="acc-title">${acc.title}</div>
+                            <div class="acc-info">
+                                <span><i class="fa-solid fa-gamepad"></i> ${acc.game}</span>
+                                <span><i class="fa-solid fa-check"></i> Bảo hành 100%</span>
+                            </div>
+                            <div class="acc-footer">
+                                <div class="price">${acc.price.toLocaleString('vi-VN')} đ</div>
+                                <button class="btn btn-primary" style="font-size: 12px;">Xem Chi Tiết</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        function closeModal() {
-            document.getElementById('authModal').style.display = 'none';
+        // MODAL MANAGEMENT
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
         }
 
-        // Xử lý Đăng ký (Đã tích hợp kiểm tra trùng Email)
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // XỬ LÝ AUTHENTICATION
         async function handleRegister() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -253,17 +294,15 @@
             if (error) {
                 alert('Lỗi đăng ký: ' + error.message);
             } else {
-                // Kiểm tra nếu tài khoản trùng lặp đã tồn tại
                 if (data.user && data.user.identities && data.user.identities.length === 0) {
-                    alert('⚠️ Email này đã được đăng ký tài khoản trước đó! Vui lòng chọn Email khác hoặc bấm Đăng Nhập.');
+                    alert('⚠️ Email này đã được đăng ký trước đó!');
                 } else {
-                    alert('🎉 Đăng ký thành công! Bạn có thể Đăng nhập ngay bây giờ.');
-                    closeModal();
+                    alert('🎉 Đăng ký thành công!');
+                    closeModal('authModal');
                 }
             }
         }
 
-        // Xử lý Đăng nhập
         async function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -274,37 +313,143 @@
             if (error) alert('Lỗi đăng nhập: ' + error.message);
             else {
                 alert('Đăng nhập thành công!');
-                closeModal();
+                closeModal('authModal');
                 checkUserStatus();
             }
         }
 
-        // Xử lý Đăng xuất
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             alert('Đã đăng xuất!');
             checkUserStatus();
         }
 
-        // Kiểm tra trạng thái đăng nhập
         async function checkUserStatus() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             const authBtns = document.getElementById('auth-buttons');
             
             if (user) {
+                // Kiểm tra xem user có phải Admin hay không (Email chứa từ admin)
+                const isAdmin = user.email.toLowerCase().includes('admin');
+
                 authBtns.innerHTML = `
+                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-screwdriver-wrench"></i> Quản Lý Admin</button>` : ''}
                     <span style="color:#4ade80; font-weight:bold;"><i class="fa-solid fa-user-check"></i> ${user.email.split('@')[0]}</span>
                     <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
             } else {
                 authBtns.innerHTML = `
-                    <button class="btn btn-login" onclick="openModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
-                    <button class="btn btn-primary" onclick="openModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+                    <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
+                    <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
                 `;
             }
         }
 
-        // Tự động kiểm tra khi tải trang
+        function openAuthModal(mode) {
+            const title = document.getElementById('modalTitle');
+            const btn = document.getElementById('modalSubmitBtn');
+            if(mode === 'login') {
+                title.innerText = 'ĐĂNG NHẬP TÀI KHOẢN';
+                btn.innerText = 'ĐĂNG NHẬP';
+                btn.onclick = handleLogin;
+            } else {
+                title.innerText = 'ĐĂNG KÝ TÀI KHOẢN MỚI';
+                btn.innerText = 'ĐĂNG KÝ';
+                btn.onclick = handleRegister;
+            }
+            openModal('authModal');
+        }
+
+        // ================= Quản Lý Admin Dashboard ================= //
+        function openAdminDashboard() {
+            renderAdminTable();
+            openModal('adminModal');
+        }
+
+        function renderAdminTable() {
+            const tableBody = document.getElementById('adminAccTableBody');
+            tableBody.innerHTML = '';
+
+            accList.forEach(acc => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>#${acc.id}</td>
+                        <td><strong>${acc.title}</strong></td>
+                        <td>${acc.game}</td>
+                        <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding:4px 8px; font-size:12px;" onclick="editAcc('${acc.id}')"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteAcc('${acc.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openAddAccModal() {
+            document.getElementById('accFormTitle').innerText = 'THÊM ACC GAME MỚI';
+            document.getElementById('accForm').reset();
+            document.getElementById('accId').value = '';
+            openModal('addAccModal');
+        }
+
+        function handleSaveAcc(e) {
+            e.preventDefault();
+            const id = document.getElementById('accId').value;
+            const title = document.getElementById('accTitle').value;
+            const game = document.getElementById('accGameType').value;
+            const price = parseInt(document.getElementById('accPrice').value);
+            const img = document.getElementById('accImg').value;
+            const tag = document.getElementById('accTag').value;
+
+            if (id) {
+                // Cập nhật Acc
+                let index = accList.findIndex(a => a.id === id);
+                if (index !== -1) {
+                    accList[index] = { id, title, game, price, img, tag };
+                }
+            } else {
+                // Thêm Acc Mới
+                const newAcc = {
+                    id: Date.now().toString().slice(-4),
+                    title, game, price, img, tag
+                };
+                accList.unshift(newAcc);
+            }
+
+            saveAccsToStorage();
+            renderShopAcc();
+            renderAdminTable();
+            closeModal('addAccModal');
+            alert('Lưu thông tin Acc thành công!');
+        }
+
+        function editAcc(id) {
+            const acc = accList.find(a => a.id === id);
+            if (!acc) return;
+
+            document.getElementById('accFormTitle').innerText = 'CHỈNH SỬA ACC GAME';
+            document.getElementById('accId').value = acc.id;
+            document.getElementById('accTitle').value = acc.title;
+            document.getElementById('accGameType').value = acc.game;
+            document.getElementById('accPrice').value = acc.price;
+            document.getElementById('accImg').value = acc.img;
+            document.getElementById('accTag').value = acc.tag || '';
+
+            openModal('addAccModal');
+        }
+
+        function deleteAcc(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa tài khoản game này không?')) {
+                accList = accList.filter(a => a.id !== id);
+                saveAccsToStorage();
+                renderShopAcc();
+                renderAdminTable();
+            }
+        }
+
+        // Khởi tạo trang
+        renderShopAcc();
         checkUserStatus();
     </script>
 </body>
