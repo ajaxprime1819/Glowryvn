@@ -21,7 +21,7 @@
         .nav-links { display: flex; gap: 20px; list-style: none; font-weight: 600; }
         .nav-links a:hover { color: #3b82f6; transition: 0.3s; }
         .auth-btns { display: flex; gap: 10px; align-items: center; }
-        .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; }
+        .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-login { background: #334155; color: #fff; }
         .btn-login:hover { background: #475569; }
         .btn-primary { background: #3b82f6; color: #fff; }
@@ -58,7 +58,7 @@
         /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
-        .admin-modal-content { max-width: 900px; }
+        .admin-modal-content { max-width: 950px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
         .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
         
@@ -69,16 +69,26 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ADMIN TABLE */
+        /* ADMIN & HISTORY TABLE */
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         .admin-table th, .admin-table td { border: 1px solid #334155; padding: 10px; text-align: left; }
         .admin-table th { background: #0f172a; color: #3b82f6; }
+        .order-id-badge { background: #3b82f620; color: #3b82f6; border: 1px dashed #3b82f6; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-family: monospace; }
+
+        /* TOAST NOTIFICATION */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; border-left: 5px solid #3b82f6; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
+        .toast.success { border-left-color: #22c55e; }
+        .toast.error { border-left-color: #ef4444; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
         /* FOOTER */
         footer { background: #090d16; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; font-size: 14px; }
     </style>
 </head>
 <body>
+
+    <div id="toast-container"></div>
 
     <!-- HEADER -->
     <header>
@@ -88,7 +98,7 @@
                 <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
                 <li><a href="#"><i class="fa-solid fa-store"></i> Shop Acc</a></li>
                 <li><a href="javascript:void(0)" onclick="openDepositModal()"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
-                <li><a href="#"><i class="fa-solid fa-newspaper"></i> Tin tức</a></li>
+                <li><a href="javascript:void(0)" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> Acc Đã Mua</a></li>
             </ul>
             <div class="auth-btns" id="auth-buttons">
                 <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
@@ -113,6 +123,7 @@
                 <option value="Free Fire">Free Fire</option>
                 <option value="Liên Quân">Liên Quân Mobile</option>
                 <option value="Genshin">Genshin Impact</option>
+                <option value="Roblox">Roblox</option>
             </select>
             <select id="filterPrice">
                 <option value="">-- Mức giá --</option>
@@ -192,6 +203,28 @@
         </div>
     </div>
 
+    <!-- POPUP TÀI KHOẢN ĐÃ MUA -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content admin-modal-content">
+            <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
+            <h3><i class="fa-solid fa-box-open"></i> LỊCH SỬ ĐƠN HÀNG & ACC ĐÃ MUA</h3>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Đơn Hàng</th>
+                            <th>Mã Acc</th>
+                            <th>Tên Tiêu Đề</th>
+                            <th>Giá Mua</th>
+                            <th>Tài Khoản / Mật Khẩu Bàn Giao</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- POPUP ADMIN DASHBOARD -->
     <div class="modal" id="adminModal">
         <div class="modal-content admin-modal-content">
@@ -208,7 +241,7 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Mã/ID</th>
+                            <th>Mã Acc</th>
                             <th>Tên Tiêu Đề</th>
                             <th>Loại Game</th>
                             <th>Giá Bán</th>
@@ -252,7 +285,8 @@
                 </select>
                 <input type="number" id="accPrice" class="form-input" style="margin-bottom:10px;" required placeholder="Giá bán...">
                 <input type="text" id="accImg" class="form-input" style="margin-bottom:10px;" required placeholder="Link hình ảnh...">
-                <input type="text" id="accTag" class="form-input" style="margin-bottom:15px;" placeholder="Tag (Ví dụ: VIP, GIẢM 20%)...">
+                <input type="text" id="accTag" class="form-input" style="margin-bottom:10px;" placeholder="Tag (Ví dụ: VIP, GIẢM 20%)...">
+                <input type="text" id="accAccountData" class="form-input" style="margin-bottom:15px;" placeholder="Tài khoản|Mật khẩu (VD: user123|pass123)...">
                 <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">LƯU TÀI KHOẢN</button>
             </form>
         </div>
@@ -272,8 +306,30 @@
 
         let currentUser = null;
 
-        // Dữ liệu số dư khách hàng lưu trữ
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // Tạo mã đơn hàng ngẫu nhiên (Ví dụ: DH-83921)
+        function generateOrderId() {
+            return 'DH-' + Math.floor(10000 + Math.random() * 90000);
+        }
+
+        // Sao chép tài khoản vào bộ nhớ tạm
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showToast('Đã sao chép tài khoản/mật khẩu!', 'success');
+        }
+
+        // Dữ liệu số dư & Lịch sử mua acc của khách hàng
         let userBalances = JSON.parse(localStorage.getItem('shop_user_balances')) || {};
+        let userPurchases = JSON.parse(localStorage.getItem('shop_user_purchases')) || {};
 
         function getUserBalance(email) {
             return userBalances[email] || 0;
@@ -286,10 +342,10 @@
 
         // Acc game mặc định
         let defaultAccs = [
-            { id: '1', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%' },
-            { id: '2', title: 'Acc Liên Quân #LQ552 - 110 Tướng 200 Skin', game: 'Liên Quân', price: 350000, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400', tag: 'MỚI' },
-            { id: '3', title: 'Acc Genshin Impact AR56 - 8 Nhân Vật 5 Sao', game: 'Genshin', price: 500000, img: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=400', tag: '' },
-            { id: '4', title: 'Acc Roblox Blox Fruit - Max Level + V4', game: 'Roblox', price: 200000, img: 'https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?q=80&w=400', tag: 'VIP' }
+            { id: '1001', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%', credentials: 'ff_user01|pass_ff_vip1' },
+            { id: '1002', title: 'Acc Liên Quân #LQ552 - 110 Tướng 200 Skin', game: 'Liên Quân', price: 350000, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400', tag: 'MỚI', credentials: 'lq_user02|pass_lq_vip2' },
+            { id: '1003', title: 'Acc Genshin Impact AR56 - 8 Nhân Vật 5 Sao', game: 'Genshin', price: 500000, img: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=400', tag: '', credentials: 'genshin_03|genshin_pass3' },
+            { id: '1004', title: 'Acc Roblox Blox Fruit - Max Level + V4', game: 'Roblox', price: 200000, img: 'https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?q=80&w=400', tag: 'VIP', credentials: 'roblox_04|roblox_pass4' }
         ];
 
         let accList = JSON.parse(localStorage.getItem('shop_acc_list')) || defaultAccs;
@@ -306,7 +362,7 @@
 
             let filteredList = accList.filter(item => {
                 let matchGame = gameFilter === "" || item.game === gameFilter;
-                let matchSearch = item.title.toLowerCase().includes(searchVal);
+                let matchSearch = item.title.toLowerCase().includes(searchVal) || item.id.includes(searchVal);
                 let matchPrice = true;
 
                 if (priceFilter === "1") matchPrice = item.price < 200000;
@@ -328,7 +384,7 @@
                         ${acc.tag ? `<span class="acc-tag">${acc.tag}</span>` : ''}
                         <img src="${acc.img}" class="acc-img" alt="${acc.title}">
                         <div class="acc-body">
-                            <div class="acc-title">${acc.title}</div>
+                            <div class="acc-title">#${acc.id} - ${acc.title}</div>
                             <div class="acc-info">
                                 <span><i class="fa-solid fa-gamepad"></i> ${acc.game}</span>
                                 <span><i class="fa-solid fa-check"></i> Bảo hành 100%</span>
@@ -346,31 +402,81 @@
         // XỬ LÝ MUA ACC
         function buyAcc(id, price) {
             if (!currentUser) {
-                alert('Vui lòng đăng nhập để mua tài khoản!');
+                showToast('Vui lòng đăng nhập để mua tài khoản!', 'error');
                 openAuthModal('login');
                 return;
             }
 
             let balance = getUserBalance(currentUser.email);
             if (balance < price) {
-                alert(`Số dư của bạn không đủ! Hiện tại bạn có ${balance.toLocaleString('vi-VN')} đ. Vui lòng nạp thêm tiền.`);
+                showToast(`Số dư không đủ! Cần thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
                 openDepositModal();
             } else {
-                if (confirm(`Bạn có chắc chắn muốn mua acc này với giá ${price.toLocaleString('vi-VN')} đ?`)) {
+                if (confirm(`Xác nhận mua tài khoản #${id} với giá ${price.toLocaleString('vi-VN')} đ?`)) {
+                    let purchasedAcc = accList.find(a => a.id === id);
+                    
+                    // Tạo mã đơn hàng ngẫu nhiên cho đơn này
+                    const orderId = generateOrderId();
+                    const orderItem = {
+                        orderId: orderId,
+                        ...purchasedAcc,
+                        purchasedAt: new Date().toLocaleString('vi-VN')
+                    };
+
                     updateUserBalance(currentUser.email, -price);
+                    
+                    // Lưu đơn hàng vào lịch sử đã mua
+                    if (!userPurchases[currentUser.email]) userPurchases[currentUser.email] = [];
+                    userPurchases[currentUser.email].push(orderItem);
+                    localStorage.setItem('shop_user_purchases', JSON.stringify(userPurchases));
+
+                    // Xóa Acc khỏi shop
                     accList = accList.filter(a => a.id !== id);
                     saveAccsToStorage();
                     renderShopAcc();
                     checkUserStatus();
-                    alert('🎉 Mua tài khoản thành công! Cảm ơn bạn đã ủng hộ shop.');
+                    
+                    showToast(`🎉 Mua thành công! Mã đơn hàng: ${orderId}`, 'success');
                 }
             }
+        }
+
+        // POPUP LỊCH SỬ TÀI KHOẢN ĐÃ MUA
+        function openHistoryModal() {
+            if (!currentUser) {
+                showToast('Vui lòng đăng nhập để xem lịch sử!', 'error');
+                openAuthModal('login');
+                return;
+            }
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            const history = userPurchases[currentUser.email] || [];
+
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có đơn hàng nào!</td></tr>`;
+            } else {
+                history.slice().reverse().forEach(acc => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="order-id-badge">${acc.orderId || 'DH-00000'}</span></td>
+                            <td>#${acc.id}</td>
+                            <td><strong>${acc.title}</strong></td>
+                            <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
+                            <td>
+                                <code style="background:#0f172a; padding:4px 8px; border-radius:4px; color:#f59e0b;">${acc.credentials || 'TK: demo | MK: demo123'}</code>
+                                <button class="btn btn-login" style="padding: 2px 6px; font-size:11px; margin-left:5px;" onclick="copyToClipboard('${acc.credentials}')"><i class="fa-solid fa-copy"></i> Copy</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            openModal('historyModal');
         }
 
         // XỬ LÝ POPUP NẠP TIỀN
         function openDepositModal() {
             if (!currentUser) {
-                alert('Vui lòng đăng nhập trước khi nạp tiền!');
+                showToast('Vui lòng đăng nhập trước khi nạp tiền!', 'error');
                 openAuthModal('login');
                 return;
             }
@@ -399,16 +505,16 @@
         }
 
         function confirmBankDeposit() {
-            alert('Yêu cầu đã được gửi! Hệ thống sẽ kiểm tra và cộng tiền trong 1-3 phút.');
+            showToast('Yêu cầu đã được gửi! Hệ thống sẽ duyệt tiền trong ít phút.', 'success');
             closeModal('depositModal');
         }
 
         function submitCardDeposit() {
             const code = document.getElementById('cardCode').value.trim();
             const seri = document.getElementById('cardSeri').value.trim();
-            if (!code || !seri) return alert('Vui lòng nhập đầy đủ Mã Thẻ và Số Seri!');
+            if (!code || !seri) return showToast('Vui lòng nhập đầy đủ Mã Thẻ và Số Seri!', 'error');
             
-            alert('Đang xử lý thẻ cào... Thẻ của bạn đã được gửi tới hệ thống.');
+            showToast('Đã gửi thẻ thành công! Hệ thống đang gạch thẻ...', 'success');
             document.getElementById('cardCode').value = '';
             document.getElementById('cardSeri').value = '';
             closeModal('depositModal');
@@ -423,10 +529,10 @@
             const targetEmail = document.getElementById('adminTargetEmail').value.trim();
             const amount = parseInt(document.getElementById('adminAddAmount').value);
 
-            if (!targetEmail || isNaN(amount)) return alert('Vui lòng nhập chính xác Email và Số tiền!');
+            if (!targetEmail || isNaN(amount)) return showToast('Nhập chính xác Email và Số tiền!', 'error');
 
             updateUserBalance(targetEmail, amount);
-            alert(`Thành công! Đã cộng ${amount.toLocaleString('vi-VN')} đ cho tài khoản ${targetEmail}`);
+            showToast(`Cộng ${amount.toLocaleString('vi-VN')} đ cho ${targetEmail} thành công!`, 'success');
             closeModal('adminDepositModal');
             checkUserStatus();
         }
@@ -438,15 +544,15 @@
         async function handleRegister() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
+            if(!email || !password) return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
             
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) alert('Lỗi: ' + error.message);
+            if (error) showToast(error.message, 'error');
             else {
                 if (data.user && data.user.identities && data.user.identities.length === 0) {
-                    alert('⚠️ Email này đã được đăng ký trước đó!');
+                    showToast('Email này đã được đăng ký!', 'error');
                 } else {
-                    alert('🎉 Đăng ký thành công!');
+                    showToast('Đăng ký thành công!', 'success');
                     closeModal('authModal');
                 }
             }
@@ -455,12 +561,12 @@
         async function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
+            if(!email || !password) return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
 
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) alert('Lỗi: ' + error.message);
+            if (error) showToast(error.message, 'error');
             else {
-                alert('Đăng nhập thành công!');
+                showToast('Đăng nhập thành công!', 'success');
                 closeModal('authModal');
                 checkUserStatus();
             }
@@ -469,7 +575,7 @@
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             currentUser = null;
-            alert('Đã đăng xuất!');
+            showToast('Đã đăng xuất!', 'info');
             checkUserStatus();
         }
 
@@ -486,7 +592,7 @@
                     <span style="background:#0f172a; padding:6px 12px; border-radius:20px; border:1px solid #22c55e; color:#22c55e; font-weight:bold;">
                         <i class="fa-solid fa-coins"></i> ${balance.toLocaleString('vi-VN')} đ
                     </span>
-                    <button class="btn btn-success" onclick="openDepositModal()"><i class="fa-solid fa-plus"></i> Nạp tiền</button>
+                    <button class="btn btn-success" onclick="openDepositModal()"><i class="fa-solid fa-plus"></i></button>
                     ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Admin</button>` : ''}
                     <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
                 `;
@@ -549,19 +655,20 @@
             const price = parseInt(document.getElementById('accPrice').value);
             const img = document.getElementById('accImg').value;
             const tag = document.getElementById('accTag').value;
+            const credentials = document.getElementById('accAccountData').value || 'tk_demo|mk_demo';
 
             if (id) {
                 let index = accList.findIndex(a => a.id === id);
-                if (index !== -1) accList[index] = { id, title, game, price, img, tag };
+                if (index !== -1) accList[index] = { id, title, game, price, img, tag, credentials };
             } else {
-                accList.unshift({ id: Date.now().toString().slice(-4), title, game, price, img, tag });
+                accList.unshift({ id: Date.now().toString().slice(-4), title, game, price, img, tag, credentials });
             }
 
             saveAccsToStorage();
             renderShopAcc();
             renderAdminTable();
             closeModal('addAccModal');
-            alert('Lưu Acc thành công!');
+            showToast('Lưu Acc thành công!', 'success');
         }
 
         function editAcc(id) {
@@ -574,6 +681,7 @@
             document.getElementById('accPrice').value = acc.price;
             document.getElementById('accImg').value = acc.img;
             document.getElementById('accTag').value = acc.tag || '';
+            document.getElementById('accAccountData').value = acc.credentials || '';
             openModal('addAccModal');
         }
 
@@ -583,6 +691,7 @@
                 saveAccsToStorage();
                 renderShopAcc();
                 renderAdminTable();
+                showToast('Đã xóa tài khoản khỏi danh sách!', 'info');
             }
         }
 
