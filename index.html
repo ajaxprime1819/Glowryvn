@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHOPGAME24H - Hệ Thống Bán Acc & Dịch Vụ Game Uy Tín</title>
-    <!-- FontAwesome Icons -->
+    <title>SHOPGAME24H - Hệ Thống Bán Acc & Dịch Vụ Cày Thuê Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -31,7 +29,6 @@
         .btn-warning { background: #f59e0b; color: #fff; }
         .btn-warning:hover { background: #d97706; }
         .btn-danger { background: #ef4444; color: #fff; }
-        .btn-danger:hover { background: #dc2626; }
 
         /* HERO BANNER */
         .hero { 
@@ -40,55 +37,47 @@
             padding: 80px 20px; 
             text-align: center; 
         }
-        .hero h1 { font-size: 36px; margin-bottom: 10px; text-transform: uppercase; color: #f8fafc; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .hero p { color: #cbd5e1; font-size: 18px; margin-bottom: 25px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .hero h1 { font-size: 36px; margin-bottom: 10px; text-transform: uppercase; color: #f8fafc; }
+        .hero p { color: #cbd5e1; font-size: 18px; margin-bottom: 25px; }
 
-        /* FILTER & SEARCH */
+        /* CONTAINER & GRID */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .filter-box { background: #1e293b; padding: 20px; border-radius: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; border: 1px solid #334155; }
         .filter-box select, .filter-box input, .form-input { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; outline: none; width: 100%; }
-
-        /* GRID SHOP ACC */
+        
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; }
-        .acc-card { background: #1e293b; border-radius: 10px; overflow: hidden; border: 1px solid #334155; transition: transform 0.3s, box-shadow 0.3s; position: relative; }
-        .acc-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
+        .acc-card { background: #1e293b; border-radius: 10px; overflow: hidden; border: 1px solid #334155; position: relative; }
         .acc-img { width: 100%; height: 160px; object-fit: cover; }
         .acc-tag { position: absolute; top: 10px; right: 10px; background: #ef4444; color: #fff; padding: 3px 8px; font-size: 12px; font-weight: bold; border-radius: 4px; }
         .acc-body { padding: 15px; }
-        .acc-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .acc-info { font-size: 13px; color: #94a3b8; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .acc-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; }
         .acc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 10px; }
         .price { font-size: 18px; font-weight: 800; color: #22c55e; }
 
+        /* BADGE TRẠNG THÁI */
+        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-completed { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e; }
+
         /* MODALS */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
-        .admin-modal-content { max-width: 950px; }
+        .admin-modal-content { max-width: 1000px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
         .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
-        
-        /* TAB DEPOSIT */
-        .deposit-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 10px; background: #0f172a; border: 1px solid #334155; color: #fff; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; }
-        .tab-btn.active { background: #3b82f6; border-color: #3b82f6; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
 
-        /* ADMIN & HISTORY TABLE */
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        /* TABLES */
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
         .admin-table th, .admin-table td { border: 1px solid #334155; padding: 10px; text-align: left; }
         .admin-table th { background: #0f172a; color: #3b82f6; }
-        .order-id-badge { background: #3b82f620; color: #3b82f6; border: 1px dashed #3b82f6; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-family: monospace; }
 
-        /* TOAST NOTIFICATION */
+        /* TOAST */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; border-left: 5px solid #3b82f6; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
+        .toast { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; border-left: 5px solid #3b82f6; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
         .toast.success { border-left-color: #22c55e; }
         .toast.error { border-left-color: #ef4444; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        /* FOOTER */
-        footer { background: #090d16; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; font-size: 14px; }
+        footer { background: #090d16; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; }
     </style>
 </head>
 <body>
@@ -103,7 +92,7 @@
                 <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
                 <li><a href="#"><i class="fa-solid fa-store"></i> Shop Acc</a></li>
                 <li><a href="javascript:void(0)" onclick="openDepositModal()"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
-                <li><a href="javascript:void(0)" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Mua</a></li>
+                <li><a href="javascript:void(0)" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> Đơn Cày Thuê</a></li>
             </ul>
             <div class="auth-btns" id="auth-buttons">
                 <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
@@ -114,120 +103,98 @@
 
     <!-- HERO BANNER -->
     <section class="hero">
-        <h1>KHO TÀI KHOẢN & DỊCH VỤ GAME VIP #1 VIỆT NAM</h1>
-        <p>Giao dịch tự động 24/7 - Blox Fruits, Grow a Garden, Xu TikTok, Cày thuê, Trái Vĩnh Viễn</p>
+        <h1>DỊCH VỤ CÀY THUÊ ROBLOX BLOX FRUITS UY TÍN</h1>
+        <p>Bàn giao tài khoản nhanh chóng - Bảo mật thông tin tuyệt đối 100%</p>
         <button class="btn btn-success" style="padding: 12px 30px; font-size: 16px;" onclick="openDepositModal()"><i class="fa-solid fa-bolt"></i> NẠP TIỀN NGAY</button>
     </section>
 
     <!-- MAIN CONTENT -->
     <div class="container">
-        <!-- BỘ LỌC TÌM KIẾM CẬP NHẬT -->
         <div class="filter-box">
             <select id="filterGame">
-                <option value="">-- tất cả Danh mục --</option>
-                <option value="Roblox">Roblox General</option>
-                <option value="Blox Fruits">Roblox Blox Fruits</option>
-                <option value="Grow a Garden">Grow a Garden</option>
-                <option value="Trái Vĩnh Viễn">Trái Vĩnh Viễn (Blox Fruits)</option>
-                <option value="Skin Trái - Trái Rương">Skin Trái / Trái Rương</option>
+                <option value="">-- Tất cả danh mục --</option>
                 <option value="Cày Thuê Roblox">Cày Thuê Blox Fruits</option>
+                <option value="Trái Vĩnh Viễn">Trái Vĩnh Viễn</option>
                 <option value="Xu TikTok">Xu TikTok</option>
-                <option value="Free Fire">Free Fire</option>
-                <option value="Liên Quân">Liên Quân Mobile</option>
-                <option value="Genshin">Genshin Impact</option>
             </select>
-            <select id="filterPrice">
-                <option value="">-- Mức giá --</option>
-                <option value="1">Dưới 200.000đ</option>
-                <option value="2">200.000đ - 500.000đ</option>
-                <option value="3">Trên 500.000đ</option>
-            </select>
-            <input type="text" id="searchInput" placeholder="Nhập tên vật phẩm, gói dịch vụ hoặc từ khóa...">
+            <input type="text" id="searchInput" placeholder="Nhập tên gói cày thuê...">
             <button class="btn btn-primary" onclick="renderShopAcc()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
         </div>
 
-        <!-- DANH SÁCH SẢN PHẨM / DỊCH VỤ -->
-        <h2 style="margin-bottom: 20px; border-left: 4px solid #3b82f6; padding-left: 10px;">SẢN PHẨM & DỊCH VỤ HOT</h2>
+        <h2 style="margin-bottom: 20px; border-left: 4px solid #3b82f6; padding-left: 10px;">DANH SÁCH GÓI CÀY THUÊ</h2>
         <div class="shop-grid" id="accGrid"></div>
     </div>
 
-    <!-- POPUP NẠP TIỀN -->
-    <div class="modal" id="depositModal">
+    <!-- POPUP ĐẶT ĐƠN CÀY THUÊ (DÀNH CHO KHÁCH HÀNG) -->
+    <div class="modal" id="orderServiceModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
-            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
+            <span class="close-btn" onclick="closeModal('orderServiceModal')">&times;</span>
+            <h3><i class="fa-solid fa-gamepad"></i> GỬI THÔNG TIN CÀY THUÊ</h3>
+            <p style="font-size:13px; color:#94a3b8; text-align:center; margin-bottom:15px;" id="serviceTitleDisplay"></p>
             
-            <div class="deposit-tabs">
-                <div class="tab-btn active" onclick="switchDepositTab('bank')"><i class="fa-solid fa-qrcode"></i> Ngân Hàng / QR</div>
-                <div class="tab-btn" onclick="switchDepositTab('card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào</div>
-            </div>
+            <form onsubmit="handleConfirmOrder(event)">
+                <input type="hidden" id="serviceId">
+                <input type="hidden" id="servicePrice">
+                <input type="hidden" id="serviceName">
 
-            <!-- Tab Ngân Hàng -->
-            <div class="tab-content active" id="tabBank">
-                <p style="font-size:13px; color:#94a3b8; margin-bottom:10px;">Nhập số tiền muốn nạp để hệ thống tạo mã QR tự động:</p>
-                <input type="number" id="depositAmount" class="form-input" style="margin-bottom:15px;" placeholder="Nhập số tiền (VD: 50000)" oninput="updateQrCode()">
-                
-                <div style="background:#0f172a; padding:15px; border-radius:8px; text-align:center; border:1px dashed #3b82f6;">
-                    <p style="font-size:14px; font-weight:bold; color:#22c55e;">Ngân Hàng: MBBank</p>
-                    <p style="font-size:14px;">Số TK: <strong>0333333333</strong> (Chủ TK: NGUYEN VAN A)</p>
-                    <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=NAPTIEN" style="margin: 10px 0; border-radius:8px; background:#fff; padding:5px;">
-                    <p style="font-size:12px; color:#ef4444;" id="depositMemo">Nội dung CK: <strong>NAP [Email Của Bạn]</strong></p>
+                <label style="font-size:12px; color:#94a3b8;">Tài khoản Roblox / Email:</label>
+                <input type="text" id="robloxUser" class="form-input" style="margin-bottom:10px;" required placeholder="Nhập tên đăng nhập Roblox...">
+
+                <label style="font-size:12px; color:#94a3b8;">Mật khẩu Roblox:</label>
+                <input type="password" id="robloxPass" class="form-input" style="margin-bottom:10px;" required placeholder="Nhập mật khẩu...">
+
+                <label style="font-size:12px; color:#ef4444; font-weight:bold;">Mã PIN / Pass 3 / Mã 2FA Khôi Phục (Nếu có):</label>
+                <input type="text" id="robloxPass3" class="form-input" style="margin-bottom:15px;" placeholder="Mã PIN 4 số hoặc mã dự phòng 2FA...">
+
+                <div style="background:#0f172a; padding:10px; border-radius:6px; margin-bottom:15px; font-size:12px; color:#94a3b8;">
+                    ⚠️ <b>Lưu ý:</b> Vui lòng tắt xác minh 2 bước qua Email/SĐT hoặc cung cấp Pass 3/Mã dự phòng để Admin vào cày nhanh nhất!
                 </div>
-                <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="confirmBankDeposit()">ĐÃ CHUYỂN KHOẢN</button>
-            </div>
 
-            <!-- Tab Thẻ Cào -->
-            <div class="tab-content" id="tabCard">
-                <label style="font-size:12px; color:#94a3b8;">Chọn Loại Thẻ:</label>
-                <select id="cardType" class="form-input" style="margin-bottom:10px;">
-                    <option value="Viettel">Viettel</option>
-                    <option value="Vinaphone">Vinaphone</option>
-                    <option value="Mobifone">Mobifone</option>
-                </select>
+                <button type="submit" class="btn btn-success" style="width:100%; padding:12px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
+            </form>
+        </div>
+    </div>
 
-                <label style="font-size:12px; color:#94a3b8;">Mệnh Giá:</label>
-                <select id="cardValue" class="form-input" style="margin-bottom:10px;">
-                    <option value="10000">10.000 đ</option>
-                    <option value="20000">20.000 đ</option>
-                    <option value="50000">50.000 đ</option>
-                    <option value="100000">100.000 đ</option>
-                    <option value="200000">200.000 đ</option>
-                    <option value="500000">500.000 đ</option>
-                </select>
+    <!-- POPUP ADMIN DASHBOARD (QUẢN LÝ ĐƠN CÀY THUÊ) -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content admin-modal-content">
+            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
+            <h3><i class="fa-solid fa-user-gear"></i> QUẢN LÝ ĐƠN CÀY THUÊ (ADMIN)</h3>
 
-                <input type="text" id="cardCode" class="form-input" style="margin-bottom:10px;" placeholder="Nhập Mã Thẻ (PIN)...">
-                <input type="text" id="cardSeri" class="form-input" style="margin-bottom:15px;" placeholder="Nhập Số Seri...">
-
-                <button class="btn btn-primary" style="width:100%;" onclick="submitCardDeposit()">GỬI THẺ CÀO</button>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Đơn</th>
+                            <th>Khách Hàng</th>
+                            <th>Gói Cày Thuê</th>
+                            <th>TK Roblox</th>
+                            <th>MK Roblox</th>
+                            <th>Pass 3 / PIN</th>
+                            <th>Trạng Thái</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminOrderTableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- POPUP AUTH -->
-    <div class="modal" id="authModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
-            <h3 id="modalTitle">ĐĂNG NHẬP</h3>
-            <input type="email" id="email" class="form-input" style="margin-bottom:15px;" placeholder="Nhập Email...">
-            <input type="password" id="password" class="form-input" style="margin-bottom:15px;" placeholder="Mật khẩu (tối thiểu 6 ký tự)...">
-            <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px;">XÁC NHẬN</button>
-        </div>
-    </div>
-
-    <!-- POPUP TÀI KHOẢN / DỊCH VỤ ĐÃ MUA -->
+    <!-- POPUP LỊCH SỬ ĐƠN HÀNG (CỦA KHÁCH) -->
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
-            <h3><i class="fa-solid fa-box-open"></i> LỊCH SỬ ĐƠN HÀNG & BÀN GIAO</h3>
+            <h3><i class="fa-solid fa-box-open"></i> LỊCH SỬ ĐƠN CÀY THUÊ CỦA BẠN</h3>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Mã Đơn Hàng</th>
-                            <th>Mã Item</th>
-                            <th>Tên Tiêu Đề</th>
-                            <th>Giá Mua</th>
-                            <th>Tài Khoản / Mã Quà / Thông Tin Bàn Giao</th>
+                            <th>Tên Gói</th>
+                            <th>Giá Tiền</th>
+                            <th>Tài Khoản Đã Gửi</th>
+                            <th>Trạng Thái Duyệt</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
@@ -236,94 +203,37 @@
         </div>
     </div>
 
-    <!-- POPUP ADMIN DASHBOARD -->
-    <div class="modal" id="adminModal">
-        <div class="modal-content admin-modal-content">
-            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
-            <h3><i class="fa-solid fa-user-gear"></i> QUẢN LÝ HỆ THỐNG SHOP GAME</h3>
-            
-            <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="openAddAccModal()"><i class="fa-solid fa-plus"></i> Thêm Sản Phẩm / Dịch Vụ Mới</button>
-                <button class="btn btn-success" onclick="openAdminDepositManagement()"><i class="fa-solid fa-money-check-dollar"></i> Cộng Tiền Cho Khách</button>
-            </div>
-
-            <h4 style="color: #94a3b8; margin-bottom: 10px;">Danh sách Sản phẩm / Dịch vụ hiện tại:</h4>
-            <div style="overflow-x: auto;">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Mã</th>
-                            <th>Tên Tiêu Đề</th>
-                            <th>Danh Mục</th>
-                            <th>Giá Bán</th>
-                            <th>Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminAccTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- POPUP CỘNG TIỀN (ADMIN) -->
-    <div class="modal" id="adminDepositModal">
+    <!-- POPUP AUTH & NẠP TIỀN -->
+    <div class="modal" id="authModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('adminDepositModal')">&times;</span>
-            <h3>CỘNG TIỀN CHO KHÁCH HÀNG</h3>
-            <label style="font-size:12px; color:#94a3b8;">Email Khách Hàng:</label>
-            <input type="email" id="adminTargetEmail" class="form-input" style="margin-bottom:10px;" placeholder="Nhập email khách...">
-            
-            <label style="font-size:12px; color:#94a3b8;">Số Tiền Cộng (VNĐ):</label>
-            <input type="number" id="adminAddAmount" class="form-input" style="margin-bottom:15px;" placeholder="Ví dụ: 100000">
-
-            <button class="btn btn-success" style="width:100%; padding:12px;" onclick="handleAddMoneyByAdmin()">XÁC NHẬN CỘNG TIỀN</button>
+            <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
+            <h3 id="modalTitle">ĐĂNG NHẬP</h3>
+            <input type="email" id="email" class="form-input" style="margin-bottom:15px;" placeholder="Nhập Email...">
+            <input type="password" id="password" class="form-input" style="margin-bottom:15px;" placeholder="Mật khẩu...">
+            <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px;">XÁC NHẬN</button>
         </div>
     </div>
 
-    <!-- POPUP THÊM/SỬA ACC & DỊCH VỤ (ADMIN) -->
-    <div class="modal" id="addAccModal">
+    <div class="modal" id="depositModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('addAccModal')">&times;</span>
-            <h3 id="accFormTitle">THÊM MỚI SẢN PHẨM / DỊCH VỤ</h3>
-            <form id="accForm" onsubmit="handleSaveAcc(event)">
-                <input type="hidden" id="accId">
-                <input type="text" id="accTitle" class="form-input" style="margin-bottom:10px;" required placeholder="Tiêu đề...">
-                <select id="accGameType" class="form-input" style="margin-bottom:10px;" required>
-                    <option value="Blox Fruits">Roblox Blox Fruits</option>
-                    <option value="Grow a Garden">Grow a Garden</option>
-                    <option value="Trái Vĩnh Viễn">Trái Vĩnh Viễn (Blox Fruits)</option>
-                    <option value="Skin Trái - Trái Rương">Skin Trái / Trái Rương</option>
-                    <option value="Cày Thuê Roblox">Cày Thuê Blox Fruits</option>
-                    <option value="Xu TikTok">Xu TikTok</option>
-                    <option value="Roblox">Roblox General</option>
-                    <option value="Free Fire">Free Fire</option>
-                    <option value="Liên Quân">Liên Quân Mobile</option>
-                    <option value="Genshin">Genshin Impact</option>
-                </select>
-                <input type="number" id="accPrice" class="form-input" style="margin-bottom:10px;" required placeholder="Giá bán...">
-                <input type="text" id="accImg" class="form-input" style="margin-bottom:10px;" required placeholder="Link hình ảnh...">
-                <input type="text" id="accTag" class="form-input" style="margin-bottom:10px;" placeholder="Tag (Ví dụ: VIP, GIAO NHANH, GIẢM 20%)...">
-                <input type="text" id="accAccountData" class="form-input" style="margin-bottom:15px;" placeholder="Nội dung bàn giao (TK|MK hoặc Mã Quà)...">
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">LƯU SẢN PHẨM</button>
-            </form>
+            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
+            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
+            <input type="number" id="depositAmount" class="form-input" style="margin-bottom:15px;" placeholder="Nhập số tiền nạp...">
+            <button class="btn btn-primary" style="width:100%;" onclick="confirmBankDeposit()">XÁC NHẬN NẠP TIỀN</button>
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer>
-        <p>&copy; 2026 SHOPGAME24H. All rights reserved. Hệ thống bán tài khoản game & Dịch vụ cày thuê uy tín.</p>
+        <p>&copy; 2026 SHOPGAME24H. All rights reserved.</p>
     </footer>
 
-    <!-- JAVASCRIPT XỬ LÝ -->
     <script>
         const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU'; 
-        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
 
-        // Toast Notification System
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -333,84 +243,37 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        // Tạo mã đơn hàng ngẫu nhiên (Ví dụ: DH-83921)
-        function generateOrderId() {
-            return 'DH-' + Math.floor(10000 + Math.random() * 90000);
-        }
-
-        // Sao chép tài khoản vào bộ nhớ tạm
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            showToast('Đã sao chép thông tin bàn giao!', 'success');
-        }
-
-        // Dữ liệu số dư & Lịch sử mua acc của khách hàng
+        // LƯU TRỮ ĐƠN CÀY THUÊ
+        let serviceOrders = JSON.parse(localStorage.getItem('shop_service_orders')) || [];
         let userBalances = JSON.parse(localStorage.getItem('shop_user_balances')) || {};
-        let userPurchases = JSON.parse(localStorage.getItem('shop_user_purchases')) || {};
 
-        function getUserBalance(email) {
-            return userBalances[email] || 0;
-        }
-
+        function getUserBalance(email) { return userBalances[email] || 0; }
         function updateUserBalance(email, amount) {
             userBalances[email] = (userBalances[email] || 0) + amount;
             localStorage.setItem('shop_user_balances', JSON.stringify(userBalances));
         }
 
-        // Danh sách mẫu đa dạng bao gồm các mục mới
-        let defaultAccs = [
-            { id: '2001', title: 'Trái Vĩnh Viễn Dragon (Rồng) - Blox Fruits', game: 'Trái Vĩnh Viễn', price: 450000, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', tag: 'HOT', credentials: 'CODE-DRAGON-PERM-992' },
-            { id: '2002', title: 'Gói 10,000 Xu TikTok - Nạp Trực Tiếp Qua ID', game: 'Xu TikTok', price: 180000, img: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=400', tag: 'CHIẾT KHẤU', credentials: 'Lên đơn tự động vào ID TikTok' },
-            { id: '2003', title: 'Grow a Garden - Nông Trại Trái Cây Đầy Đủ Vật Phẩm', game: 'Grow a Garden', price: 120000, img: 'https://images.unsplash.com/photo-1595855759920-86582396756a?q=80&w=400', tag: 'MỚI', credentials: 'garden_user01|pass_garden' },
-            { id: '2004', title: 'Rương Skin Trái Leopard + Dough VIP', game: 'Skin Trái - Trái Rương', price: 250000, img: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=400', tag: 'RƯƠNG VIP', credentials: 'Mã Quà: RUNG-SKIN-8839' },
-            { id: '2005', title: 'Cày Thuê Max Level 2550 + Mở Melee VIP', game: 'Cày Thuê Roblox', price: 90000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400', tag: 'SIÊU TỐC', credentials: 'Vui lòng liên hệ Admin để gửi Acc cày' },
-            { id: '1001', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%', credentials: 'ff_user01|pass_ff_vip1' }
+        // Danh sách các gói cày thuê
+        let serviceList = [
+            { id: 'CT01', title: 'Cày Thuê Max Level 2550 (Blox Fruits)', game: 'Cày Thuê Roblox', price: 50000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400', tag: 'SIÊU TỐC' },
+            { id: 'CT02', title: 'Cày Thuê Mở Sức Mạnh Tộc V4 Full Gear', game: 'Cày Thuê Roblox', price: 120000, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', tag: 'HOT' },
+            { id: 'CT03', title: 'Cày Thuê Lấy Kiếm Cổ Đại + Melee VIP', game: 'Cày Thuê Roblox', price: 80000, img: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=400', tag: 'GIÁ RẺ' }
         ];
-
-        let accList = JSON.parse(localStorage.getItem('shop_acc_list')) || defaultAccs;
-
-        function saveAccsToStorage() {
-            localStorage.setItem('shop_acc_list', JSON.stringify(accList));
-        }
 
         function renderShopAcc() {
             const accGrid = document.getElementById('accGrid');
-            const gameFilter = document.getElementById('filterGame').value;
-            const priceFilter = document.getElementById('filterPrice').value;
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
-
-            let filteredList = accList.filter(item => {
-                let matchGame = gameFilter === "" || item.game === gameFilter;
-                let matchSearch = item.title.toLowerCase().includes(searchVal) || item.id.includes(searchVal);
-                let matchPrice = true;
-
-                if (priceFilter === "1") matchPrice = item.price < 200000;
-                else if (priceFilter === "2") matchPrice = item.price >= 200000 && item.price <= 500000;
-                else if (priceFilter === "3") matchPrice = item.price > 500000;
-
-                return matchGame && matchSearch && matchPrice;
-            });
-
             accGrid.innerHTML = '';
-            if (filteredList.length === 0) {
-                accGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding:30px;">Không tìm thấy sản phẩm nào!</p>';
-                return;
-            }
-
-            filteredList.forEach(acc => {
+            
+            serviceList.forEach(item => {
                 accGrid.innerHTML += `
                     <div class="acc-card">
-                        ${acc.tag ? `<span class="acc-tag">${acc.tag}</span>` : ''}
-                        <img src="${acc.img}" class="acc-img" alt="${acc.title}">
+                        <span class="acc-tag">${item.tag}</span>
+                        <img src="${item.img}" class="acc-img">
                         <div class="acc-body">
-                            <div class="acc-title">#${acc.id} - ${acc.title}</div>
-                            <div class="acc-info">
-                                <span><i class="fa-solid fa-gamepad"></i> ${acc.game}</span>
-                                <span><i class="fa-solid fa-shield-halved"></i> Tự động 24/7</span>
-                            </div>
+                            <div class="acc-title">${item.title}</div>
                             <div class="acc-footer">
-                                <div class="price">${acc.price.toLocaleString('vi-VN')} đ</div>
-                                <button class="btn btn-primary" style="font-size: 12px;" onclick="buyAcc('${acc.id}', ${acc.price})">Mua Ngay</button>
+                                <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
+                                <button class="btn btn-primary" onclick="openOrderModal('${item.id}', '${item.title}', ${item.price})">Đặt Cày Thuê</button>
                             </div>
                         </div>
                     </div>
@@ -418,70 +281,121 @@
             });
         }
 
-        // XỬ LÝ MUA ACC / DỊCH VỤ
-        function buyAcc(id, price) {
+        // MỞ POPUP ĐẶT ĐƠN CÀY THUÊ
+        function openOrderModal(id, title, price) {
             if (!currentUser) {
-                showToast('Vui lòng đăng nhập để thực hiện giao dịch!', 'error');
-                openAuthModal('login');
-                return;
+                showToast('Vui lòng đăng nhập trước khi đặt đơn cày thuê!', 'error');
+                return openAuthModal('login');
+            }
+            document.getElementById('serviceId').value = id;
+            document.getElementById('serviceName').value = title;
+            document.getElementById('servicePrice').value = price;
+            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${title} - Giá: ${price.toLocaleString('vi-VN')} đ`;
+            openModal('orderServiceModal');
+        }
+
+        // KHÁCH XÁC NHẬN ĐẶT ĐƠN
+        function handleConfirmOrder(e) {
+            e.preventDefault();
+            const price = parseInt(document.getElementById('servicePrice').value);
+            const balance = getUserBalance(currentUser.email);
+
+            if (balance < price) {
+                showToast(`Số dư không đủ! Vui lòng nạp thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
+                closeModal('orderServiceModal');
+                return openDepositModal();
             }
 
-            let balance = getUserBalance(currentUser.email);
-            if (balance < price) {
-                showToast(`Số dư không đủ! Cần thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
-                openDepositModal();
+            // Trừ tiền
+            updateUserBalance(currentUser.email, -price);
+
+            // Lưu thông tin đơn cày thuê
+            const newOrder = {
+                orderId: 'CT-' + Math.floor(10000 + Math.random() * 90000),
+                userEmail: currentUser.email,
+                serviceName: document.getElementById('serviceName').value,
+                price: price,
+                robloxUser: document.getElementById('robloxUser').value.trim(),
+                robloxPass: document.getElementById('robloxPass').value.trim(),
+                robloxPass3: document.getElementById('robloxPass3').value.trim() || 'Không có',
+                status: 'pending', // pending: Đang chờ cày, completed: Đã duyệt / Đã cày xong
+                createdAt: new Date().toLocaleString('vi-VN')
+            };
+
+            serviceOrders.unshift(newOrder);
+            localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
+
+            closeModal('orderServiceModal');
+            checkUserStatus();
+            showToast('🎉 Đặt đơn thành công! Thông tin tài khoản đã được gửi đến Admin.', 'success');
+        }
+
+        // ADMIN XEM VÀ DUYỆT ĐƠN CÀY THUÊ
+        function openAdminDashboard() {
+            const tbody = document.getElementById('adminOrderTableBody');
+            tbody.innerHTML = '';
+
+            if (serviceOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8;">Chưa có đơn cày thuê nào!</td></tr>`;
             } else {
-                if (confirm(`Xác nhận thanh toán #${id} với giá ${price.toLocaleString('vi-VN')} đ?`)) {
-                    let purchasedAcc = accList.find(a => a.id === id);
-                    
-                    const orderId = generateOrderId();
-                    const orderItem = {
-                        orderId: orderId,
-                        ...purchasedAcc,
-                        purchasedAt: new Date().toLocaleString('vi-VN')
-                    };
+                serviceOrders.forEach((order, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${order.orderId}</b></td>
+                            <td>${order.userEmail}</td>
+                            <td>${order.serviceName}</td>
+                            <td><b style="color:#3b82f6;">${order.robloxUser}</b></td>
+                            <td><code style="background:#0f172a; padding:2px 5px; color:#f59e0b;">${order.robloxPass}</code></td>
+                            <td><code style="background:#0f172a; padding:2px 5px; color:#ef4444;">${order.robloxPass3}</code></td>
+                            <td>
+                                <span class="status-badge ${order.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                                    ${order.status === 'pending' ? '⏳ Đang Cày' : '✅ Đã Hoàn Thành'}
+                                </span>
+                            </td>
+                            <td>
+                                ${order.status === 'pending' ? 
+                                `<button class="btn btn-success" style="padding:4px 8px; font-size:11px;" onclick="approveOrder('${order.orderId}')"><i class="fa-solid fa-check"></i> Duyệt Cày Xong</button>` 
+                                : '<span style="color:#22c55e;">Đã Xong</span>'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            openModal('adminModal');
+        }
 
-                    updateUserBalance(currentUser.email, -price);
-                    
-                    if (!userPurchases[currentUser.email]) userPurchases[currentUser.email] = [];
-                    userPurchases[currentUser.email].push(orderItem);
-                    localStorage.setItem('shop_user_purchases', JSON.stringify(userPurchases));
-
-                    // Xóa item sau khi bán (hoặc giữ lại nếu là gói dịch vụ)
-                    accList = accList.filter(a => a.id !== id);
-                    saveAccsToStorage();
-                    renderShopAcc();
-                    checkUserStatus();
-                    
-                    showToast(`🎉 Mua thành công! Mã đơn: ${orderId}`, 'success');
-                }
+        // ADMIN BẤM NÚT DUYỆT ĐƠN CÀY XONG
+        function approveOrder(orderId) {
+            let order = serviceOrders.find(o => o.orderId === orderId);
+            if (order) {
+                order.status = 'completed';
+                localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
+                openAdminDashboard();
+                showToast(`Đã duyệt hoàn thành đơn cày thuê ${orderId}!`, 'success');
             }
         }
 
-        // POPUP LỊCH SỬ TÀI KHOẢN ĐÃ MUA
+        // KHÁCH XEM LỊCH SỬ CÀY THUÊ
         function openHistoryModal() {
-            if (!currentUser) {
-                showToast('Vui lòng đăng nhập để xem lịch sử!', 'error');
-                openAuthModal('login');
-                return;
-            }
+            if (!currentUser) return openAuthModal('login');
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
-            const history = userPurchases[currentUser.email] || [];
 
-            if (history.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có đơn hàng nào!</td></tr>`;
+            const myOrders = serviceOrders.filter(o => o.userEmail === currentUser.email);
+            if (myOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Bạn chưa đặt đơn cày thuê nào!</td></tr>`;
             } else {
-                history.slice().reverse().forEach(acc => {
+                myOrders.forEach(o => {
                     tbody.innerHTML += `
                         <tr>
-                            <td><span class="order-id-badge">${acc.orderId || 'DH-00000'}</span></td>
-                            <td>#${acc.id}</td>
-                            <td><strong>${acc.title}</strong></td>
-                            <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
+                            <td><b>${o.orderId}</b></td>
+                            <td>${o.serviceName}</td>
+                            <td style="color:#22c55e; font-weight:bold;">${o.price.toLocaleString('vi-VN')} đ</td>
+                            <td>Roblox: <b>${o.robloxUser}</b></td>
                             <td>
-                                <code style="background:#0f172a; padding:4px 8px; border-radius:4px; color:#f59e0b;">${acc.credentials || 'Tự động kích hoạt'}</code>
-                                <button class="btn btn-login" style="padding: 2px 6px; font-size:11px; margin-left:5px;" onclick="copyToClipboard('${acc.credentials}')"><i class="fa-solid fa-copy"></i> Copy</button>
+                                <span class="status-badge ${o.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                                    ${o.status === 'pending' ? '⏳ Admin đang cày...' : '🎉 Đã cày xong!'}
+                                </span>
                             </td>
                         </tr>
                     `;
@@ -490,109 +404,44 @@
             openModal('historyModal');
         }
 
-        // XỬ LÝ POPUP NẠP TIỀN
-        function openDepositModal() {
-            if (!currentUser) {
-                showToast('Vui lòng đăng nhập trước khi nạp tiền!', 'error');
-                openAuthModal('login');
-                return;
-            }
-            document.getElementById('depositMemo').innerHTML = `Nội dung CK: <strong>NAP ${currentUser.email.split('@')[0]}</strong>`;
-            openModal('depositModal');
-        }
-
-        function switchDepositTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            if (tab === 'bank') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('tabBank').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('tabCard').classList.add('active');
-            }
-        }
-
-        function updateQrCode() {
-            const amount = document.getElementById('depositAmount').value || 50000;
-            const userPrefix = currentUser ? currentUser.email.split('@')[0] : 'KHACH';
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MBBANK-0333333333-NAP_${userPrefix}_${amount}VND`;
-            document.getElementById('qrImage').src = qrUrl;
-        }
-
-        function confirmBankDeposit() {
-            showToast('Yêu cầu đã được gửi! Hệ thống sẽ duyệt tiền trong ít phút.', 'success');
-            closeModal('depositModal');
-        }
-
-        function submitCardDeposit() {
-            const code = document.getElementById('cardCode').value.trim();
-            const seri = document.getElementById('cardSeri').value.trim();
-            if (!code || !seri) return showToast('Vui lòng nhập đầy đủ Mã Thẻ và Số Seri!', 'error');
-            
-            showToast('Đã gửi thẻ thành công! Hệ thống đang gạch thẻ...', 'success');
-            document.getElementById('cardCode').value = '';
-            document.getElementById('cardSeri').value = '';
-            closeModal('depositModal');
-        }
-
-        // CỘNG TIỀN DÀNH CHO ADMIN
-        function openAdminDepositManagement() {
-            openModal('adminDepositModal');
-        }
-
-        function handleAddMoneyByAdmin() {
-            const targetEmail = document.getElementById('adminTargetEmail').value.trim();
-            const amount = parseInt(document.getElementById('adminAddAmount').value);
-
-            if (!targetEmail || isNaN(amount)) return showToast('Nhập chính xác Email và Số tiền!', 'error');
-
-            updateUserBalance(targetEmail, amount);
-            showToast(`Cộng ${amount.toLocaleString('vi-VN')} đ cho ${targetEmail} thành công!`, 'success');
-            closeModal('adminDepositModal');
-            checkUserStatus();
-        }
-
-        // AUTHENTICATION
+        // TIỆN ÍCH MODAL & AUTH
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        async function handleRegister() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            if(!email || !password) return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
-            
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) showToast(error.message, 'error');
-            else {
-                if (data.user && data.user.identities && data.user.identities.length === 0) {
-                    showToast('Email này đã được đăng ký!', 'error');
-                } else {
-                    showToast('Đăng ký thành công!', 'success');
-                    closeModal('authModal');
-                }
+        function openDepositModal() {
+            if (!currentUser) return openAuthModal('login');
+            openModal('depositModal');
+        }
+
+        function confirmBankDeposit() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            if (amount > 0 && currentUser) {
+                updateUserBalance(currentUser.email, amount);
+                showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ!`, 'success');
+                closeModal('depositModal');
+                checkUserStatus();
             }
         }
 
         async function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            if(!email || !password) return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) showToast(error.message, 'error');
-            else {
-                showToast('Đăng nhập thành công!', 'success');
-                closeModal('authModal');
-                checkUserStatus();
-            }
+            else { showToast('Đăng nhập thành công!', 'success'); closeModal('authModal'); checkUserStatus(); }
+        }
+
+        async function handleRegister() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const { error } = await supabaseClient.auth.signUp({ email, password });
+            if (error) showToast(error.message, 'error');
+            else { showToast('Đăng ký thành công!', 'success'); closeModal('authModal'); }
         }
 
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             currentUser = null;
-            showToast('Đã đăng xuất!', 'info');
             checkUserStatus();
         }
 
@@ -600,7 +449,7 @@
             const { data: { user } } = await supabaseClient.auth.getUser();
             currentUser = user;
             const authBtns = document.getElementById('auth-buttons');
-            
+
             if (user) {
                 const isAdmin = user.email.toLowerCase().includes('admin');
                 const balance = getUserBalance(user.email);
@@ -610,7 +459,7 @@
                         <i class="fa-solid fa-coins"></i> ${balance.toLocaleString('vi-VN')} đ
                     </span>
                     <button class="btn btn-success" onclick="openDepositModal()"><i class="fa-solid fa-plus"></i></button>
-                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Admin</button>` : ''}
+                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Duyệt Đơn Admin</button>` : ''}
                     <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
                 `;
             } else {
@@ -636,83 +485,6 @@
             openModal('authModal');
         }
 
-        // ADMIN FUNCTIONS
-        function openAdminDashboard() { renderAdminTable(); openModal('adminModal'); }
-        function renderAdminTable() {
-            const tableBody = document.getElementById('adminAccTableBody');
-            tableBody.innerHTML = '';
-            accList.forEach(acc => {
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>#${acc.id}</td>
-                        <td><strong>${acc.title}</strong></td>
-                        <td>${acc.game}</td>
-                        <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
-                        <td>
-                            <button class="btn btn-primary" style="padding:4px 8px; font-size:12px;" onclick="editAcc('${acc.id}')">Sửa</button>
-                            <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteAcc('${acc.id}')">Xóa</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function openAddAccModal() {
-            document.getElementById('accFormTitle').innerText = 'THÊM MỚI SẢN PHẨM / DỊCH VỤ';
-            document.getElementById('accForm').reset();
-            document.getElementById('accId').value = '';
-            openModal('addAccModal');
-        }
-
-        function handleSaveAcc(e) {
-            e.preventDefault();
-            const id = document.getElementById('accId').value;
-            const title = document.getElementById('accTitle').value;
-            const game = document.getElementById('accGameType').value;
-            const price = parseInt(document.getElementById('accPrice').value);
-            const img = document.getElementById('accImg').value;
-            const tag = document.getElementById('accTag').value;
-            const credentials = document.getElementById('accAccountData').value || 'Thanh toán thành công!';
-
-            if (id) {
-                let index = accList.findIndex(a => a.id === id);
-                if (index !== -1) accList[index] = { id, title, game, price, img, tag, credentials };
-            } else {
-                accList.unshift({ id: Date.now().toString().slice(-4), title, game, price, img, tag, credentials });
-            }
-
-            saveAccsToStorage();
-            renderShopAcc();
-            renderAdminTable();
-            closeModal('addAccModal');
-            showToast('Lưu thành công!', 'success');
-        }
-
-        function editAcc(id) {
-            const acc = accList.find(a => a.id === id);
-            if (!acc) return;
-            document.getElementById('accFormTitle').innerText = 'CHỈNH SỬA SẢN PHẨM / DỊCH VỤ';
-            document.getElementById('accId').value = acc.id;
-            document.getElementById('accTitle').value = acc.title;
-            document.getElementById('accGameType').value = acc.game;
-            document.getElementById('accPrice').value = acc.price;
-            document.getElementById('accImg').value = acc.img;
-            document.getElementById('accTag').value = acc.tag || '';
-            document.getElementById('accAccountData').value = acc.credentials || '';
-            openModal('addAccModal');
-        }
-
-        function deleteAcc(id) {
-            if (confirm('Xóa mục này khỏi danh sách?')) {
-                accList = accList.filter(a => a.id !== id);
-                saveAccsToStorage();
-                renderShopAcc();
-                renderAdminTable();
-                showToast('Đã xóa thành công!', 'info');
-            }
-        }
-
-        // Khởi tạo
         renderShopAcc();
         checkUserStatus();
     </script>
