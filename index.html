@@ -319,6 +319,16 @@
         let authMode = 'login';
         let selectedAccToBuy = null;
 
+        // Tự động khởi chạy khi load trang
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data } = await supabaseClient.auth.getSession();
+            if (data && data.session) {
+                currentUser = data.session.user;
+            }
+            await checkUserStatus();
+            await renderShopItems();
+        });
+
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -330,6 +340,46 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        /* --- AUTHENTICATION --- */
+        function openAuthModal(mode) {
+            authMode = mode;
+            document.getElementById('modalTitle').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ TÀI KHOẢN';
+            document.getElementById('modalSubmitBtn').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ';
+            openModal('authModal');
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (authMode === 'register') {
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) return showToast(error.message, 'error');
+                
+                // Khởi tạo số dư 0đ cho tài khoản mới trong table user_balances
+                await supabaseClient.from('user_balances').insert([{ email: email, balance: 0 }]);
+                
+                showToast('Đăng ký thành công! Đang đăng nhập...', 'success');
+                currentUser = data.user;
+            } else {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) return showToast('Email hoặc mật khẩu không chính xác!', 'error');
+                currentUser = data.user;
+                showToast('Đăng nhập thành công!', 'success');
+            }
+            
+            closeModal('authModal');
+            checkUserStatus();
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            checkUserStatus();
+            showToast('Đã đăng xuất!', 'success');
+        }
 
         /* --- XỬ LÝ SỐ DƯ TỪ SUPABASE --- */
         async function getUserBalance(email) {
@@ -364,19 +414,20 @@
 
         /* --- XỬ LÝ SẢN PHẨM & CÀY THUÊ TỪ DB --- */
         async function renderShopItems() {
+            // Render Acc Games
             const { data: accGameList } = await supabaseClient.from('acc_games').select('*');
             const accGameGrid = document.getElementById('accGameGrid');
             accGameGrid.innerHTML = '';
-            if (accGameList) {
+            if (accGameList && accGameList.length > 0) {
                 accGameList.forEach(item => {
                     accGameGrid.innerHTML += `
                         <div class="acc-card">
-                            <span class="acc-tag">${item.tag}</span>
-                            <img src="${item.img}" class="acc-img">
+                            <span class="acc-tag">${item.tag || 'HOT'}</span>
+                            <img src="${item.img || 'https://i.ibb.co/4wcD0R4k/image.jpg'}" class="acc-img">
                             <div class="acc-body">
                                 <div class="acc-title">${item.title}</div>
                                 <div class="acc-footer">
-                                    <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
+                                    <div class="price">${Number(item.price).toLocaleString('vi-VN')} đ</div>
                                     ${item.is_sold ? `<button class="btn btn-login" disabled>ĐÃ BÁN</button>` : 
                                     `<button class="btn btn-success" onclick="openConfirmBuyModal('${item.id}')"><i class="fa-solid fa-cart-shopping"></i> Mua Ngay</button>`}
                                 </div>
@@ -384,27 +435,32 @@
                         </div>
                     `;
                 });
+            } else {
+                accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào được đăng bán.</p>';
             }
 
+            // Render Services
             const { data: serviceList } = await supabaseClient.from('services').select('*');
             const serviceGrid = document.getElementById('serviceGrid');
             serviceGrid.innerHTML = '';
-            if (serviceList) {
+            if (serviceList && serviceList.length > 0) {
                 serviceList.forEach(item => {
                     serviceGrid.innerHTML += `
                         <div class="acc-card">
-                            <span class="acc-tag" style="background:#f59e0b;">${item.tag}</span>
-                            <img src="${item.img}" class="acc-img">
+                            <span class="acc-tag" style="background:#f59e0b;">${item.tag || 'CÀY THUÊ'}</span>
+                            <img src="${item.img || 'https://i.ibb.co/4wcD0R4k/image.jpg'}" class="acc-img">
                             <div class="acc-body">
                                 <div class="acc-title">${item.title}</div>
                                 <div class="acc-footer">
-                                    <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
+                                    <div class="price">${Number(item.price).toLocaleString('vi-VN')} đ</div>
                                     <button class="btn btn-primary" onclick="openOrderServiceModal('${item.id}')"><i class="fa-solid fa-bolt"></i> Thuê Ngay</button>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
+            } else {
+                serviceGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có gói cày thuê nào.</p>';
             }
         }
 
@@ -415,13 +471,13 @@
             if (!acc) return;
             selectedAccToBuy = acc;
             document.getElementById('confirmAccTitle').innerText = acc.title;
-            document.getElementById('confirmAccPrice').innerText = acc.price.toLocaleString('vi-VN') + ' đ';
+            document.getElementById('confirmAccPrice').innerText = Number(acc.price).toLocaleString('vi-VN') + ' đ';
             document.getElementById('btnConfirmBuyProceed').onclick = processBuyAcc;
             openModal('confirmBuyModal');
         }
 
         async function processBuyAcc() {
-            if (!selectedAccToBuy) return;
+            if (!selectedAccToBuy || !currentUser) return;
             const balance = await getUserBalance(currentUser.email);
             if (balance < selectedAccToBuy.price) {
                 closeModal('confirmBuyModal');
@@ -431,14 +487,14 @@
             await updateUserBalance(currentUser.email, -selectedAccToBuy.price);
             await supabaseClient.from('acc_games').update({ is_sold: true, buyer_email: currentUser.email }).eq('id', selectedAccToBuy.id);
 
-            document.getElementById('resUser').innerText = selectedAccToBuy.user;
-            document.getElementById('resPass').innerText = selectedAccToBuy.pass;
-            document.getElementById('resPass3').innerText = selectedAccToBuy.pass3 || 'Không có';
+            document.getElementById('resUser').innerText = selectedAccToBuy.user || selectedAccToBuy.acc_user || 'N/A';
+            document.getElementById('resPass').innerText = selectedAccToBuy.pass || selectedAccToBuy.acc_pass || 'N/A';
+            document.getElementById('resPass3').innerText = selectedAccToBuy.pass3 || selectedAccToBuy.acc_pass3 || 'Không có';
 
             closeModal('confirmBuyModal');
             openModal('buyAccResultModal');
-            checkUserStatus();
-            renderShopItems();
+            await checkUserStatus();
+            await renderShopItems();
         }
 
         async function openOrderServiceModal(serviceId) {
@@ -449,12 +505,13 @@
             document.getElementById('serviceId').value = service.id;
             document.getElementById('servicePrice').value = service.price;
             document.getElementById('serviceName').value = service.title;
-            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${service.title} - Giá: ${service.price.toLocaleString('vi-VN')} đ`;
+            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${service.title} - Giá: ${Number(service.price).toLocaleString('vi-VN')} đ`;
             openModal('orderServiceModal');
         }
 
         async function handleConfirmOrder(e) {
             e.preventDefault();
+            if (!currentUser) return;
             const price = parseInt(document.getElementById('servicePrice').value);
             const balance = await getUserBalance(currentUser.email);
 
@@ -466,7 +523,6 @@
             await updateUserBalance(currentUser.email, -price);
 
             await supabaseClient.from('service_orders').insert([{
-                id: 'DH' + Date.now().toString().slice(-6),
                 user_email: currentUser.email,
                 service_name: document.getElementById('serviceName').value,
                 price: price,
@@ -478,11 +534,72 @@
 
             showToast('Đặt đơn thành công! Admin sẽ duyệt đơn cho bạn.', 'success');
             closeModal('orderServiceModal');
-            checkUserStatus();
+            await checkUserStatus();
             e.target.reset();
         }
 
-        /* --- ADMIN DASHBOARD --- */
+        /* --- LỊCH SỬ GIAO DỊCH KHÁCH HÀNG --- */
+        async function openHistoryModal() {
+            if (!currentUser) return openAuthModal('login');
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Đang tải...</td></tr>';
+            openModal('historyModal');
+
+            let rowsHTML = '';
+            
+            // Lấy danh sách Acc đã mua
+            const { data: boughtAccs } = await supabaseClient.from('acc_games').select('*').eq('buyer_email', currentUser.email);
+            if (boughtAccs) {
+                boughtAccs.forEach(item => {
+                    rowsHTML += `
+                        <tr>
+                            <td><b style="color:#22c55e;">Mua Acc</b></td>
+                            <td>${item.title}</td>
+                            <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
+                            <td>TK: <b>${item.user || item.acc_user}</b> | MK: <b>${item.pass || item.acc_pass}</b> | 2FA: <b>${item.pass3 || 'Không'}</b></td>
+                            <td><span class="status-badge status-completed">Thành công</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Lấy danh sách Đơn Cày Thuê
+            const { data: orders } = await supabaseClient.from('service_orders').select('*').eq('user_email', currentUser.email);
+            if (orders) {
+                orders.forEach(item => {
+                    rowsHTML += `
+                        <tr>
+                            <td><b style="color:#f59e0b;">Cày Thuê</b></td>
+                            <td>${item.service_name}</td>
+                            <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
+                            <td>TK Game: <b>${item.roblox_user}</b></td>
+                            <td><span class="status-badge ${item.status === 'Đang xử lý' ? 'status-pending' : 'status-completed'}">${item.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            tbody.innerHTML = rowsHTML || '<tr><td colspan="5" style="text-align:center;">Bạn chưa có lịch sử giao dịch nào!</td></tr>';
+        }
+
+        /* --- NẠP TIỀN VÀO TÀI KHOẢN --- */
+        function openDepositModal() {
+            if (!currentUser) return openAuthModal('login');
+            openModal('depositModal');
+        }
+
+        async function confirmBankDeposit() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            if (!amount || amount <= 0) return showToast('Vui lòng nhập số tiền hợp lệ!', 'error');
+
+            await updateUserBalance(currentUser.email, amount);
+            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ vào tài khoản!`, 'success');
+            closeModal('depositModal');
+            document.getElementById('depositAmount').value = '';
+            await checkUserStatus();
+        }
+
+        /* --- ADMIN DASHBOARD & CONTROLS --- */
         async function openAdminDashboard() {
             if (!currentUser || currentUser.email !== 'admin@gmail.com') return showToast('Bạn không có quyền Admin!', 'error');
             await renderAdminData();
@@ -499,7 +616,7 @@
         }
 
         async function renderAdminData() {
-            // Render Đơn cày thuê
+            // 1. Render Đơn cày thuê
             const { data: orders } = await supabaseClient.from('service_orders').select('*');
             const orderTbody = document.getElementById('adminOrderTableBody');
             orderTbody.innerHTML = '';
@@ -520,90 +637,83 @@
                         </tr>
                     `;
                 });
+            } else {
+                orderTbody.innerHTML = '<tr><td colspan="8">Chưa có đơn cày thuê nào.</td></tr>';
             }
 
-            // Render Gói Cày
+            // 2. Render Gói Cày
             const { data: services } = await supabaseClient.from('services').select('*');
             const serviceTbody = document.getElementById('adminServiceTableBody');
             serviceTbody.innerHTML = '';
-            if (services) {
+            if (services && services.length > 0) {
                 services.forEach(item => {
                     serviceTbody.innerHTML += `
                         <tr>
                             <td>${item.id}</td>
                             <td>${item.title}</td>
-                            <td>${item.price.toLocaleString('vi-VN')} đ</td>
+                            <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
                             <td>${item.tag}</td>
                             <td><button class="btn btn-danger" onclick="deleteService('${item.id}')">Xóa</button></td>
                         </tr>
                     `;
                 });
+            } else {
+                serviceTbody.innerHTML = '<tr><td colspan="5">Chưa có gói cày thuê nào.</td></tr>';
             }
 
-            // Render Acc Game
+            // 3. Render Acc Game Bán
             const { data: accs } = await supabaseClient.from('acc_games').select('*');
             const accTbody = document.getElementById('adminAccSellTableBody');
             accTbody.innerHTML = '';
-            if (accs) {
+            if (accs && accs.length > 0) {
                 accs.forEach(item => {
                     accTbody.innerHTML += `
                         <tr>
                             <td>${item.id}</td>
                             <td>${item.title}</td>
-                            <td>${item.user}</td>
-                            <td>${item.pass}</td>
-                            <td>${item.pass3 || 'Không'}</td>
-                            <td>${item.price.toLocaleString('vi-VN')} đ</td>
-                            <td>${item.is_sold ? '<span style="color:#ef4444">Đã bán</span>' : '<span style="color:#22c55e">Chưa bán</span>'}</td>
+                            <td>${item.user || item.acc_user}</td>
+                            <td>${item.pass || item.acc_pass}</td>
+                            <td>${item.pass3 || item.acc_pass3 || 'Không'}</td>
+                            <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
+                            <td>${item.is_sold ? '<b style="color:#ef4444;">Đã Bán</b>' : '<b style="color:#22c55e;">Còn Hàng</b>'}</td>
                             <td><button class="btn btn-danger" onclick="deleteAccGame('${item.id}')">Xóa</button></td>
                         </tr>
                     `;
                 });
+            } else {
+                accTbody.innerHTML = '<tr><td colspan="8">Chưa có Acc Game nào.</td></tr>';
             }
 
-            // Render Số Dư Khách
+            // 4. Render Số Dư Khách Hàng
             const { data: balances } = await supabaseClient.from('user_balances').select('*');
-            const balTbody = document.getElementById('adminUserBalanceTableBody');
-            balTbody.innerHTML = '';
-            if (balances) {
+            const userBalTbody = document.getElementById('adminUserBalanceTableBody');
+            userBalTbody.innerHTML = '';
+            if (balances && balances.length > 0) {
                 balances.forEach(item => {
-                    balTbody.innerHTML += `
+                    userBalTbody.innerHTML += `
                         <tr>
-                            <td>${item.email}</td>
-                            <td><b>${item.balance.toLocaleString('vi-VN')} đ</b></td>
+                            <td><b>${item.email}</b></td>
+                            <td style="color:#22c55e; font-weight:bold;">${Number(item.balance).toLocaleString('vi-VN')} đ</td>
                             <td>
-                                <button class="btn btn-success" onclick="quickAddBalance('${item.email}', 50000)">+50k</button>
-                                <button class="btn btn-warning" onclick="quickAddBalance('${item.email}', 100000)">+100k</button>
+                                <button class="btn btn-success" onclick="quickAdjustBalance('${item.email}', 50000)">+50k</button>
+                                <button class="btn btn-primary" onclick="quickAdjustBalance('${item.email}', 100000)">+100k</button>
                             </td>
                         </tr>
                     `;
                 });
+            } else {
+                userBalTbody.innerHTML = '<tr><td colspan="3">Chưa có thông tin số dư khách hàng nào.</td></tr>';
             }
         }
 
-        /* --- CÁC THAO TÁC ADMIN --- */
+        // Action Admin Duyệt đơn cày
         async function completeOrder(orderId) {
             await supabaseClient.from('service_orders').update({ status: 'Hoàn thành' }).eq('id', orderId);
-            showToast('Đã duyệt đơn cày thuê thành công!', 'success');
-            renderAdminData();
+            showToast('Đã duyệt đơn cày thuê!', 'success');
+            await renderAdminData();
         }
 
-        async function deleteService(serviceId) {
-            if (!confirm('Bạn có chắc muốn xóa gói cày thuê này?')) return;
-            await supabaseClient.from('services').delete().eq('id', serviceId);
-            showToast('Đã xóa gói cày thuê!', 'success');
-            renderAdminData();
-            renderShopItems();
-        }
-
-        async function deleteAccGame(accId) {
-            if (!confirm('Bạn có chắc muốn xóa Acc Game này?')) return;
-            await supabaseClient.from('acc_games').delete().eq('id', accId);
-            showToast('Đã xóa Acc Game!', 'success');
-            renderAdminData();
-            renderShopItems();
-        }
-
+        // Action Admin Thêm/Xóa Gói Cày
         async function handleAddNewService(e) {
             e.preventDefault();
             const title = document.getElementById('newServiceTitle').value;
@@ -611,168 +721,64 @@
             const tag = document.getElementById('newServiceTag').value;
             const img = document.getElementById('newServiceImg').value;
 
-            const { data, error } = await supabaseClient.from('services').insert([{
-                id: 'DV' + Date.now(),
-                title: title,
-                price: price,
-                tag: tag,
-                img: img
-            }]);
-
-            if (error) {
-                showToast('Lỗi Supabase: ' + error.message, 'error');
-                console.error('Lỗi khi thêm gói:', error);
-            } else {
-                showToast('Đã thêm gói cày thuê mới thành công!', 'success');
-                e.target.reset();
-                await renderAdminData();
-                await renderShopItems();
-            }
+            await supabaseClient.from('services').insert([{ title, price, tag, img }]);
+            showToast('Đã thêm gói cày mới thành công!', 'success');
+            e.target.reset();
+            await renderAdminData();
+            await renderShopItems();
         }
 
+        async function deleteService(id) {
+            await supabaseClient.from('services').delete().eq('id', id);
+            showToast('Đã xóa gói cày!', 'success');
+            await renderAdminData();
+            await renderShopItems();
+        }
+
+        // Action Admin Thêm/Xóa Acc Game
         async function handleAddNewAccGame(e) {
             e.preventDefault();
-            const { error } = await supabaseClient.from('acc_games').insert([{
-                id: 'ACC' + Date.now(),
-                title: document.getElementById('newAccTitle').value,
-                price: parseInt(document.getElementById('newAccPrice').value),
-                tag: document.getElementById('newAccTag').value,
-                user: document.getElementById('newAccUser').value,
-                pass: document.getElementById('newAccPass').value,
-                pass3: document.getElementById('newAccPass3').value,
-                img: document.getElementById('newAccImg').value,
-                is_sold: false
-            }]);
+            const title = document.getElementById('newAccTitle').value;
+            const price = parseInt(document.getElementById('newAccPrice').value);
+            const tag = document.getElementById('newAccTag').value;
+            const user = document.getElementById('newAccUser').value;
+            const pass = document.getElementById('newAccPass').value;
+            const pass3 = document.getElementById('newAccPass3').value;
+            const img = document.getElementById('newAccImg').value;
 
-            if (error) {
-                showToast('Lỗi: ' + error.message, 'error');
-            } else {
-                showToast('Đã đăng bán Acc Game mới!', 'success');
-                e.target.reset();
-                renderAdminData();
-                renderShopItems();
-            }
+            await supabaseClient.from('acc_games').insert([{ title, price, tag, user, pass, pass3, img, is_sold: false }]);
+            showToast('Đã đăng bán Acc Game mới thành công!', 'success');
+            e.target.reset();
+            await renderAdminData();
+            await renderShopItems();
         }
 
+        async function deleteAccGame(id) {
+            await supabaseClient.from('acc_games').delete().eq('id', id);
+            showToast('Đã xóa Acc Game!', 'success');
+            await renderAdminData();
+            await renderShopItems();
+        }
+
+        // Action Admin Điều Chỉnh Số Dư Khách Hàng
         async function handleAdminAdjustBalance(e) {
             e.preventDefault();
-            const email = document.getElementById('targetUserEmail').value;
+            const email = document.getElementById('targetUserEmail').value.trim();
             const amount = parseInt(document.getElementById('adjustAmount').value);
+
             await updateUserBalance(email, amount);
-            showToast(`Đã thay đổi số dư cho ${email}`, 'success');
+            showToast(`Đã điều chỉnh số dư của ${email}`, 'success');
             e.target.reset();
-            renderAdminData();
-            if (currentUser && currentUser.email === email) checkUserStatus();
+            await renderAdminData();
+            await checkUserStatus();
         }
 
-        async function quickAddBalance(email, amount) {
+        async function quickAdjustBalance(email, amount) {
             await updateUserBalance(email, amount);
             showToast(`Đã cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}`, 'success');
-            renderAdminData();
-            if (currentUser && currentUser.email === email) checkUserStatus();
+            await renderAdminData();
+            await checkUserStatus();
         }
-
-        /* --- LỊCH SỬ GIAO DỊCH KHÁCH HÀNG --- */
-        async function openHistoryModal() {
-            if (!currentUser) return openAuthModal('login');
-            
-            const historyTbody = document.getElementById('historyTableBody');
-            historyTbody.innerHTML = '';
-
-            // Lấy acc đã mua
-            const { data: boughtAccs } = await supabaseClient.from('acc_games').select('*').eq('buyer_email', currentUser.email);
-            if (boughtAccs) {
-                boughtAccs.forEach(item => {
-                    historyTbody.innerHTML += `
-                        <tr>
-                            <td><span class="status-badge status-completed">Mua Acc</span></td>
-                            <td>${item.title}</td>
-                            <td>${item.price.toLocaleString('vi-VN')} đ</td>
-                            <td>TK: <b>${item.user}</b> | MK: <b>${item.pass}</b> | 2FA: <b>${item.pass3 || 'Không'}</b></td>
-                            <td>Thành công</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            // Lấy đơn cày thuê đã đặt
-            const { data: orders } = await supabaseClient.from('service_orders').select('*').eq('user_email', currentUser.email);
-            if (orders) {
-                orders.forEach(item => {
-                    historyTbody.innerHTML += `
-                        <tr>
-                            <td><span class="status-badge status-pending">Cày Thuê</span></td>
-                            <td>${item.service_name}</td>
-                            <td>${item.price.toLocaleString('vi-VN')} đ</td>
-                            <td>TK Roblox: <b>${item.roblox_user}</b></td>
-                            <td><span class="status-badge ${item.status === 'Đang xử lý' ? 'status-pending' : 'status-completed'}">${item.status}</span></td>
-                        </tr>
-                    `;
-                });
-            }
-
-            openModal('historyModal');
-        }
-
-        /* --- ĐĂNG NHẬP / ĐĂNG KÝ / ĐĂNG XUẤT --- */
-        function openAuthModal(mode) {
-            authMode = mode;
-            document.getElementById('modalTitle').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ TÀI KHOẢN';
-            document.getElementById('modalSubmitBtn').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'TẠO TÀI KHOẢN';
-            openModal('authModal');
-        }
-
-        async function handleAuthSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (authMode === 'register') {
-                const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                if (error) return showToast(error.message, 'error');
-                showToast('Đăng ký thành công! Hãy đăng nhập ngay.', 'success');
-                openAuthModal('login');
-            } else {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) return showToast('Email hoặc Mật khẩu không đúng!', 'error');
-                currentUser = data.user;
-                showToast('Đăng nhập thành công!', 'success');
-                closeModal('authModal');
-                checkUserStatus();
-            }
-        }
-
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            currentUser = null;
-            checkUserStatus();
-            showToast('Đã đăng xuất tài khoản!', 'info');
-        }
-
-        function openDepositModal() {
-            if (!currentUser) return openAuthModal('login');
-            openModal('depositModal');
-        }
-
-        async function confirmBankDeposit() {
-            const amount = parseInt(document.getElementById('depositAmount').value);
-            if (!amount || amount < 10000) return showToast('Số tiền nạp tối thiểu là 10.000đ', 'error');
-
-            await updateUserBalance(currentUser.email, amount);
-            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ vào tài khoản!`, 'success');
-            closeModal('depositModal');
-            checkUserStatus();
-        }
-
-        // Tự động khởi chạy khi tải trang
-        window.onload = async () => {
-            const { data } = await supabaseClient.auth.getUser();
-            if (data && data.user) {
-                currentUser = data.user;
-            }
-            checkUserStatus();
-            renderShopItems();
-        };
     </script>
 </body>
 </html>
