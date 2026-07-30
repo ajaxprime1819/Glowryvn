@@ -13,9 +13,15 @@
 
         /* HEADER & NAVIGATION */
         header { background: #1e293b; border-bottom: 2px solid #3b82f6; position: sticky; top: 0; z-index: 100; }
-        .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
-        .logo { font-size: 24px; font-weight: 800; color: #3b82f6; display: flex; align-items: center; gap: 10px; }
+        .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .logo { font-size: 22px; font-weight: 800; color: #3b82f6; display: flex; align-items: center; gap: 10px; }
         .logo span { color: #ef4444; }
+
+        /* HEADER CENTER CONTENT (ĐĂNG NHẬP / ĐĂNG KÝ HOẶC THÔNG TIN TÀI KHOẢN) */
+        .header-center { display: flex; align-items: center; gap: 12px; }
+        .user-header-info { display: flex; align-items: center; gap: 15px; font-size: 14px; background: #0f172a; padding: 6px 16px; border-radius: 20px; border: 1px solid #334155; }
+        .user-header-info .email { color: #cbd5e1; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .user-header-info .balance { color: #22c55e; font-weight: bold; display: flex; align-items: center; gap: 6px; }
 
         /* HAMBURGER MENU DROPDOWN */
         .menu-container { position: relative; }
@@ -24,7 +30,7 @@
             color: #fff;
             border: 1px solid #475569;
             padding: 10px 14px;
-            font-size: 20px;
+            font-size: 18px;
             border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
@@ -40,7 +46,7 @@
             right: 0;
             top: 50px;
             background: #1e293b;
-            min-width: 250px;
+            min-width: 220px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             border: 1px solid #334155;
             border-radius: 10px;
@@ -49,15 +55,6 @@
             flex-direction: column;
         }
         .dropdown-menu.show { display: flex; }
-
-        .user-info-box {
-            padding: 12px 15px;
-            background: #0f172a;
-            border-bottom: 1px solid #334155;
-            font-size: 13px;
-        }
-        .user-info-box .email { color: #94a3b8; font-weight: 600; word-break: break-all; margin-bottom: 4px; }
-        .user-info-box .balance { color: #22c55e; font-weight: bold; font-size: 15px; }
 
         .dropdown-item {
             padding: 12px 18px;
@@ -144,13 +141,19 @@
     <!-- HEADER -->
     <header>
         <div class="navbar">
+            <!-- LOGO TRÊN CÙNG BÊN TRÁI -->
             <a href="#" class="logo"><i class="fa-solid fa-store"></i> TẠP HÓA <span>CHÍ NGHĨA</span></a>
             
-            <!-- MENU 3 GẠCH DROPDOWN -->
+            <!-- ĐĂNG NHẬP / ĐĂNG KÝỞ GIỮA THANH TRÊN CÙNG -->
+            <div class="header-center" id="headerCenterAuth">
+                <!-- Sẽ tự động thay đổi bằng JS: Hiện nút Đăng Nhập / Đăng Ký hoặc Thông tin User -->
+            </div>
+
+            <!-- MENU 3 GẠCH BÊN PHẢI -->
             <div class="menu-container">
                 <button class="hamburger-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-bars"></i></button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <!-- Nội dung sẽ tự động render theo trạng thái Đăng nhập / Chưa đăng nhập -->
+                    <!-- Danh sách các nút chức năng -->
                 </div>
             </div>
         </div>
@@ -347,23 +350,30 @@
             dropdown.classList.remove('show');
         }
 
-        // Đóng dropdown khi click bên ngoài
         window.onclick = function(e) {
             if (!e.target.matches('.hamburger-btn') && !e.target.matches('.hamburger-btn *')) {
                 closeMenu();
             }
         };
 
-        /* RENDER NỘI DUNG MENU 3 GẠCH DỰA TRÊN TRẠNG THÁI ĐĂNG NHẬP */
+        /* CẬP NHẬT HEADER BÊN TRÊN CÙNG (Ở GIỮA & TRONG MENU 3 GẠCH) */
         function checkUserStatus() {
-            const menu = document.getElementById('dropdownMenu');
+            const headerCenter = document.getElementById('headerCenterAuth');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+
             if (currentUser) {
                 const balance = getUserBalance(currentUser.email);
-                menu.innerHTML = `
-                    <div class="user-info-box">
-                        <div class="email"><i class="fa-solid fa-user-circle"></i> ${currentUser.email}</div>
-                        <div class="balance"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</div>
+                
+                // Hiển thị ở giữa header
+                headerCenter.innerHTML = `
+                    <div class="user-header-info">
+                        <span class="email"><i class="fa-solid fa-user-circle"></i> ${currentUser.email}</span>
+                        <span class="balance"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
                     </div>
+                `;
+
+                // Menu 3 gạch
+                dropdownMenu.innerHTML = `
                     <a href="#" class="dropdown-item" onclick="closeMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
                     <button class="dropdown-item" onclick="openDepositModal()"><i class="fa-solid fa-wallet" style="color:#22c55e;"></i> Nạp tiền</button>
                     <button class="dropdown-item" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left" style="color:#3b82f6;"></i> Lịch Sử Đơn</button>
@@ -372,7 +382,14 @@
                     <button class="dropdown-item" onclick="logout()" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
             } else {
-                menu.innerHTML = `
+                // Hiển thị Đăng nhập / Đăng ký ở GIỮA thanh trên cùng
+                headerCenter.innerHTML = `
+                    <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
+                    <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+                `;
+
+                // Menu 3 gạch khi chưa đăng nhập
+                dropdownMenu.innerHTML = `
                     <a href="#" class="dropdown-item" onclick="closeMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
                     <button class="dropdown-item" onclick="openAuthModal('login')"><i class="fa-solid fa-right-to-bracket" style="color:#3b82f6;"></i> Đăng nhập</button>
                     <button class="dropdown-item" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus" style="color:#22c55e;"></i> Đăng ký</button>
