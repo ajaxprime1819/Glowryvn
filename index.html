@@ -119,11 +119,9 @@
 
     <!-- MAIN CONTENT -->
     <div class="container">
-        <!-- SECTION 1: BÁN ACC GAME -->
         <h2 class="section-title"><i class="fa-solid fa-store" style="color:#ef4444;"></i> DANH SÁCH ACC GAME ĐANG BÁN</h2>
         <div class="shop-grid" id="accGameGrid"></div>
 
-        <!-- SECTION 2: GÓI CÀY THUÊ -->
         <h2 class="section-title"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> DANH SÁCH GÓI CÀY THUÊ</h2>
         <div class="shop-grid" id="serviceGrid"></div>
     </div>
@@ -268,12 +266,12 @@
             <!-- TAB 3: THÊM VÀ QUẢN LÝ ACC GAME BÁN -->
             <div id="tab-acc-sell" class="tab-content">
                 <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #22c55e;">
-                    <h4 style="color:#22c55e; margin-bottom:10px;"><i class="fa-solid fa-cart-plus"></i> Thêm Acc Game Mới Cần Bán (Nhập TK, MK, Pass 3)</h4>
+                    <h4 style="color:#22c55e; margin-bottom:10px;"><i class="fa-solid fa-cart-plus"></i> Thêm Acc Game Mới Cần Bán</h4>
                     <form onsubmit="handleAddNewAccGame(event)">
                         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-                            <input type="text" id="newAccTitle" class="form-input" placeholder="Tiêu đề Acc (vd: Acc Blox Fruits Mochi V2)..." required>
+                            <input type="text" id="newAccTitle" class="form-input" placeholder="Tiêu đề Acc..." required>
                             <input type="number" id="newAccPrice" class="form-input" placeholder="Giá tiền (VNĐ)..." required>
-                            <input type="text" id="newAccTag" class="form-input" placeholder="Tag (vd: ACC VIP, NICK NGON)..." required>
+                            <input type="text" id="newAccTag" class="form-input" placeholder="Tag (ACC VIP, NICK NGON)..." required>
                             <input type="text" id="newAccUser" class="form-input" placeholder="Tài Khoản Game (User)..." required>
                             <input type="text" id="newAccPass" class="form-input" placeholder="Mật Khẩu Game (Pass)..." required>
                             <input type="text" id="newAccPass3" class="form-input" placeholder="Pass 3 / Mã 2FA (Nếu có)...">
@@ -387,6 +385,7 @@
 
         let currentUser = null;
         let authMode = 'login';
+        let selectedAccToBuy = null;
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
@@ -426,7 +425,6 @@
             const authContainer = document.getElementById('auth-buttons');
             if (currentUser) {
                 const balance = getUserBalance(currentUser.email);
-                /* Nút 'Đổi MK' được thêm dưới dạng btn-login kích thước nhỏ gọn */
                 authContainer.innerHTML = `
                     <span style="font-size:14px; font-weight:bold; color:#22c55e;"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
                     <span style="font-size:14px; color:#94a3b8;"><i class="fa-solid fa-user"></i> ${currentUser.email}</span>
@@ -442,27 +440,333 @@
             }
         }
 
+        /* --- MỞ VÀ CẬP NHẬT BẢNG QUẢN TRỊ ADMIN --- */
+        function openAdminDashboard() {
+            if (!currentUser || currentUser.email !== 'admin@gmail.com') {
+                return showToast('Bạn không có quyền truy cập trang Admin!', 'error');
+            }
+            renderAdminData();
+            openModal('adminModal');
+        }
+
+        function switchAdminTab(evt, tabId) {
+            let tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            let tabBtns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function renderAdminData() {
+            // Render Tab 1: Duyệt Đơn
+            const orderTbody = document.getElementById('adminOrderTableBody');
+            orderTbody.innerHTML = '';
+            if (serviceOrders.length === 0) {
+                orderTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#64748b;">Chưa có đơn cày thuê nào.</td></tr>`;
+            } else {
+                serviceOrders.forEach((item, index) => {
+                    orderTbody.innerHTML += `
+                        <tr>
+                            <td>#${item.id}</td>
+                            <td>${item.userEmail}</td>
+                            <td>${item.serviceName}</td>
+                            <td><b>${item.robloxUser}</b></td>
+                            <td>${item.robloxPass}</td>
+                            <td>${item.robloxPass3 || 'Không'}</td>
+                            <td><span class="status-badge ${item.status === 'Đang xử lý' ? 'status-pending' : 'status-completed'}">${item.status}</span></td>
+                            <td>
+                                ${item.status === 'Đang xử lý' ? 
+                                `<button class="btn btn-success" onclick="completeOrder(${index})"><i class="fa-solid fa-check"></i> Hoàn thành</button>` : 
+                                '<span style="color:#22c55e;">Xong</span>'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Render Tab 2: Quản lý gói cày
+            const serviceTbody = document.getElementById('adminServiceTableBody');
+            serviceTbody.innerHTML = '';
+            serviceList.forEach((item, index) => {
+                serviceTbody.innerHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.title}</td>
+                        <td>${item.price.toLocaleString('vi-VN')} đ</td>
+                        <td><span class="acc-tag" style="position:static;">${item.tag}</span></td>
+                        <td><button class="btn btn-danger" onclick="deleteService(${index})"><i class="fa-solid fa-trash"></i> Xóa</button></td>
+                    </tr>
+                `;
+            });
+
+            // Render Tab 3: Bán Acc
+            const accTbody = document.getElementById('adminAccSellTableBody');
+            accTbody.innerHTML = '';
+            accGameList.forEach((item, index) => {
+                accTbody.innerHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.title}</td>
+                        <td><b>${item.user}</b></td>
+                        <td>${item.pass}</td>
+                        <td>${item.pass3 || 'Không'}</td>
+                        <td>${item.price.toLocaleString('vi-VN')} đ</td>
+                        <td>${item.isSold ? '<span style="color:#ef4444; font-weight:bold;">Đã Bán</span>' : '<span style="color:#22c55e; font-weight:bold;">Còn Hàng</span>'}</td>
+                        <td><button class="btn btn-danger" onclick="deleteAccGame(${index})"><i class="fa-solid fa-trash"></i> Xóa</button></td>
+                    </tr>
+                `;
+            });
+
+            // Render Tab 4: Số dư
+            const balanceTbody = document.getElementById('adminUserBalanceTableBody');
+            balanceTbody.innerHTML = '';
+            const emails = Object.keys(userBalances);
+            if (emails.length === 0) {
+                balanceTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#64748b;">Chưa có tài khoản khách nào.</td></tr>`;
+            } else {
+                emails.forEach(email => {
+                    balanceTbody.innerHTML += `
+                        <tr>
+                            <td>${email}</td>
+                            <td><b style="color:#22c55e;">${userBalances[email].toLocaleString('vi-VN')} đ</b></td>
+                            <td>
+                                <button class="btn btn-success" onclick="quickAddBalance('${email}', 50000)">+50k</button>
+                                <button class="btn btn-success" onclick="quickAddBalance('${email}', 100000)">+100k</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        /* --- XỬ LÝ QUẢN TRỊ ADMIN --- */
+        function completeOrder(index) {
+            serviceOrders[index].status = 'Hoàn thành';
+            localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
+            showToast('Đã cập nhật đơn hàng thành Hoàn Thành!', 'success');
+            renderAdminData();
+        }
+
+        function handleAddNewService(e) {
+            e.preventDefault();
+            const newObj = {
+                id: 'CT' + Date.now().toString().slice(-4),
+                title: document.getElementById('newServiceTitle').value,
+                price: parseInt(document.getElementById('newServicePrice').value),
+                tag: document.getElementById('newServiceTag').value,
+                img: document.getElementById('newServiceImg').value
+            };
+            serviceList.push(newObj);
+            localStorage.setItem('shop_service_list', JSON.stringify(serviceList));
+            showToast('Đã thêm gói cày mới thành công!', 'success');
+            renderShopItems();
+            renderAdminData();
+            e.target.reset();
+        }
+
+        function deleteService(index) {
+            if (confirm('Bạn có chắc muốn xóa gói cày này?')) {
+                serviceList.splice(index, 1);
+                localStorage.setItem('shop_service_list', JSON.stringify(serviceList));
+                renderShopItems();
+                renderAdminData();
+                showToast('Đã xóa gói cày thuê!', 'info');
+            }
+        }
+
+        function handleAddNewAccGame(e) {
+            e.preventDefault();
+            const newAcc = {
+                id: 'ACC' + Date.now().toString().slice(-4),
+                title: document.getElementById('newAccTitle').value,
+                price: parseInt(document.getElementById('newAccPrice').value),
+                tag: document.getElementById('newAccTag').value,
+                user: document.getElementById('newAccUser').value,
+                pass: document.getElementById('newAccPass').value,
+                pass3: document.getElementById('newAccPass3').value,
+                img: document.getElementById('newAccImg').value,
+                isSold: false
+            };
+            accGameList.push(newAcc);
+            localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
+            showToast('Đã đăng bán tài khoản mới thành công!', 'success');
+            renderShopItems();
+            renderAdminData();
+            e.target.reset();
+        }
+
+        function deleteAccGame(index) {
+            if (confirm('Bạn có chắc muốn xóa tài khoản game này?')) {
+                accGameList.splice(index, 1);
+                localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
+                renderShopItems();
+                renderAdminData();
+                showToast('Đã xóa tài khoản!', 'info');
+            }
+        }
+
+        function handleAdminAdjustBalance(e) {
+            e.preventDefault();
+            const email = document.getElementById('targetUserEmail').value.trim();
+            const amount = parseInt(document.getElementById('adjustAmount').value);
+            updateUserBalance(email, amount);
+            showToast(`Cập nhật số dư cho ${email} thành công!`, 'success');
+            renderAdminData();
+            checkUserStatus();
+            e.target.reset();
+        }
+
+        function quickAddBalance(email, amount) {
+            updateUserBalance(email, amount);
+            showToast(`Đã cộng ${amount.toLocaleString('vi-VN')} đ cho ${email}`, 'success');
+            renderAdminData();
+            checkUserStatus();
+        }
+
+        /* --- XỬ LÝ MUA ACC & ĐẶT ĐƠN --- */
+        function openConfirmBuyModal(accId) {
+            if (!currentUser) return openAuthModal('login');
+            const acc = accGameList.find(a => a.id === accId);
+            if (!acc) return;
+            selectedAccToBuy = acc;
+            document.getElementById('confirmAccTitle').innerText = acc.title;
+            document.getElementById('confirmAccPrice').innerText = acc.price.toLocaleString('vi-VN') + ' đ';
+            document.getElementById('btnConfirmBuyProceed').onclick = processBuyAcc;
+            openModal('confirmBuyModal');
+        }
+
+        function processBuyAcc() {
+            if (!selectedAccToBuy) return;
+            const balance = getUserBalance(currentUser.email);
+            if (balance < selectedAccToBuy.price) {
+                closeModal('confirmBuyModal');
+                return showToast('Số dư tài khoản không đủ, vui lòng nạp thêm!', 'error');
+            }
+
+            updateUserBalance(currentUser.email, -selectedAccToBuy.price);
+            selectedAccToBuy.isSold = true;
+            localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
+
+            purchasedAccs.push({
+                userEmail: currentUser.email,
+                accTitle: selectedAccToBuy.title,
+                price: selectedAccToBuy.price,
+                accUser: selectedAccToBuy.user,
+                accPass: selectedAccToBuy.pass,
+                accPass3: selectedAccToBuy.pass3,
+                date: new Date().toLocaleString('vi-VN')
+            });
+            localStorage.setItem('shop_purchased_accs', JSON.stringify(purchasedAccs));
+
+            document.getElementById('resUser').innerText = selectedAccToBuy.user;
+            document.getElementById('resPass').innerText = selectedAccToBuy.pass;
+            document.getElementById('resPass3').innerText = selectedAccToBuy.pass3 || 'Không có';
+
+            closeModal('confirmBuyModal');
+            openModal('buyAccResultModal');
+            checkUserStatus();
+            renderShopItems();
+        }
+
+        function openOrderServiceModal(serviceId) {
+            if (!currentUser) return openAuthModal('login');
+            const service = serviceList.find(s => s.id === serviceId);
+            if (!service) return;
+
+            document.getElementById('serviceId').value = service.id;
+            document.getElementById('servicePrice').value = service.price;
+            document.getElementById('serviceName').value = service.title;
+            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${service.title} - Giá: ${service.price.toLocaleString('vi-VN')} đ`;
+            openModal('orderServiceModal');
+        }
+
+        function handleConfirmOrder(e) {
+            e.preventDefault();
+            const price = parseInt(document.getElementById('servicePrice').value);
+            const balance = getUserBalance(currentUser.email);
+
+            if (balance < price) {
+                closeModal('orderServiceModal');
+                return showToast('Số dư không đủ để thanh toán gói này!', 'error');
+            }
+
+            updateUserBalance(currentUser.email, -price);
+
+            const newOrder = {
+                id: Date.now().toString().slice(-6),
+                userEmail: currentUser.email,
+                serviceName: document.getElementById('serviceName').value,
+                price: price,
+                robloxUser: document.getElementById('robloxUser').value,
+                robloxPass: document.getElementById('robloxPass').value,
+                robloxPass3: document.getElementById('robloxPass3').value,
+                status: 'Đang xử lý',
+                date: new Date().toLocaleString('vi-VN')
+            };
+
+            serviceOrders.push(newOrder);
+            localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
+
+            showToast('Đặt đơn cày thuê thành công! Admin sẽ xử lý sớm nhất.', 'success');
+            closeModal('orderServiceModal');
+            checkUserStatus();
+            e.target.reset();
+        }
+
+        function openHistoryModal() {
+            if (!currentUser) return openAuthModal('login');
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            const myAccs = purchasedAccs.filter(a => a.userEmail === currentUser.email);
+            const myOrders = serviceOrders.filter(o => o.userEmail === currentUser.email);
+
+            if (myAccs.length === 0 && myOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">Bạn chưa mua tài khoản hoặc đặt đơn cày thuê nào.</td></tr>`;
+            } else {
+                myAccs.forEach(acc => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span style="color:#22c55e; font-weight:bold;">Mua Acc Game</span></td>
+                            <td>${acc.accTitle}</td>
+                            <td>${acc.price.toLocaleString('vi-VN')} đ</td>
+                            <td>TK: <b>${acc.accUser}</b> | MK: <b>${acc.accPass}</b> | 2FA: <b>${acc.accPass3 || 'Không'}</b></td>
+                            <td><span class="status-badge status-completed">Thành công</span></td>
+                        </tr>
+                    `;
+                });
+
+                myOrders.forEach(order => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span style="color:#3b82f6; font-weight:bold;">Cày Thuê</span></td>
+                            <td>${order.serviceName}</td>
+                            <td>${order.price.toLocaleString('vi-VN')} đ</td>
+                            <td>TK Roblox gửi: <b>${order.robloxUser}</b></td>
+                            <td><span class="status-badge ${order.status === 'Đang xử lý' ? 'status-pending' : 'status-completed'}">${order.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            openModal('historyModal');
+        }
+
         /* --- XỬ LÝ ĐỔI MẬT KHẨU SUPABASE --- */
         async function handleChangePassword() {
             const newPassword = document.getElementById('newPassword').value.trim();
             const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
 
-            if (!newPassword || !confirmNewPassword) {
-                return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
-            }
+            if (!newPassword || !confirmNewPassword) return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
+            if (newPassword !== confirmNewPassword) return showToast('Mật khẩu xác nhận không trùng khớp!', 'error');
+            if (newPassword.length < 6) return showToast('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
 
-            if (newPassword !== confirmNewPassword) {
-                return showToast('Mật khẩu xác nhận không trùng khớp!', 'error');
-            }
-
-            if (newPassword.length < 6) {
-                return showToast('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
-            }
-
-            // Gọi API Supabase để đổi mật khẩu cho tài khoản hiện tại
-            const { data, error } = await supabaseClient.auth.updateUser({
-                password: newPassword
-            });
+            const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
 
             if (error) {
                 showToast('Lỗi đổi mật khẩu: ' + error.message, 'error');
