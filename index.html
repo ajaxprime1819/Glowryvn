@@ -126,7 +126,18 @@
         <div class="shop-grid" id="serviceGrid"></div>
     </div>
 
-    <!-- MODAL XÁC NHẬN MUA ACC (ĐỒNG Ý / HỦY BỎ) -->
+    <!-- POPUP ĐỔI MẬT KHẨU (THÊM MỚI) -->
+    <div class="modal" id="changePasswordModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('changePasswordModal')">&times;</span>
+            <h3 style="color:#f59e0b;"><i class="fa-solid fa-key"></i> ĐỔI MẬT KHẨU TÀI KHOẢN</h3>
+            <input type="password" id="newPassword" class="form-input" placeholder="Mật khẩu mới (ít nhất 6 ký tự)...">
+            <input type="password" id="confirmNewPassword" class="form-input" placeholder="Xác nhận mật khẩu mới...">
+            <button class="btn btn-warning" style="width:100%; padding:12px; margin-top:10px;" onclick="handleChangePassword()"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐỔI MẬT KHẨU</button>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN MUA ACC -->
     <div class="modal" id="confirmBuyModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('confirmBuyModal')">&times;</span>
@@ -416,6 +427,7 @@
                 authContainer.innerHTML = `
                     <span style="font-size:14px; font-weight:bold; color:#22c55e;"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
                     <span style="font-size:14px; color:#94a3b8;"><i class="fa-solid fa-user"></i> ${currentUser.email}</span>
+                    <button class="btn btn-warning" onclick="openModal('changePasswordModal')"><i class="fa-solid fa-key"></i> Đổi MK</button>
                     ${currentUser.email === 'admin@gmail.com' ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-gear"></i> Admin</button>` : ''}
                     <button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
@@ -424,6 +436,38 @@
                     <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
                     <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
                 `;
+            }
+        }
+
+        /* --- XỬ LÝ ĐỔI MẬT KHẨU SUPABASE --- */
+        async function handleChangePassword() {
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
+
+            if (!newPassword || !confirmNewPassword) {
+                return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
+            }
+
+            if (newPassword !== confirmNewPassword) {
+                return showToast('Mật khẩu xác nhận không trùng khớp!', 'error');
+            }
+
+            if (newPassword.length < 6) {
+                return showToast('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
+            }
+
+            // Gọi API Supabase để đổi mật khẩu cho tài khoản hiện tại
+            const { data, error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) {
+                showToast('Lỗi đổi mật khẩu: ' + error.message, 'error');
+            } else {
+                showToast('Đổi mật khẩu thành công!', 'success');
+                closeModal('changePasswordModal');
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmNewPassword').value = '';
             }
         }
 
@@ -483,7 +527,7 @@
                             <div class="acc-title">${item.title}</div>
                             <div class="acc-footer">
                                 <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
-                                ${item.isSold ? `<button class="btn btn-login" disabled>ĐÃ BÁN</button>` : 
+                                ${item.isSold ? `<button class="btn btn-login" disabled>ĐÃ BẢN</button>` : 
                                 `<button class="btn btn-success" onclick="openConfirmBuyModal('${item.id}')"><i class="fa-solid fa-cart-shopping"></i> Mua Ngay</button>`}
                             </div>
                         </div>
@@ -557,277 +601,10 @@
             document.getElementById('resUser').innerText = acc.user;
             document.getElementById('resPass').innerText = acc.pass;
             document.getElementById('resPass3').innerText = acc.pass3 || 'Không có';
-            
-            checkUserStatus();
-            renderShopItems();
             openModal('buyAccResultModal');
-        }
-
-        function openOrderModal(id, title, price) {
-            if (!currentUser) return openAuthModal('login');
-            document.getElementById('serviceId').value = id;
-            document.getElementById('serviceName').value = title;
-            document.getElementById('servicePrice').value = price;
-            document.getElementById('serviceTitleDisplay').innerText = `${title} - Giá: ${price.toLocaleString('vi-VN')} đ`;
-            openModal('orderServiceModal');
-        }
-
-        function handleConfirmOrder(e) {
-            e.preventDefault();
-            const price = parseInt(document.getElementById('servicePrice').value);
-            const balance = getUserBalance(currentUser.email);
-
-            if (balance < price) {
-                return showToast('Số dư tài khoản không đủ để đặt gói cày thuê này!', 'error');
-            }
-
-            const newOrder = {
-                orderId: 'DH' + Math.floor(1000 + Math.random() * 9000),
-                userEmail: currentUser.email,
-                serviceName: document.getElementById('serviceName').value,
-                price: price,
-                robloxUser: document.getElementById('robloxUser').value.trim(),
-                robloxPass: document.getElementById('robloxPass').value.trim(),
-                robloxPass3: document.getElementById('robloxPass3').value.trim() || 'Không có',
-                status: 'pending',
-                date: new Date().toLocaleString('vi-VN')
-            };
-
-            updateUserBalance(currentUser.email, -price);
-            serviceOrders.unshift(newOrder);
-            localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
 
             checkUserStatus();
-            closeModal('orderServiceModal');
-            showToast('Đặt đơn cày thuê thành công! Admin sẽ tiến hành xử lý.', 'success');
-            e.target.reset();
-        }
-
-        function switchAdminTab(e, tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            e.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        function openAdminDashboard() {
-            renderAdminOrdersTable();
-            renderAdminServicesTable();
-            renderAdminAccSellTable();
-            renderAdminUserBalanceTable();
-            openModal('adminModal');
-        }
-
-        function renderAdminOrdersTable() {
-            const tbody = document.getElementById('adminOrderTableBody');
-            tbody.innerHTML = '';
-            if (serviceOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8;">Chưa có đơn cày thuê nào!</td></tr>`;
-            } else {
-                serviceOrders.forEach((order) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><b>${order.orderId}</b></td>
-                            <td>${order.userEmail}</td>
-                            <td>${order.serviceName}</td>
-                            <td><b style="color:#3b82f6;">${order.robloxUser}</b></td>
-                            <td><code style="color:#f59e0b;">${order.robloxPass}</code></td>
-                            <td><code style="color:#ef4444;">${order.robloxPass3}</code></td>
-                            <td><span class="status-badge ${order.status === 'pending' ? 'status-pending' : 'status-completed'}">${order.status === 'pending' ? '⏳ Đang Cày' : '✅ Đã Hoàn Thành'}</span></td>
-                            <td>
-                                ${order.status === 'pending' ? `<button class="btn btn-success" style="padding:3px 6px; font-size:11px;" onclick="approveOrder('${order.orderId}')">Duyệt Cày Xong</button>` : '<span style="color:#22c55e;">Đã Xong</span>'}
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        }
-
-        function approveOrder(orderId) {
-            const order = serviceOrders.find(o => o.orderId === orderId);
-            if (order) {
-                order.status = 'completed';
-                localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
-                renderAdminOrdersTable();
-                showToast(`Đã duyệt hoàn thành đơn hàng ${orderId}!`, 'success');
-            }
-        }
-
-        function renderAdminServicesTable() {
-            const tbody = document.getElementById('adminServiceTableBody');
-            tbody.innerHTML = '';
-            serviceList.forEach((service) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${service.id}</b></td>
-                        <td>${service.title}</td>
-                        <td style="color:#22c55e; font-weight:bold;">${service.price.toLocaleString('vi-VN')} đ</td>
-                        <td><span class="acc-tag" style="position:static;">${service.tag}</span></td>
-                        <td><button class="btn btn-danger" style="padding:3px 6px; font-size:11px;" onclick="deleteService('${service.id}')">Xóa</button></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function deleteService(id) {
-            serviceList = serviceList.filter(s => s.id !== id);
-            localStorage.setItem('shop_service_list', JSON.stringify(serviceList));
-            renderAdminServicesTable();
             renderShopItems();
-            showToast('Đã xóa gói cày thuê!', 'info');
-        }
-
-        function renderAdminAccSellTable() {
-            const tbody = document.getElementById('adminAccSellTableBody');
-            tbody.innerHTML = '';
-            accGameList.forEach((acc) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${acc.id}</b></td>
-                        <td>${acc.title}</td>
-                        <td><b style="color:#3b82f6;">${acc.user}</b></td>
-                        <td><code style="color:#f59e0b;">${acc.pass}</code></td>
-                        <td><code style="color:#ef4444;">${acc.pass3 || 'Không có'}</code></td>
-                        <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
-                        <td>${acc.isSold ? `<span class="status-badge status-completed">Đã Bán</span>` : `<span class="status-badge status-pending">Đang Bán</span>`}</td>
-                        <td><button class="btn btn-danger" style="padding:3px 6px; font-size:11px;" onclick="deleteAccGame('${acc.id}')">Xóa</button></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function deleteAccGame(id) {
-            accGameList = accGameList.filter(a => a.id !== id);
-            localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
-            renderAdminAccSellTable();
-            renderShopItems();
-            showToast('Đã xóa Acc khỏi danh sách!', 'info');
-        }
-
-        function renderAdminUserBalanceTable() {
-            const tbody = document.getElementById('adminUserBalanceTableBody');
-            tbody.innerHTML = '';
-            const emails = Object.keys(userBalances);
-
-            if (emails.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#94a3b8;">Chưa có tài khoản khách nào!</td></tr>`;
-            } else {
-                emails.forEach((email) => {
-                    const balance = userBalances[email];
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><b>${email}</b></td>
-                            <td style="color:#22c55e; font-weight:bold;">${balance.toLocaleString('vi-VN')} đ</td>
-                            <td>
-                                <button class="btn btn-success" style="padding:3px 6px; font-size:11px;" onclick="quickAddBalance('${email}', 50000)">+50k</button>
-                                <button class="btn btn-success" style="padding:3px 6px; font-size:11px;" onclick="quickAddBalance('${email}', 100000)">+100k</button>
-                                <button class="btn btn-danger" style="padding:3px 6px; font-size:11px;" onclick="quickAddBalance('${email}', -50000)">-50k</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        }
-
-        function handleAdminAdjustBalance(e) {
-            e.preventDefault();
-            const email = document.getElementById('targetUserEmail').value.trim();
-            const amount = parseInt(document.getElementById('adjustAmount').value);
-
-            if (!email || isNaN(amount)) return showToast('Vui lòng điền đủ Email và Số tiền hợp lệ!', 'error');
-
-            updateUserBalance(email, amount);
-            showToast(`Đã ${amount >= 0 ? 'cộng' : 'trừ'} ${Math.abs(amount).toLocaleString('vi-VN')} đ cho tài khoản ${email}`, 'success');
-            
-            renderAdminUserBalanceTable();
-            checkUserStatus();
-            e.target.reset();
-        }
-
-        function quickAddBalance(email, amount) {
-            updateUserBalance(email, amount);
-            showToast(`Đã ${amount >= 0 ? 'cộng' : 'trừ'} ${Math.abs(amount).toLocaleString('vi-VN')} đ cho ${email}`, 'success');
-            renderAdminUserBalanceTable();
-            checkUserStatus();
-        }
-
-        function handleAddNewService(e) {
-            e.preventDefault();
-            const newService = {
-                id: 'CT' + Math.floor(10 + Math.random() * 90),
-                title: document.getElementById('newServiceTitle').value.trim(),
-                price: parseInt(document.getElementById('newServicePrice').value),
-                tag: document.getElementById('newServiceTag').value.trim(),
-                img: document.getElementById('newServiceImg').value.trim()
-            };
-            serviceList.unshift(newService);
-            localStorage.setItem('shop_service_list', JSON.stringify(serviceList));
-            e.target.reset();
-            renderAdminServicesTable();
-            renderShopItems();
-            showToast('Thêm gói cày thuê mới thành công!', 'success');
-        }
-
-        function handleAddNewAccGame(e) {
-            e.preventDefault();
-            const newAcc = {
-                id: 'ACC' + Math.floor(10 + Math.random() * 90),
-                title: document.getElementById('newAccTitle').value.trim(),
-                price: parseInt(document.getElementById('newAccPrice').value),
-                tag: document.getElementById('newAccTag').value.trim(),
-                user: document.getElementById('newAccUser').value.trim(),
-                pass: document.getElementById('newAccPass').value.trim(),
-                pass3: document.getElementById('newAccPass3').value.trim(),
-                img: document.getElementById('newAccImg').value.trim(),
-                isSold: false
-            };
-            accGameList.unshift(newAcc);
-            localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
-            e.target.reset();
-            renderAdminAccSellTable();
-            renderShopItems();
-            showToast('Đăng bán Acc game thành công!', 'success');
-        }
-
-        function openHistoryModal() {
-            if (!currentUser) return openAuthModal('login');
-
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-
-            const userOrders = serviceOrders.filter(o => o.userEmail === currentUser.email);
-            const userAccs = purchasedAccs.filter(a => a.userEmail === currentUser.email);
-
-            if (userOrders.length === 0 && userAccs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Bạn chưa thực hiện giao dịch nào!</td></tr>`;
-            } else {
-                userAccs.forEach(acc => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><span style="color:#22c55e; font-weight:bold;">Mua Acc Game</span></td>
-                            <td>${acc.accTitle}</td>
-                            <td style="color:#22c55e;">${acc.price.toLocaleString('vi-VN')} đ</td>
-                            <td>TK: <b>${acc.gameUser}</b> | MK: <b>${acc.gamePass}</b> | 2FA: <b>${acc.gamePass3}</b></td>
-                            <td><span class="status-badge status-completed">✅ Đã Bàn Giao</span></td>
-                        </tr>
-                    `;
-                });
-
-                userOrders.forEach(order => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><span style="color:#f59e0b; font-weight:bold;">Cày Thuê</span></td>
-                            <td>${order.serviceName}</td>
-                            <td style="color:#22c55e;">${order.price.toLocaleString('vi-VN')} đ</td>
-                            <td>TK Roblox: <b>${order.robloxUser}</b></td>
-                            <td><span class="status-badge ${order.status === 'pending' ? 'status-pending' : 'status-completed'}">${order.status === 'pending' ? '⏳ Đang Cày' : '✅ Đã Hoàn Thành'}</span></td>
-                        </tr>
-                    `;
-                });
-            }
-
-            openModal('historyModal');
         }
 
         // Khởi chạy khi load trang
