@@ -100,7 +100,7 @@
 
     <section class="hero">
         <h1>DỊCH VỤ ROBLOX ĐỀU CÓ Ở ĐÂY</h1>
-        <p>Bàn giao tài khoản tự động - Mua acc nhận tài khoản mật khẩu ngay!</p>
+        <p>Bàn giao tài khoản tự động - Nạp tiền nhanh chóng!</p>
         <button class="btn btn-success" style="padding: 12px 30px; font-size: 16px;" onclick="openDepositModal()"><i class="fa-solid fa-bolt"></i> NẠP TIỀN NGAY</button>
     </section>
 
@@ -108,11 +108,11 @@
         <h2 class="section-title"><i class="fa-solid fa-store" style="color:#ef4444;"></i> DANH SÁCH ACC GAME ĐANG BÁN</h2>
         <div class="shop-grid" id="accGameGrid"></div>
 
-        <h2 class="section-title"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> DANH SÁCH DỊCH VỤ CÀY THUÊ</h2>
+        <h2 class="section-title"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> DỊCH VỤ CÀY THUÊ HOT</h2>
         <div class="shop-grid" id="serviceGrid"></div>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODAL MUA ACC -->
     <div class="modal" id="confirmBuyModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('confirmBuyModal')">&times;</span>
@@ -144,21 +144,46 @@
         </div>
     </div>
 
-    <!-- MODAL ĐẶT CÀY THUÊ CÓ MENU LỰA CHỌN -->
+    <!-- MODAL ĐẶT CÀY THUÊ VỚI ĐẦY ĐỦ BẢNG GIÁ DỊCH VỤ -->
     <div class="modal" id="orderServiceModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('orderServiceModal')">&times;</span>
             <h3><i class="fa-solid fa-gamepad"></i> ĐẶT DỊCH VỤ CÀY THUÊ</h3>
             
             <form onsubmit="handleConfirmOrder(event)">
-                <label style="font-size:13px; color:#cbd5e1;">Chọn gói cày bạn muốn đặt:</label>
-                <select id="serviceSelectMenu" class="form-input" style="cursor:pointer;" onchange="updateSelectedServicePrice()">
-                    <!-- Options sẽ được tải động từ DB -->
+                <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn loại dịch vụ cày thuê:</label>
+                <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
+                    <!-- DANH SÁCH BẢNG GIÁ ĐÃ THÊM ĐẦY ĐỦ -->
+                    <option value="Yama" data-price="10000">Yama - 10k</option>
+                    <option value="Tushi" data-price="10000">Tushi - 10k</option>
+                    <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20k (Tổng 40k)</option>
+                    <option value="Tam Kiếm (CDK)" data-price="25000">Tam Kiếm (CDK) - 25k</option>
+                    <option value="Kéo Tim Leviathan" data-price="25000">Kéo Tim Leviathan - 25k</option>
+                    <option value="V4 A-Z Thỏ / TT / Human" data-price="45000">V4 A-Z Thỏ / Thiên Thần / Human (Bao All) - 45k</option>
+                    <option value="V4 A-Z Cy/Quỷ" data-price="55000">V4 A-Z Cyborg / Quỷ (Bao All) - 55k</option>
+                    <option value="V4 Draco" data-price="85000">V4 Draco (Bao All) - 85k</option>
+                    <option value="Lẻ 1 Gear (Không nhận dưới 2 Gear)" data-price="10000">Lẻ 1 Gear - 10k/Gear (Không nhận dưới 2 Gear)</option>
+                    <option value="Kiếm Rồng" data-price="20000">Kiếm Rồng - 20k</option>
+                    <option value="Súng Rồng" data-price="25000">Súng Rồng - 25k</option>
+                    <option value="Dino Hood" data-price="20000">Dino Hood - 20k</option>
+                    <option value="Mở cổng Draco" data-price="25000">Mở cổng Draco - 25k</option>
+                    <option value="Godhuman" data-price="30000">Godhuman - 30k</option>
+                    <option value="Võ Máu (Sanguine Art)" data-price="40000">Võ Máu (Sanguine Art) - 40k</option>
+                    <option value="Nhẫn Đỏ" data-price="50000">Nhẫn Đỏ - 50k</option>
+                    <option value="Cuốc Mythic" data-price="35000">Cuốc Mythic - 35k</option>
+                    <option value="Cày Beli 1M" data-price="1000">Cày Beli (1k / 1M Beli)</option>
+                    <option value="Cày Beli Pack 50M" data-price="35000">Cày Beli Pack 50M - 35k</option>
+                    <option value="Cày Beli Pack 100M" data-price="80000">Cày Beli Pack 100M - 80k</option>
+                    <option value="Cày Frag" data-price="1500">Cày Fragment (1.5k / 1k Frag - Úp nhiều 1k/1k)</option>
+                    <option value="Level 0 - 700" data-price="10000">Level 0 - 700 - 10k</option>
+                    <option value="Level 700 - 1500" data-price="10000">Level 700 - 1500 - 10k</option>
+                    <option value="Level 1500 - 2800" data-price="20000">Level 1500 - 2800 - 20k</option>
+                    <option value="Úp lẻ vài trăm Level" data-price="10000">Úp lẻ vài trăm Level - 10k</option>
                 </select>
 
-                <div style="background:#0f172a; padding:10px; border-radius:6px; margin-bottom:12px; border:1px solid #334155; display:flex; justify-shadow:space-between; justify-content:space-between;">
-                    <span>Thành tiền:</span>
-                    <b id="displayServicePrice" style="color:#22c55e;">0 đ</b>
+                <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:12px; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Giá tiền thanh toán:</span>
+                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">10.000 đ</b>
                 </div>
 
                 <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
@@ -183,7 +208,6 @@
 
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchAdminTab(event, 'tab-orders')"><i class="fa-solid fa-list-check"></i> Duyệt Đơn Đã Đặt</button>
-                <button class="tab-btn" onclick="switchAdminTab(event, 'tab-services')"><i class="fa-solid fa-plus-circle"></i> Quản Lý Gói Cày Thuê</button>
                 <button class="tab-btn" onclick="switchAdminTab(event, 'tab-acc-sell')"><i class="fa-solid fa-store"></i> Quản Lý Bán Acc Game</button>
                 <button class="tab-btn" onclick="switchAdminTab(event, 'tab-users-balance')"><i class="fa-solid fa-wallet"></i> Quản Lý Số Dư Khách</button>
             </div>
@@ -195,7 +219,7 @@
                             <tr>
                                 <th>Mã Đơn</th>
                                 <th>Khách Hàng</th>
-                                <th>Gói Cày</th>
+                                <th>Gói Cày Lựa Chọn</th>
                                 <th>Giá Tiền</th>
                                 <th>TK Roblox</th>
                                 <th>MK Roblox</th>
@@ -205,29 +229,6 @@
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="tab-services" class="tab-content">
-                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #334155;">
-                    <h4 style="color:#3b82f6; margin-bottom:10px;"><i class="fa-solid fa-plus"></i> Thêm Gói Cày Thuê Mới</h4>
-                    <form onsubmit="handleAddNewService(event)">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <input type="text" id="newServiceTitle" class="form-input" placeholder="Tên gói cày (VD: Cày level max)..." required>
-                            <input type="number" id="newServicePrice" class="form-input" placeholder="Giá tiền (VNĐ)..." required>
-                            <input type="text" id="newServiceTag" class="form-input" placeholder="Nhãn Tag (VD: HOT, RẺ)..." required>
-                            <input type="text" id="newServiceImg" class="form-input" placeholder="Link ảnh Banner..." required>
-                        </div>
-                        <button type="submit" class="btn btn-success" style="width:100%; margin-top:5px;">THÊM GÓI CÀY THUÊ</button>
-                    </form>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr><th>Mã Gói</th><th>Tên Gói Cày</th><th>Giá Tiền</th><th>Tag</th><th>Hành Động</th></tr>
-                        </thead>
-                        <tbody id="adminServiceTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -285,7 +286,7 @@
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
-            <h3><i class="fa-solid fa-clock-rotate-left"></i> LỊCH SỬ MUA TÀI KHOẢN & CÀY THUÊ</h3>
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> LỊCH SỬ MUA ACC & ĐẶT CÀY THUÊ</h3>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
@@ -333,7 +334,6 @@
         let currentUser = null;
         let authMode = 'login';
         let selectedAccToBuy = null;
-        let currentServicesList = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
             const { data } = await supabaseClient.auth.getSession();
@@ -394,7 +394,7 @@
             showToast('Đã đăng xuất!', 'success');
         }
 
-        /* --- TÍNH SỐ DƯ --- */
+        /* --- SỐ DƯ --- */
         async function getUserBalance(email) {
             const { data } = await supabaseClient.from('user_balances').select('balance').eq('email', email).single();
             return data ? data.balance : 0;
@@ -425,9 +425,9 @@
             }
         }
 
-        /* --- HIỂN THỊ DỊCH VỤ VÀ SẢN PHẨM --- */
+        /* --- RENDER SẢN PHẨM --- */
         async function renderShopItems() {
-            // Render Acc Games
+            // Acc Games
             const { data: accGameList } = await supabaseClient.from('acc_games').select('*');
             const accGameGrid = document.getElementById('accGameGrid');
             accGameGrid.innerHTML = '';
@@ -452,34 +452,25 @@
                 accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào bán.</p>';
             }
 
-            // Render Services
-            const { data: serviceList } = await supabaseClient.from('services').select('*');
-            currentServicesList = serviceList || [];
+            // Banner Dịch Vụ Cày Thuê
             const serviceGrid = document.getElementById('serviceGrid');
-            serviceGrid.innerHTML = '';
-
-            if (serviceList && serviceList.length > 0) {
-                serviceList.forEach(item => {
-                    serviceGrid.innerHTML += `
-                        <div class="acc-card">
-                            <span class="acc-tag" style="background:#f59e0b;">${item.tag || 'CÀY THUÊ'}</span>
-                            <img src="${item.img || 'https://i.ibb.co/4wcD0R4k/image.jpg'}" class="acc-img">
-                            <div class="acc-body">
-                                <div class="acc-title">${item.title}</div>
-                                <div class="acc-footer">
-                                    <div class="price">${Number(item.price).toLocaleString('vi-VN')} đ</div>
-                                    <button class="btn btn-primary" onclick="openOrderServiceModal('${item.id}')"><i class="fa-solid fa-bolt"></i> Thuê Ngay</button>
-                                </div>
-                            </div>
+            serviceGrid.innerHTML = `
+                <div class="acc-card">
+                    <span class="acc-tag" style="background:#f59e0b;">CÀY THUÊ UI</span>
+                    <img src="https://i.ibb.co/4wcD0R4k/image.jpg" class="acc-img">
+                    <div class="acc-body">
+                        <div class="acc-title">DỊCH VỤ CÀY THUÊ BLOX FRUIT</div>
+                        <p style="font-size:12px; color:#cbd5e1; margin-bottom:10px;">Bao gồm V4, Level, Beli, Fragment, Items Mythic, Võ, Kiếm...</p>
+                        <div class="acc-footer">
+                            <div class="price">Từ 1.000 đ</div>
+                            <button class="btn btn-primary" onclick="openOrderServiceModal()"><i class="fa-solid fa-bolt"></i> Thuê Ngay</button>
                         </div>
-                    `;
-                });
-            } else {
-                serviceGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có gói cày thuê nào.</p>';
-            }
+                    </div>
+                </div>
+            `;
         }
 
-        /* --- XỬ LÝ MUA ACC --- */
+        /* --- MUA ACC --- */
         async function openConfirmBuyModal(accId) {
             if (!currentUser) return openAuthModal('login');
             const { data: acc } = await supabaseClient.from('acc_games').select('*').eq('id', accId).single();
@@ -512,23 +503,9 @@
             await renderShopItems();
         }
 
-        /* --- XỬ LÝ MENU VÀ ĐẶT CÀY THUÊ --- */
-        function openOrderServiceModal(selectedServiceId = null) {
+        /* --- XỬ LÝ MENU & ĐẶT CÀY THUÊ --- */
+        function openOrderServiceModal() {
             if (!currentUser) return openAuthModal('login');
-
-            const selectMenu = document.getElementById('serviceSelectMenu');
-            selectMenu.innerHTML = '';
-
-            if (currentServicesList.length === 0) {
-                return showToast('Hiện chưa có gói cày thuê nào!', 'error');
-            }
-
-            // Tạo danh sách các loại cày trong menu thả xuống (Dropdown)
-            currentServicesList.forEach(srv => {
-                const isSelected = selectedServiceId && String(srv.id) === String(selectedServiceId) ? 'selected' : '';
-                selectMenu.innerHTML += `<option value="${srv.id}" data-price="${srv.price}" data-title="${srv.title}" ${isSelected}>${srv.title} - [${Number(srv.price).toLocaleString('vi-VN')} đ]</option>`;
-            });
-
             updateSelectedServicePrice();
             openModal('orderServiceModal');
         }
@@ -549,7 +526,7 @@
             const selectMenu = document.getElementById('serviceSelectMenu');
             const selectedOption = selectMenu.options[selectMenu.selectedIndex];
             
-            const serviceName = selectedOption.getAttribute('data-title');
+            const serviceName = selectedOption.text;
             const price = parseInt(selectedOption.getAttribute('data-price'));
             const robloxUser = document.getElementById('robloxUser').value.trim();
             const robloxPass = document.getElementById('robloxPass').value.trim();
@@ -576,16 +553,16 @@
             }]);
 
             if (error) {
-                showToast('Đã xảy ra lỗi khi tạo đơn: ' + error.message, 'error');
+                showToast('Lỗi gửi đơn: ' + error.message, 'error');
             } else {
-                showToast('Đặt đơn thành công! Tài khoản đã được gửi lên Admin.', 'success');
+                showToast('Đặt đơn thành công! Admin đã nhận được thông tin.', 'success');
                 closeModal('orderServiceModal');
                 e.target.reset();
                 await checkUserStatus();
             }
         }
 
-        /* --- HIỂN THỊ LỊCH SỬ CHO KHÁCH --- */
+        /* --- LỊCH SỬ GIAO DỊCH KHÁCH --- */
         async function openHistoryModal() {
             if (!currentUser) return openAuthModal('login');
             const tbody = document.getElementById('historyTableBody');
@@ -594,7 +571,7 @@
 
             let rowsHTML = '';
             
-            // 1. Acc đã mua
+            // Acc đã mua
             const { data: boughtAccs } = await supabaseClient.from('acc_games').select('*').eq('buyer_email', currentUser.email);
             if (boughtAccs && boughtAccs.length > 0) {
                 boughtAccs.forEach(item => {
@@ -610,7 +587,7 @@
                 });
             }
 
-            // 2. Lịch sử Đơn Cày Thuê
+            // Đơn cày thuê
             const { data: orders } = await supabaseClient.from('service_orders').select('*').eq('user_email', currentUser.email);
             if (orders && orders.length > 0) {
                 orders.forEach(item => {
@@ -646,7 +623,7 @@
             await checkUserStatus();
         }
 
-        /* --- ADMIN CONTROLS --- */
+        /* --- ADMIN DASHBOARD --- */
         async function openAdminDashboard() {
             if (!currentUser || currentUser.email !== 'admin@gmail.com') return showToast('Bạn không phải Admin!', 'error');
             await renderAdminData();
@@ -673,9 +650,9 @@
                         <tr>
                             <td>#${item.id}</td>
                             <td>${item.user_email}</td>
-                            <td><b>${item.service_name}</b></td>
+                            <td><b style="color:#3b82f6;">${item.service_name}</b></td>
                             <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
-                            <td style="color:#3b82f6;"><b>${item.roblox_user}</b></td>
+                            <td style="color:#22c55e;"><b>${item.roblox_user}</b></td>
                             <td style="color:#f59e0b;"><b>${item.roblox_pass}</b></td>
                             <td>${item.roblox_pass3 || 'Không'}</td>
                             <td><span class="status-badge ${item.status === 'Đang xử lý' ? 'status-pending' : 'status-completed'}">${item.status}</span></td>
@@ -687,24 +664,6 @@
                 });
             } else {
                 orderTbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Chưa có đơn cày thuê nào.</td></tr>';
-            }
-
-            // Gói cày
-            const { data: services } = await supabaseClient.from('services').select('*');
-            const serviceTbody = document.getElementById('adminServiceTableBody');
-            serviceTbody.innerHTML = '';
-            if (services && services.length > 0) {
-                services.forEach(item => {
-                    serviceTbody.innerHTML += `
-                        <tr>
-                            <td>${item.id}</td>
-                            <td>${item.title}</td>
-                            <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
-                            <td>${item.tag}</td>
-                            <td><button class="btn btn-danger" onclick="deleteService('${item.id}')">Xóa</button></td>
-                        </tr>
-                    `;
-                });
             }
 
             // Acc Game Bán
@@ -752,27 +711,6 @@
             await supabaseClient.from('service_orders').update({ status: 'Hoàn thành' }).eq('id', orderId);
             showToast('Đã hoàn tất đơn cày thuê!', 'success');
             await renderAdminData();
-        }
-
-        async function handleAddNewService(e) {
-            e.preventDefault();
-            const title = document.getElementById('newServiceTitle').value;
-            const price = parseInt(document.getElementById('newServicePrice').value);
-            const tag = document.getElementById('newServiceTag').value;
-            const img = document.getElementById('newServiceImg').value;
-
-            await supabaseClient.from('services').insert([{ title, price, tag, img }]);
-            showToast('Đã thêm dịch vụ cày mới!', 'success');
-            e.target.reset();
-            await renderAdminData();
-            await renderShopItems();
-        }
-
-        async function deleteService(id) {
-            await supabaseClient.from('services').delete().eq('id', id);
-            showToast('Đã xóa dịch vụ!', 'success');
-            await renderAdminData();
-            await renderShopItems();
         }
 
         async function handleAddNewAccGame(e) {
