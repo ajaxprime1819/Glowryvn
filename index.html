@@ -19,7 +19,9 @@
         .nav-links { display: flex; gap: 20px; list-style: none; font-weight: 600; }
         .nav-links a:hover { color: #3b82f6; transition: 0.3s; }
         .auth-btns { display: flex; gap: 10px; align-items: center; }
-        .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        
+        /* Cấu hình kích thước nút đồng bộ */
+        .btn { padding: 8px 14px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-login { background: #334155; color: #fff; }
         .btn-login:hover { background: #475569; }
         .btn-primary { background: #3b82f6; color: #fff; }
@@ -126,7 +128,7 @@
         <div class="shop-grid" id="serviceGrid"></div>
     </div>
 
-    <!-- POPUP ĐỔI MẬT KHẨU (THÊM MỚI) -->
+    <!-- POPUP ĐỔI MẬT KHẨU -->
     <div class="modal" id="changePasswordModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('changePasswordModal')">&times;</span>
@@ -424,10 +426,11 @@
             const authContainer = document.getElementById('auth-buttons');
             if (currentUser) {
                 const balance = getUserBalance(currentUser.email);
+                /* Nút 'Đổi MK' được thêm dưới dạng btn-login kích thước nhỏ gọn */
                 authContainer.innerHTML = `
                     <span style="font-size:14px; font-weight:bold; color:#22c55e;"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
                     <span style="font-size:14px; color:#94a3b8;"><i class="fa-solid fa-user"></i> ${currentUser.email}</span>
-                    <button class="btn btn-warning" onclick="openModal('changePasswordModal')"><i class="fa-solid fa-key"></i> Đổi MK</button>
+                    <button class="btn btn-login" onclick="openModal('changePasswordModal')"><i class="fa-solid fa-key"></i> Đổi MK</button>
                     ${currentUser.email === 'admin@gmail.com' ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-gear"></i> Admin</button>` : ''}
                     <button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
@@ -527,7 +530,7 @@
                             <div class="acc-title">${item.title}</div>
                             <div class="acc-footer">
                                 <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
-                                ${item.isSold ? `<button class="btn btn-login" disabled>ĐÃ BẢN</button>` : 
+                                ${item.isSold ? `<button class="btn btn-login" disabled>ĐÃ BÁN</button>` : 
                                 `<button class="btn btn-success" onclick="openConfirmBuyModal('${item.id}')"><i class="fa-solid fa-cart-shopping"></i> Mua Ngay</button>`}
                             </div>
                         </div>
@@ -546,7 +549,7 @@
                             <div class="acc-title">${item.title}</div>
                             <div class="acc-footer">
                                 <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
-                                <button class="btn btn-primary" onclick="openOrderModal('${item.id}', '${item.title}', ${item.price})">Đặt Cày Thuê</button>
+                                <button class="btn btn-primary" onclick="openOrderServiceModal('${item.id}')"><i class="fa-solid fa-bolt"></i> Thuê Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -554,62 +557,9 @@
             });
         }
 
-        /* --- MỞ POPUP XÁC NHẬN MUA ACC --- */
-        function openConfirmBuyModal(accId) {
-            if (!currentUser) return openAuthModal('login');
-            
-            const acc = accGameList.find(a => a.id === accId);
-            if (!acc || acc.isSold) return showToast('Tài khoản không tồn tại hoặc đã bán!', 'error');
-
-            document.getElementById('confirmAccTitle').innerText = acc.title;
-            document.getElementById('confirmAccPrice').innerText = `${acc.price.toLocaleString('vi-VN')} đ`;
-            
-            // Lắng nghe nút ĐỒNG Ý
-            document.getElementById('btnConfirmBuyProceed').onclick = function() {
-                closeModal('confirmBuyModal');
-                buyAccGame(accId);
-            };
-
-            openModal('confirmBuyModal');
-        }
-
-        /* --- THỰC HIỆN MUA ACC --- */
-        function buyAccGame(accId) {
-            const acc = accGameList.find(a => a.id === accId);
-            if (!acc || acc.isSold) return showToast('Tài khoản không tồn tại hoặc đã bán!', 'error');
-
-            const balance = getUserBalance(currentUser.email);
-            if (balance < acc.price) {
-                return showToast('Số dư không đủ! Vui lòng nạp thêm tiền.', 'error');
-            }
-
-            updateUserBalance(currentUser.email, -acc.price);
-            acc.isSold = true;
-            localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
-
-            purchasedAccs.unshift({
-                userEmail: currentUser.email,
-                accTitle: acc.title,
-                price: acc.price,
-                gameUser: acc.user,
-                gamePass: acc.pass,
-                gamePass3: acc.pass3 || 'Không có',
-                date: new Date().toLocaleString('vi-VN')
-            });
-            localStorage.setItem('shop_purchased_accs', JSON.stringify(purchasedAccs));
-
-            document.getElementById('resUser').innerText = acc.user;
-            document.getElementById('resPass').innerText = acc.pass;
-            document.getElementById('resPass3').innerText = acc.pass3 || 'Không có';
-            openModal('buyAccResultModal');
-
-            checkUserStatus();
-            renderShopItems();
-        }
-
-        // Khởi chạy khi load trang
-        renderShopItems();
+        // Khởi tạo hiển thị trang đầu tiên
         checkUserStatus();
+        renderShopItems();
     </script>
 </body>
 </html>
