@@ -288,9 +288,11 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
             <h3 id="modalTitle">ĐĂNG NHẬP</h3>
-            <input type="email" id="email" class="form-input" placeholder="Nhập Email...">
-            <input type="password" id="password" class="form-input" placeholder="Mật khẩu...">
-            <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px; margin-top:10px;">XÁC NHẬN</button>
+            <form onsubmit="handleAuthSubmit(event)">
+                <input type="email" id="email" class="form-input" placeholder="Nhập Email..." required>
+                <input type="password" id="password" class="form-input" placeholder="Mật khẩu..." required>
+                <button type="submit" class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px; margin-top:10px;">XÁC NHẬN</button>
+            </form>
         </div>
     </div>
 
@@ -427,7 +429,7 @@
             }
 
             await updateUserBalance(currentUser.email, -selectedAccToBuy.price);
-            await supabaseClient.from('acc_games').update({ is_sold: true }).eq('id', selectedAccToBuy.id);
+            await supabaseClient.from('acc_games').update({ is_sold: true, buyer_email: currentUser.email }).eq('id', selectedAccToBuy.id);
 
             document.getElementById('resUser').innerText = selectedAccToBuy.user;
             document.getElementById('resPass').innerText = selectedAccToBuy.pass;
@@ -548,30 +550,30 @@
                         <tr>
                             <td>${item.id}</td>
                             <td>${item.title}</td>
-                            <td><b>${item.user}</b></td>
+                            <td>${item.user}</td>
                             <td>${item.pass}</td>
                             <td>${item.pass3 || 'Không'}</td>
                             <td>${item.price.toLocaleString('vi-VN')} đ</td>
-                            <td>${item.is_sold ? 'Đã Bán' : 'Còn Hàng'}</td>
+                            <td><span class="status-badge ${item.is_sold ? 'status-completed' : 'status-pending'}">${item.is_sold ? 'Đã Bán' : 'Đang Bán'}</span></td>
                             <td><button class="btn btn-danger" onclick="deleteAccGame('${item.id}')">Xóa</button></td>
                         </tr>
                     `;
                 });
             }
 
-            // Render Số Dư
-            const { data: balances } = await supabaseClient.from('user_balances').select('*');
-            const balanceTbody = document.getElementById('adminUserBalanceTableBody');
-            balanceTbody.innerHTML = '';
-            if (balances) {
-                balances.forEach(item => {
-                    balanceTbody.innerHTML += `
+            // Render Số Dư Khách Hàng
+            const { data: userBalances } = await supabaseClient.from('user_balances').select('*');
+            const userBalTbody = document.getElementById('adminUserBalanceTableBody');
+            userBalTbody.innerHTML = '';
+            if (userBalances) {
+                userBalances.forEach(item => {
+                    userBalTbody.innerHTML += `
                         <tr>
                             <td>${item.email}</td>
-                            <td><b style="color:#22c55e;">${item.balance.toLocaleString('vi-VN')} đ</b></td>
+                            <td style="color:#22c55e; font-weight:bold;">${item.balance.toLocaleString('vi-VN')} đ</td>
                             <td>
                                 <button class="btn btn-success" onclick="quickAddBalance('${item.email}', 50000)">+50k</button>
-                                <button class="btn btn-success" onclick="quickAddBalance('${item.email}', 100000)">+100k</button>
+                                <button class="btn btn-warning" onclick="quickAddBalance('${item.email}', 100000)">+100k</button>
                             </td>
                         </tr>
                     `;
@@ -579,34 +581,36 @@
             }
         }
 
-        async function completeOrder(id) {
-            await supabaseClient.from('service_orders').update({ status: 'Hoàn thành' }).eq('id', id);
-            showToast('Đã duyệt đơn thành công!', 'success');
+        async function completeOrder(orderId) {
+            await supabaseClient.from('service_orders').update({ status: 'Hoàn thành' }).eq('id', orderId);
+            showToast('Đã duyệt hoàn thành đơn!', 'success');
             renderAdminData();
         }
 
         async function handleAddNewService(e) {
             e.preventDefault();
             await supabaseClient.from('services').insert([{
-                id: 'CT' + Date.now().toString().slice(-4),
                 title: document.getElementById('newServiceTitle').value,
                 price: parseInt(document.getElementById('newServicePrice').value),
                 tag: document.getElementById('newServiceTag').value,
                 img: document.getElementById('newServiceImg').value
             }]);
-            showToast('Đã thêm gói cày mới!', 'success');
-            renderShopItems(); renderAdminData(); e.target.reset();
+            showToast('Đã thêm gói cày thuê mới!', 'success');
+            e.target.reset();
+            renderAdminData();
+            renderShopItems();
         }
 
         async function deleteService(id) {
             await supabaseClient.from('services').delete().eq('id', id);
-            renderShopItems(); renderAdminData(); showToast('Đã xóa gói cày!', 'info');
+            showToast('Đã xóa gói cày thuê!', 'success');
+            renderAdminData();
+            renderShopItems();
         }
 
         async function handleAddNewAccGame(e) {
             e.preventDefault();
             await supabaseClient.from('acc_games').insert([{
-                id: 'ACC' + Date.now().toString().slice(-4),
                 title: document.getElementById('newAccTitle').value,
                 price: parseInt(document.getElementById('newAccPrice').value),
                 tag: document.getElementById('newAccTag').value,
@@ -616,78 +620,112 @@
                 img: document.getElementById('newAccImg').value,
                 is_sold: false
             }]);
-            showToast('Đã thêm Acc mới lên Web!', 'success');
-            renderShopItems(); renderAdminData(); e.target.reset();
+            showToast('Đã đăng bán Acc game mới!', 'success');
+            e.target.reset();
+            renderAdminData();
+            renderShopItems();
         }
 
         async function deleteAccGame(id) {
             await supabaseClient.from('acc_games').delete().eq('id', id);
-            renderShopItems(); renderAdminData(); showToast('Đã xóa Acc!', 'info');
+            showToast('Đã xóa Acc khỏi shop!', 'success');
+            renderAdminData();
+            renderShopItems();
         }
 
         async function handleAdminAdjustBalance(e) {
             e.preventDefault();
-            const email = document.getElementById('targetUserEmail').value.trim();
+            const email = document.getElementById('targetUserEmail').value;
             const amount = parseInt(document.getElementById('adjustAmount').value);
             await updateUserBalance(email, amount);
             showToast(`Đã điều chỉnh số dư cho ${email}`, 'success');
-            renderAdminData(); checkUserStatus(); e.target.reset();
+            e.target.reset();
+            renderAdminData();
+            checkUserStatus();
         }
 
         async function quickAddBalance(email, amount) {
             await updateUserBalance(email, amount);
-            showToast(`Cộng ${amount.toLocaleString('vi-VN')}đ thành công!`, 'success');
-            renderAdminData(); checkUserStatus();
-        }
-
-        /* --- TIỂU SỬ ĐƠN --- */
-        async function openHistoryModal() {
-            if (!currentUser) return openAuthModal('login');
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-
-            const { data: myOrders } = await supabaseClient.from('service_orders').select('*').eq('user_email', currentUser.email);
-            if (myOrders && myOrders.length > 0) {
-                myOrders.forEach(order => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><span style="color:#3b82f6; font-weight:bold;">Cày Thuê</span></td>
-                            <td>${order.service_name}</td>
-                            <td>${order.price.toLocaleString('vi-VN')} đ</td>
-                            <td>TK Roblox: <b>${order.roblox_user}</b></td>
-                            <td><span class="status-badge ${order.status === 'Đang xử lý' ? 'status-pending' : 'status-completed'}">${order.status}</span></td>
-                        </tr>
-                    `;
-                });
-            } else {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Bạn chưa có lịch sử đơn hàng nào.</td></tr>`;
-            }
-            openModal('historyModal');
-        }
-
-        /* --- XỬ LÝ ĐĂNG NHẬP & NẠP TIỀN --- */
-        function openAuthModal(mode) {
-            authMode = mode;
-            document.getElementById('modalTitle').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ';
-            document.getElementById('modalSubmitBtn').onclick = handleAuth;
-            openModal('authModal');
-        }
-
-        async function handleAuth() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            if (!email || !password) return showToast('Vui lòng điền đủ email & mật khẩu!', 'error');
-
-            currentUser = { email };
-            const bal = await getUserBalance(email);
-            if (bal === 0) await updateUserBalance(email, 0);
-
-            showToast('Đăng nhập thành công!', 'success');
-            closeModal('authModal');
+            showToast(`Đã cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}`, 'success');
+            renderAdminData();
             checkUserStatus();
         }
 
-        function logout() { currentUser = null; checkUserStatus(); showToast('Đã đăng xuất!', 'info'); }
+        /* --- XỬ LÝ LỊCH SỬ MUA HÀNG --- */
+        async function openHistoryModal() {
+            if (!currentUser) return openAuthModal('login');
+            const historyTbody = document.getElementById('historyTableBody');
+            historyTbody.innerHTML = '';
+
+            // Lấy Acc đã mua
+            const { data: boughtAccs } = await supabaseClient.from('acc_games').select('*').eq('buyer_email', currentUser.email);
+            if (boughtAccs) {
+                boughtAccs.forEach(acc => {
+                    historyTbody.innerHTML += `
+                        <tr>
+                            <td><span class="status-badge status-completed">Mua Acc</span></td>
+                            <td>${acc.title}</td>
+                            <td>${acc.price.toLocaleString('vi-VN')} đ</td>
+                            <td>TK: <b>${acc.user}</b> | MK: <b>${acc.pass}</b> | 2FA: <b>${acc.pass3 || 'Không'}</b></td>
+                            <td><span class="status-badge status-completed">Thành công</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Lấy Đơn cày thuê
+            const { data: userOrders } = await supabaseClient.from('service_orders').select('*').eq('user_email', currentUser.email);
+            if (userOrders) {
+                userOrders.forEach(ord => {
+                    historyTbody.innerHTML += `
+                        <tr>
+                            <td><span class="status-badge status-pending">Cày Thuê</span></td>
+                            <td>${ord.service_name}</td>
+                            <td>${ord.price.toLocaleString('vi-VN')} đ</td>
+                            <td>TK: <b>${ord.roblox_user}</b> | status: ${ord.status}</td>
+                            <td><span class="status-badge ${ord.status === 'Hoàn thành' ? 'status-completed' : 'status-pending'}">${ord.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            openModal('historyModal');
+        }
+
+        /* --- XỬ LÝ ĐẮNG NHẬP / ĐẮNG KÝ --- */
+        function openAuthModal(mode) {
+            authMode = mode;
+            document.getElementById('modalTitle').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ TÀI KHOẢN';
+            document.getElementById('modalSubmitBtn').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ NGAY';
+            openModal('authModal');
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (authMode === 'register') {
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) return showToast(error.message, 'error');
+                showToast('Đăng ký thành công! Vui lòng đăng nhập.', 'success');
+                openAuthModal('login');
+            } else {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) return showToast(error.message, 'error');
+                currentUser = data.user;
+                showToast('Đăng nhập thành công!', 'success');
+                closeModal('authModal');
+                checkUserStatus();
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            showToast('Đã đăng xuất thành công.', 'info');
+            checkUserStatus();
+        }
 
         function openDepositModal() {
             if (!currentUser) return openAuthModal('login');
@@ -696,17 +734,24 @@
 
         async function confirmBankDeposit() {
             const amount = parseInt(document.getElementById('depositAmount').value);
-            if (!amount || amount <= 0) return showToast('Số tiền nạp không hợp lệ!', 'error');
-
+            if (!amount || amount <= 0) return showToast('Vui lòng nhập số tiền hợp lệ!', 'error');
+            
+            // Giả lập xử lý nạp tiền thành công
             await updateUserBalance(currentUser.email, amount);
-            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ!`, 'success');
+            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ vào tài khoản!`, 'success');
             closeModal('depositModal');
             checkUserStatus();
         }
 
-        // Khởi chạy ứng dụng
-        checkUserStatus();
-        renderShopItems();
+        /* KHỞI TẠO */
+        window.onload = async () => {
+            const { data } = await supabaseClient.auth.getUser();
+            if (data && data.user) {
+                currentUser = data.user;
+            }
+            checkUserStatus();
+            renderShopItems();
+        };
     </script>
 </body>
 </html>
