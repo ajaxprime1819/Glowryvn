@@ -1,3 +1,60 @@
+<!-- DEPOSIT MODAL (QR CODE & THẺ CÀO) -->
+<div class="modal" id="depositModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
+        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button id="btnTabQR" class="btn btn-primary" style="flex:1;" onclick="switchDepositTab('qr')"><i class="fa-solid fa-qrcode"></i> Nạp qua QR Code</button>
+            <button id="btnTabCard" class="btn btn-login" style="flex:1;" onclick="switchDepositTab('card')"><i class="fa-solid fa-credit-card"></i> Nạp Thẻ Cào</button>
+        </div>
+
+        <!-- TAB NẠP QR -->
+        <div id="depositTabQR">
+            <label style="font-size:13px; color:#cbd5e1;">Nhập số tiền muốn nạp (VNĐ):</label>
+            <input type="number" id="qrAmount" class="form-input" placeholder="VD: 50000, 100000..." min="10000">
+            <button class="btn btn-success" style="width:100%; margin-bottom:15px;" onclick="generateQRCode()"><i class="fa-solid fa-qrcode"></i> TẠO MÃ QR CHUYỂN KHOẢN</button>
+            
+            <div id="qrResultBox" style="text-align:center; display:none; background:#0f172a; padding:15px; border-radius:8px; border:1px solid #334155;">
+                <img id="qrCodeImage" src="" alt="QR Code" style="max-width:200px; border-radius:8px; margin-bottom:10px; background:#fff; padding:5px;">
+                <p style="font-size:13px; color:#cbd5e1; margin-bottom:5px;">Quét mã QR bằng App Ngân Hàng</p>
+                <p style="font-size:12px; color:#f59e0b;">Nội dung chuyển khoản chính xác:</p>
+                <b id="qrContentInfo" style="color:#22c55e; font-size:15px; background:#1e293b; padding:5px 10px; display:inline-block; margin-top:5px; border-radius:4px;"></b>
+            </div>
+        </div>
+
+        <!-- TAB NẠP THẺ CÀO -->
+        <div id="depositTabCard" style="display: none;">
+            <form onsubmit="submitCardDeposit(event)">
+                <label style="font-size:13px; color:#cbd5e1;">Chọn nhà mạng:</label>
+                <select id="cardTelco" class="form-input" style="font-weight:bold; color:#3b82f6;">
+                    <option value="VIETTEL">Viettel</option>
+                    <option value="VINAPHONE">Vinaphone</option>
+                    <option value="MOBIFONE">Mobifone</option>
+                </select>
+
+                <label style="font-size:13px; color:#cbd5e1;">Chọn mệnh giá:</label>
+                <select id="cardAmount" class="form-input" style="font-weight:bold; color:#22c55e;">
+                    <option value="10000">10.000 đ</option>
+                    <option value="20000">20.000 đ</option>
+                    <option value="50000">50.000 đ</option>
+                    <option value="100000">100.000 đ</option>
+                    <option value="200000">200.000 đ</option>
+                    <option value="500000">500.000 đ</option>
+                </select>
+
+                <label style="font-size:13px; color:#cbd5e1;">Mã thẻ cào (PIN):</label>
+                <input type="text" id="cardPin" class="form-input" required placeholder="Nhập mã thẻ...">
+
+                <label style="font-size:13px; color:#cbd5e1;">Số Seri thẻ:</label>
+                <input type="text" id="cardSerial" class="form-input" required placeholder="Nhập số seri...">
+
+                <button type="submit" class="btn btn-warning" style="width:100%; margin-top:10px;"><i class="fa-solid fa-paper-plane"></i> GỬI THẺ CÀO NẠP</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU'; 
@@ -18,6 +75,7 @@
 
     function showToast(message, type = 'info') {
         const container = document.getElementById('toast-container');
+        if (!container) return;
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${message}`;
@@ -81,6 +139,7 @@
 
     async function checkUserStatus() {
         const authContainer = document.getElementById('auth-buttons');
+        if (!authContainer) return;
         if (currentUser) {
             const balance = await getUserBalance(currentUser.email);
             authContainer.innerHTML = `
@@ -101,43 +160,47 @@
     async function renderShopItems() {
         const { data: accGameList } = await supabaseClient.from('acc_games').select('*');
         const accGameGrid = document.getElementById('accGameGrid');
-        accGameGrid.innerHTML = '';
-        if (accGameList && accGameList.length > 0) {
-            accGameList.forEach(item => {
-                accGameGrid.innerHTML += `
-                    <div class="acc-card">
-                        <span class="acc-tag">${item.tag || 'HOT'}</span>
-                        <img src="${item.img || 'https://i.ibb.co/4wcD0R4k/image.jpg'}" class="acc-img">
-                        <div class="acc-body">
-                            <div class="acc-title">${item.title}</div>
-                            <div class="acc-footer">
-                                <div class="price">${Number(item.price).toLocaleString('vi-VN')} đ</div>
-                                ${item.is_sold ? `<button class="btn btn-login" disabled>ĐÃ BÁN</button>` : 
-                                `<button class="btn btn-success" onclick="openConfirmBuyModal('${item.id}')"><i class="fa-solid fa-cart-shopping"></i> Mua Ngay</button>`}
+        if (accGameGrid) {
+            accGameGrid.innerHTML = '';
+            if (accGameList && accGameList.length > 0) {
+                accGameList.forEach(item => {
+                    accGameGrid.innerHTML += `
+                        <div class="acc-card">
+                            <span class="acc-tag">${item.tag || 'HOT'}</span>
+                            <img src="${item.img || 'https://i.ibb.co/4wcD0R4k/image.jpg'}" class="acc-img">
+                            <div class="acc-body">
+                                <div class="acc-title">${item.title}</div>
+                                <div class="acc-footer">
+                                    <div class="price">${Number(item.price).toLocaleString('vi-VN')} đ</div>
+                                    ${item.is_sold ? `<button class="btn btn-login" disabled>ĐÃ BÁN</button>` : 
+                                    `<button class="btn btn-success" onclick="openConfirmBuyModal('${item.id}')"><i class="fa-solid fa-cart-shopping"></i> Mua Ngay</button>`}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            });
-        } else {
-            accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào bán.</p>';
+                    `;
+                });
+            } else {
+                accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào bán.</p>';
+            }
         }
 
         const serviceGrid = document.getElementById('serviceGrid');
-        serviceGrid.innerHTML = `
-            <div class="acc-card">
-                <span class="acc-tag" style="background:#f59e0b;">CÀY THUÊ UI</span>
-                <img src="https://i.ibb.co/4wcD0R4k/image.jpg" class="acc-img">
-                <div class="acc-body">
-                    <div class="acc-title">DỊCH VỤ CÀY THUÊ BLOX FRUIT</div>
-                    <p style="font-size:12px; color:#cbd5e1; margin-bottom:10px;">Bao gồm V4, Level, Beli, Fragment, Items Mythic, Võ, Kiếm...</p>
-                    <div class="acc-footer">
-                        <div class="price">sẵn sàng</div>
-                        <button class="btn btn-primary" onclick="openOrderServiceModal()"><i class="fa-solid fa-bolt"></i> Thuê Ngay</button>
+        if (serviceGrid) {
+            serviceGrid.innerHTML = `
+                <div class="acc-card">
+                    <span class="acc-tag" style="background:#f59e0b;">CÀY THUÊ UI</span>
+                    <img src="https://i.ibb.co/4wcD0R4k/image.jpg" class="acc-img">
+                    <div class="acc-body">
+                        <div class="acc-title">DỊCH VỤ CÀY THUÊ BLOX FRUIT</div>
+                        <p style="font-size:12px; color:#cbd5e1; margin-bottom:10px;">Bao gồm V4, Level, Beli, Fragment, Items Mythic, Võ, Kiếm...</p>
+                        <div class="acc-footer">
+                            <div class="price">sẵn sàng</div>
+                            <button class="btn btn-primary" onclick="openOrderServiceModal()"><i class="fa-solid fa-bolt"></i> Thuê Ngay</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     /* --- MUA ACC --- */
@@ -182,6 +245,7 @@
 
     function updateSelectedServicePrice() {
         const selectMenu = document.getElementById('serviceSelectMenu');
+        if (!selectMenu) return;
         const selectedOption = selectMenu.options[selectMenu.selectedIndex];
         if (selectedOption) {
             const price = parseInt(selectedOption.getAttribute('data-price'));
@@ -289,6 +353,7 @@
         const { data: myOrders } = await supabaseClient.from('orders').select('*').eq('user_email', currentUser.email).order('created_at', { ascending: false });
         
         const tbody = document.getElementById('historyTableBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
         if (myOrders && myOrders.length > 0) {
             myOrders.forEach(o => {
@@ -321,6 +386,7 @@
     async function loadAdminOrders() {
         const { data: orders } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
         const tbody = document.getElementById('adminOrderTableBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
         if (orders && orders.length > 0) {
             orders.forEach(o => {
@@ -382,6 +448,7 @@
     async function loadAdminAccSell() {
         const { data: accs } = await supabaseClient.from('acc_games').select('*');
         const tbody = document.getElementById('adminAccSellTableBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
         if (accs) {
             accs.forEach(a => {
@@ -411,6 +478,7 @@
     async function loadAdminUsersBalance() {
         const { data: balances } = await supabaseClient.from('user_balances').select('*');
         const tbody = document.getElementById('adminUserBalanceTableBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
         if (balances) {
             balances.forEach(b => {
