@@ -170,7 +170,7 @@
         <div class="shop-grid" id="serviceGrid"></div>
     </div>
 
-    <!-- POPUP DASHBOARD ADMIN (ĐÃ THÊM MỚI TÍNH NĂNG VÀO ĐÂY) -->
+    <!-- POPUP DASHBOARD ADMIN -->
     <div class="modal" id="adminModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
@@ -258,7 +258,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
             <h3 id="modalTitle">ĐĂNG NHẬP</h3>
-            <input type="email" id="email" class="form-input" placeholder="Nhập Email (Dùng admin@gmail.com để thử QTV)...">
+            <input type="email" id="email" class="form-input" placeholder="Nhập Email...">
             <input type="password" id="password" class="form-input" placeholder="Mật khẩu...">
             <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px; margin-top:10px;">XÁC NHẬN</button>
         </div>
@@ -373,7 +373,6 @@
             }
         }
 
-        /* TÍNH NĂNG ADMIN DASHBOARD */
         function openAdminDashboard() {
             if (!currentUser || currentUser.email !== 'admin@gmail.com') {
                 return showToast('Bạn không phải là Quản Trị Viên!', 'error');
