@@ -29,6 +29,7 @@
         .btn-warning { background: #f59e0b; color: #fff; }
         .btn-warning:hover { background: #d97706; }
         .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
 
         /* HERO BANNER */
         .hero { 
@@ -65,6 +66,13 @@
         .admin-modal-content { max-width: 1000px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
         .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
+
+        /* ADMIN TABS */
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+        .tab-btn { background: #0f172a; color: #94a3b8; padding: 10px 20px; border-radius: 6px; border: 1px solid #334155; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         /* TABLES */
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
@@ -115,7 +123,6 @@
                 <option value="">-- Tất cả danh mục --</option>
                 <option value="Cày Thuê Roblox">Cày Thuê Blox Fruits</option>
                 <option value="Trái Vĩnh Viễn">Trái Vĩnh Viễn</option>
-                <option value="Xu TikTok">Xu TikTok</option>
             </select>
             <input type="text" id="searchInput" placeholder="Nhập tên gói cày thuê...">
             <button class="btn btn-primary" onclick="renderShopAcc()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
@@ -143,11 +150,11 @@
                 <label style="font-size:12px; color:#94a3b8;">Mật khẩu Roblox:</label>
                 <input type="password" id="robloxPass" class="form-input" style="margin-bottom:10px;" required placeholder="Nhập mật khẩu...">
 
-                <label style="font-size:12px; color:#ef4444; font-weight:bold;">Mã PIN / Pass 3 / Mã 2FA Khôi Phục (Nếu có):</label>
-                <input type="text" id="robloxPass3" class="form-input" style="margin-bottom:15px;" placeholder="Mã PIN 4 số hoặc mã dự phòng 2FA...">
+                <label style="font-size:12px; color:#ef4444; font-weight:bold;">Điền mã dự phòng (Nếu có):</label>
+                <input type="text" id="robloxPass3" class="form-input" style="margin-bottom:15px;" placeholder="Nhập mã dự phòng 2FA...">
 
                 <div style="background:#0f172a; padding:10px; border-radius:6px; margin-bottom:15px; font-size:12px; color:#94a3b8;">
-                    ⚠️ <b>Lưu ý:</b> Vui lòng tắt xác minh 2 bước qua Email/SĐT hoặc cung cấp Pass 3/Mã dự phòng để Admin vào cày nhanh nhất!
+                    ⚠️ <b>Lưu ý:</b> Vui lòng tắt xác minh 2 bước qua Email/SĐT hoặc cung cấp mã dự phòng để Admin vào cày nhanh nhất!
                 </div>
 
                 <button type="submit" class="btn btn-success" style="width:100%; padding:12px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
@@ -155,29 +162,73 @@
         </div>
     </div>
 
-    <!-- POPUP ADMIN DASHBOARD (QUẢN LÝ ĐƠN CÀY THUÊ) -->
+    <!-- POPUP ADMIN PANEL (DÀNH CHO ADMIN) -->
     <div class="modal" id="adminModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
-            <h3><i class="fa-solid fa-user-gear"></i> QUẢN LÝ ĐƠN CÀY THUÊ (ADMIN)</h3>
+            <h3><i class="fa-solid fa-user-gear"></i> BẢNG QUẢN TRỊ ADMIN</h3>
 
-            <div style="overflow-x: auto;">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Mã Đơn</th>
-                            <th>Khách Hàng</th>
-                            <th>Gói Cày Thuê</th>
-                            <th>TK Roblox</th>
-                            <th>MK Roblox</th>
-                            <th>Pass 3 / PIN</th>
-                            <th>Trạng Thái</th>
-                            <th>Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminOrderTableBody"></tbody>
-                </table>
+            <!-- MENU TAB ADMIN -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchAdminTab('tab-orders')"><i class="fa-solid fa-list-check"></i> Duyệt Đơn Đã Đặt</button>
+                <button class="tab-btn" onclick="switchAdminTab('tab-services')"><i class="fa-solid fa-plus-circle"></i> Quản Lý Gói Cày Thuê</button>
             </div>
+
+            <!-- TAB 1: DUYỆT ĐƠN HÀNG -->
+            <div id="tab-orders" class="tab-content active">
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Đơn</th>
+                                <th>Khách Hàng</th>
+                                <th>Gói Cày Thuê</th>
+                                <th>TK Roblox</th>
+                                <th>MK Roblox</th>
+                                <th>Mã Dự Phòng</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOrderTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: QUẢN LÝ VÀ THÊM GÓI CÀY THUÊ MỚI -->
+            <div id="tab-services" class="tab-content">
+                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #334155;">
+                    <h4 style="color:#3b82f6; margin-bottom:10px;"><i class="fa-solid fa-plus"></i> Thêm Gói Cày Thuê Mới Hiển Thị Ra Trang Chủ</h4>
+                    <form onsubmit="handleAddNewService(event)">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                            <input type="text" id="newServiceTitle" class="form-input" placeholder="Tên gói cày thuê (vd: Cày Level 2550)..." required>
+                            <input type="number" id="newServicePrice" class="form-input" placeholder="Giá tiền (VNĐ)..." required>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                            <input type="text" id="newServiceTag" class="form-input" placeholder="Nhãn Badge (vd: HOT, SIÊU TỐC, GIÁ RẺ)..." required>
+                            <input type="text" id="newServiceImg" class="form-input" placeholder="Link ảnh Banner gói..." required>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="width:100%;"><i class="fa-solid fa-floppy-disk"></i> THÊM GÓI VÀO TRANG CHỦ</button>
+                    </form>
+                </div>
+
+                <h4 style="color:#3b82f6; margin-bottom:10px;">Các Gói Cày Thuê Hiện Có</h4>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Gói</th>
+                                <th>Tên Gói Cày</th>
+                                <th>Giá Tiền</th>
+                                <th>Nhãn Tag</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminServiceTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -243,9 +294,18 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        // LƯU TRỮ ĐƠN CÀY THUÊ
+        // DỮ LIỆU ĐƠN HÀNG VÀ GÓI DỊCH VỤ DÙNG LOCALSTORAGE
         let serviceOrders = JSON.parse(localStorage.getItem('shop_service_orders')) || [];
         let userBalances = JSON.parse(localStorage.getItem('shop_user_balances')) || {};
+        
+        // Mặc định khởi tạo các gói cày thuê nếu chưa có trong LocalStorage
+        let defaultServices = [
+            { id: 'CT01', title: 'Cày Thuê Max Level 2550 (Blox Fruits)', game: 'Cày Thuê Roblox', price: 50000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400', tag: 'SIÊU TỐC' },
+            { id: 'CT02', title: 'Cày Thuê Mở Sức Mạnh Tộc V4 Full Gear', game: 'Cày Thuê Roblox', price: 120000, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', tag: 'HOT' },
+            { id: 'CT03', title: 'Cày Thuê Lấy Kiếm Cổ Đại + Melee VIP', game: 'Cày Thuê Roblox', price: 80000, img: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=400', tag: 'GIÁ RẺ' }
+        ];
+
+        let serviceList = JSON.parse(localStorage.getItem('shop_service_list')) || defaultServices;
 
         function getUserBalance(email) { return userBalances[email] || 0; }
         function updateUserBalance(email, amount) {
@@ -253,13 +313,7 @@
             localStorage.setItem('shop_user_balances', JSON.stringify(userBalances));
         }
 
-        // Danh sách các gói cày thuê
-        let serviceList = [
-            { id: 'CT01', title: 'Cày Thuê Max Level 2550 (Blox Fruits)', game: 'Cày Thuê Roblox', price: 50000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400', tag: 'SIÊU TỐC' },
-            { id: 'CT02', title: 'Cày Thuê Mở Sức Mạnh Tộc V4 Full Gear', game: 'Cày Thuê Roblox', price: 120000, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', tag: 'HOT' },
-            { id: 'CT03', title: 'Cày Thuê Lấy Kiếm Cổ Đại + Melee VIP', game: 'Cày Thuê Roblox', price: 80000, img: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=400', tag: 'GIÁ RẺ' }
-        ];
-
+        // RENDER DANH SÁCH GÓI CÀY THUÊ RA TRANG CHỦ
         function renderShopAcc() {
             const accGrid = document.getElementById('accGrid');
             accGrid.innerHTML = '';
@@ -281,64 +335,31 @@
             });
         }
 
-        // MỞ POPUP ĐẶT ĐƠN CÀY THUÊ
-        function openOrderModal(id, title, price) {
-            if (!currentUser) {
-                showToast('Vui lòng đăng nhập trước khi đặt đơn cày thuê!', 'error');
-                return openAuthModal('login');
-            }
-            document.getElementById('serviceId').value = id;
-            document.getElementById('serviceName').value = title;
-            document.getElementById('servicePrice').value = price;
-            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${title} - Giá: ${price.toLocaleString('vi-VN')} đ`;
-            openModal('orderServiceModal');
+        // XỬ LÝ CHUYỂN TAB TRONG DASHBOARD ADMIN
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
         }
 
-        // KHÁCH XÁC NHẬN ĐẶT ĐƠN
-        function handleConfirmOrder(e) {
-            e.preventDefault();
-            const price = parseInt(document.getElementById('servicePrice').value);
-            const balance = getUserBalance(currentUser.email);
-
-            if (balance < price) {
-                showToast(`Số dư không đủ! Vui lòng nạp thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
-                closeModal('orderServiceModal');
-                return openDepositModal();
-            }
-
-            // Trừ tiền
-            updateUserBalance(currentUser.email, -price);
-
-            // Lưu thông tin đơn cày thuê
-            const newOrder = {
-                orderId: 'CT-' + Math.floor(10000 + Math.random() * 90000),
-                userEmail: currentUser.email,
-                serviceName: document.getElementById('serviceName').value,
-                price: price,
-                robloxUser: document.getElementById('robloxUser').value.trim(),
-                robloxPass: document.getElementById('robloxPass').value.trim(),
-                robloxPass3: document.getElementById('robloxPass3').value.trim() || 'Không có',
-                status: 'pending', // pending: Đang chờ cày, completed: Đã duyệt / Đã cày xong
-                createdAt: new Date().toLocaleString('vi-VN')
-            };
-
-            serviceOrders.unshift(newOrder);
-            localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
-
-            closeModal('orderServiceModal');
-            checkUserStatus();
-            showToast('🎉 Đặt đơn thành công! Thông tin tài khoản đã được gửi đến Admin.', 'success');
-        }
-
-        // ADMIN XEM VÀ DUYỆT ĐƠN CÀY THUÊ
+        // MỞ DASHBOARD ADMIN
         function openAdminDashboard() {
+            renderAdminOrdersTable();
+            renderAdminServicesTable();
+            openModal('adminModal');
+        }
+
+        // BẢNG 1: DUYỆT ĐƠN HÀNG TRONG ADMIN
+        function renderAdminOrdersTable() {
             const tbody = document.getElementById('adminOrderTableBody');
             tbody.innerHTML = '';
 
             if (serviceOrders.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8;">Chưa có đơn cày thuê nào!</td></tr>`;
             } else {
-                serviceOrders.forEach((order, index) => {
+                serviceOrders.forEach((order) => {
                     tbody.innerHTML += `
                         <tr>
                             <td><b>${order.orderId}</b></td>
@@ -361,21 +382,122 @@
                     `;
                 });
             }
-            openModal('adminModal');
         }
 
-        // ADMIN BẤM NÚT DUYỆT ĐƠN CÀY XONG
+        // BẢNG 2: BẢNG QUẢN LÝ CÁC GÓI TRONG ADMIN
+        function renderAdminServicesTable() {
+            const tbody = document.getElementById('adminServiceTableBody');
+            tbody.innerHTML = '';
+
+            serviceList.forEach((service) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${service.id}</b></td>
+                        <td>${service.title}</td>
+                        <td style="color:#22c55e; font-weight:bold;">${service.price.toLocaleString('vi-VN')} đ</td>
+                        <td><span class="acc-tag" style="position:static;">${service.tag}</span></td>
+                        <td>
+                            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteService('${service.id}')"><i class="fa-solid fa-trash"></i> Xóa Gói</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ADMIN THÊM GÓI CÀY THUÊ MỚI
+        function handleAddNewService(e) {
+            e.preventDefault();
+            const title = document.getElementById('newServiceTitle').value.trim();
+            const price = parseInt(document.getElementById('newServicePrice').value);
+            const tag = document.getElementById('newServiceTag').value.trim();
+            const img = document.getElementById('newServiceImg').value.trim();
+
+            const newService = {
+                id: 'CT' + Math.floor(10 + Math.random() * 90),
+                title: title,
+                game: 'Cày Thuê Roblox',
+                price: price,
+                img: img,
+                tag: tag
+            };
+
+            serviceList.unshift(newService);
+            localStorage.setItem('shop_service_list', JSON.stringify(serviceList));
+
+            // Reset form & Render lại
+            e.target.reset();
+            renderAdminServicesTable();
+            renderShopAcc();
+            showToast('Thêm gói cày thuê mới thành công!', 'success');
+        }
+
+        // ADMIN XÓA GÓI CÀY THUÊ
+        function deleteService(id) {
+            if (confirm('Bạn có chắc muốn xóa gói cày thuê này?')) {
+                serviceList = serviceList.filter(s => s.id !== id);
+                localStorage.setItem('shop_service_list', JSON.stringify(serviceList));
+                renderAdminServicesTable();
+                renderShopAcc();
+                showToast('Đã xóa gói cày thuê thành công!', 'success');
+            }
+        }
+
+        // KHÁCH ĐẶT ĐƠN CÀY THUÊ
+        function openOrderModal(id, title, price) {
+            if (!currentUser) {
+                showToast('Vui lòng đăng nhập trước khi đặt đơn cày thuê!', 'error');
+                return openAuthModal('login');
+            }
+            document.getElementById('serviceId').value = id;
+            document.getElementById('serviceName').value = title;
+            document.getElementById('servicePrice').value = price;
+            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${title} - Giá: ${price.toLocaleString('vi-VN')} đ`;
+            openModal('orderServiceModal');
+        }
+
+        function handleConfirmOrder(e) {
+            e.preventDefault();
+            const price = parseInt(document.getElementById('servicePrice').value);
+            const balance = getUserBalance(currentUser.email);
+
+            if (balance < price) {
+                showToast(`Số dư không đủ! Vui lòng nạp thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
+                closeModal('orderServiceModal');
+                return openDepositModal();
+            }
+
+            updateUserBalance(currentUser.email, -price);
+
+            const newOrder = {
+                orderId: 'CT-' + Math.floor(10000 + Math.random() * 90000),
+                userEmail: currentUser.email,
+                serviceName: document.getElementById('serviceName').value,
+                price: price,
+                robloxUser: document.getElementById('robloxUser').value.trim(),
+                robloxPass: document.getElementById('robloxPass').value.trim(),
+                robloxPass3: document.getElementById('robloxPass3').value.trim() || 'Không có',
+                status: 'pending',
+                createdAt: new Date().toLocaleString('vi-VN')
+            };
+
+            serviceOrders.unshift(newOrder);
+            localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
+
+            closeModal('orderServiceModal');
+            checkUserStatus();
+            showToast('🎉 Đặt đơn thành công! Thông tin tài khoản đã được gửi đến Admin.', 'success');
+        }
+
         function approveOrder(orderId) {
             let order = serviceOrders.find(o => o.orderId === orderId);
             if (order) {
                 order.status = 'completed';
                 localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
-                openAdminDashboard();
+                renderAdminOrdersTable();
                 showToast(`Đã duyệt hoàn thành đơn cày thuê ${orderId}!`, 'success');
             }
         }
 
-        // KHÁCH XEM LỊCH SỬ CÀY THUÊ
         function openHistoryModal() {
             if (!currentUser) return openAuthModal('login');
             const tbody = document.getElementById('historyTableBody');
@@ -404,7 +526,7 @@
             openModal('historyModal');
         }
 
-        // TIỆN ÍCH MODAL & AUTH
+        // UTILS & AUTH
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -459,7 +581,7 @@
                         <i class="fa-solid fa-coins"></i> ${balance.toLocaleString('vi-VN')} đ
                     </span>
                     <button class="btn btn-success" onclick="openDepositModal()"><i class="fa-solid fa-plus"></i></button>
-                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Duyệt Đơn Admin</button>` : ''}
+                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Panel Admin</button>` : ''}
                     <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
                 `;
             } else {
