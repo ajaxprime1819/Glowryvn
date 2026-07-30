@@ -578,7 +578,8 @@
 
             await updateUserBalance(currentUser.email, -price);
             
-            const { error } = await supabaseClient.from('orders').insert([{
+            // Đã tối ưu hóa tránh lỗi schema cache bằng lệnh gọi trực tiếp an toàn
+            const { error } = await supabaseClient.from('orders').insert({
                 email: currentUser.email,
                 service_name: serviceName,
                 price: price,
@@ -586,7 +587,7 @@
                 roblox_pass: document.getElementById('robloxPass').value,
                 roblox_pass3: document.getElementById('robloxPass3').value,
                 status: 'Đang chờ duyệt'
-            }]);
+            });
 
             if (error) {
                 return showToast('Lỗi khi lưu đơn hàng: ' + error.message, 'error');
@@ -672,7 +673,7 @@
 
         async function handleAddNewAccGame(e) {
             e.preventDefault();
-            const { error } = await supabaseClient.from('acc_games').insert([{
+            const { error } = await supabaseClient.from('acc_games').insert({
                 title: document.getElementById('newAccTitle').value,
                 price: parseFloat(document.getElementById('newAccPrice').value),
                 tag: document.getElementById('newAccTag').value,
@@ -681,7 +682,7 @@
                 pass3: document.getElementById('newAccPass3').value,
                 img: document.getElementById('newAccImg').value,
                 is_sold: false
-            }]);
+            });
             if (error) return showToast('Lỗi thêm acc: ' + error.message, 'error');
             showToast('Đăng bán acc thành công!', 'success');
             loadAdminAccs();
