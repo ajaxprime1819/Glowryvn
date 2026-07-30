@@ -198,7 +198,7 @@
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h3 id="modalTitle">ĐĂNG NHẬP</h3>
             <input type="email" id="email" placeholder="Nhập Email...">
-            <input type="password" id="password" placeholder="Nhập Mật khẩu (ít nhất 6 ký tự)...">
+            <input type="password" id="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)...">
             <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px;">XÁC NHẬN</button>
         </div>
     </div>
@@ -210,9 +210,9 @@
 
     <!-- JAVASCRIPT XỬ LÝ SUPABASE -->
     <script>
-        // THÔNG TIN SUPABASE ĐÃ ĐƯỢC CẤU HÌNH SẴN:
-        const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU';
+        // 🛠️ DÁN MÃ ANON PUBLIC BẠN CỦA BẠN VÀO DÒNG DƯỚI DÂY:
+        const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co/rest/v1/';
+        const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU'; 
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -243,12 +243,14 @@
         async function handleRegister() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            if(!email || !password) return alert('Vui lòng nhập đầy đủ thông tin!');
+            
+            if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
+            if(password.length < 6) return alert('Mật khẩu phải từ 6 ký tự trở lên!');
 
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) alert('Lỗi: ' + error.message);
+            if (error) alert('Lỗi đăng ký: ' + error.message);
             else {
-                alert('Đăng ký thành công! Bạn có thể Đăng nhập ngay.');
+                alert('Đăng ký thành công! Bạn có thể bấm Đăng nhập ngay.');
                 closeModal();
             }
         }
@@ -256,7 +258,8 @@
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            if(!email || !password) return alert('Vui lòng nhập đầy đủ thông tin!');
+            
+            if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
 
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) alert('Lỗi đăng nhập: ' + error.message);
@@ -290,7 +293,7 @@
             }
         }
 
-        // Tự động kiểm tra trạng thái đăng nhập khi tải trang
+        // Tự động kiểm tra khi tải trang
         checkUserStatus();
     </script>
 </body>
