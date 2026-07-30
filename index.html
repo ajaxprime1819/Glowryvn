@@ -17,7 +17,7 @@
         .logo { font-size: 22px; font-weight: 800; color: #3b82f6; display: flex; align-items: center; gap: 10px; }
         .logo span { color: #ef4444; }
 
-        /* HEADER CENTER CONTENT (ĐĂNG NHẬP / ĐĂNG KÝ HOẶC THÔNG TIN TÀI KHOẢN) */
+        /* HEADER CENTER CONTENT */
         .header-center { display: flex; align-items: center; gap: 12px; }
         .user-header-info { display: flex; align-items: center; gap: 15px; font-size: 14px; background: #0f172a; padding: 6px 16px; border-radius: 20px; border: 1px solid #334155; }
         .user-header-info .email { color: #cbd5e1; font-weight: 600; display: flex; align-items: center; gap: 6px; }
@@ -141,20 +141,13 @@
     <!-- HEADER -->
     <header>
         <div class="navbar">
-            <!-- LOGO TRÊN CÙNG BÊN TRÁI -->
             <a href="#" class="logo"><i class="fa-solid fa-store"></i> TẠP HÓA <span>CHÍ NGHĨA</span></a>
             
-            <!-- ĐĂNG NHẬP / ĐĂNG KÝỞ GIỮA THANH TRÊN CÙNG -->
-            <div class="header-center" id="headerCenterAuth">
-                <!-- Sẽ tự động thay đổi bằng JS: Hiện nút Đăng Nhập / Đăng Ký hoặc Thông tin User -->
-            </div>
+            <div class="header-center" id="headerCenterAuth"></div>
 
-            <!-- MENU 3 GẠCH BÊN PHẢI -->
             <div class="menu-container">
                 <button class="hamburger-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-bars"></i></button>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <!-- Danh sách các nút chức năng -->
-                </div>
+                <div class="dropdown-menu" id="dropdownMenu"></div>
             </div>
         </div>
     </header>
@@ -175,6 +168,44 @@
         <!-- SECTION 2: GÓI CÀY THUÊ -->
         <h2 class="section-title"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> DANH SÁCH GÓI CÀY THUÊ</h2>
         <div class="shop-grid" id="serviceGrid"></div>
+    </div>
+
+    <!-- POPUP DASHBOARD ADMIN (ĐÃ THÊM MỚI TÍNH NĂNG VÀO ĐÂY) -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content admin-modal-content">
+            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
+            <h3 style="color:#ec4899;"><i class="fa-solid fa-user-gear"></i> BẢNG QUẢN TRỊ ADMIN</h3>
+            
+            <div style="margin-bottom: 20px; background:#0f172a; padding:15px; border-radius:8px; border:1px solid #334155;">
+                <h4 style="color:#3b82f6; margin-bottom:10px;"><i class="fa-solid fa-plus"></i> THÊM ACC GAME MỚI</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="text" id="addAccTitle" class="form-input" placeholder="Tên sản phẩm acc...">
+                    <input type="number" id="addAccPrice" class="form-input" placeholder="Giá tiền (VNĐ)...">
+                    <input type="text" id="addAccUser" class="form-input" placeholder="Tên tài khoản (Username)...">
+                    <input type="text" id="addAccPass" class="form-input" placeholder="Mật khẩu (Password)...">
+                    <input type="text" id="addAccPass3" class="form-input" placeholder="Mã 2FA / Pass 3 (Nếu có)...">
+                    <input type="text" id="addAccImg" class="form-input" placeholder="Link ảnh Acc (URL)...">
+                </div>
+                <button class="btn btn-success" onclick="handleAddAccGame()" style="margin-top:5px; width:100%;"><i class="fa-solid fa-plus"></i> THÊM TÀI KHOẢN VÀO SHOP</button>
+            </div>
+
+            <h4 style="color:#22c55e; margin: 15px 0 10px 0;"><i class="fa-solid fa-list"></i> DANH SÁCH ACC GAME HIỆN CÓ</h4>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Giá Tiền</th>
+                            <th>Tài Khoản / Mật Khẩu</th>
+                            <th>Trạng Thái</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminAccTableBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- POPUP ĐỔI MẬT KHẨU -->
@@ -222,60 +253,12 @@
         </div>
     </div>
 
-    <!-- POPUP ĐẶT ĐƠN CÀY THUÊ -->
-    <div class="modal" id="orderServiceModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('orderServiceModal')">&times;</span>
-            <h3><i class="fa-solid fa-gamepad"></i> GỬI THÔNG TIN CÀY THUÊ</h3>
-            <p style="font-size:13px; color:#94a3b8; text-align:center; margin-bottom:15px;" id="serviceTitleDisplay"></p>
-            
-            <form onsubmit="handleConfirmOrder(event)">
-                <input type="hidden" id="serviceId">
-                <input type="hidden" id="servicePrice">
-                <input type="hidden" id="serviceName">
-
-                <label style="font-size:12px; color:#94a3b8;">Tài khoản Roblox / Email:</label>
-                <input type="text" id="robloxUser" class="form-input" required placeholder="Nhập tên đăng nhập Roblox...">
-
-                <label style="font-size:12px; color:#94a3b8;">Mật khẩu Roblox:</label>
-                <input type="password" id="robloxPass" class="form-input" required placeholder="Nhập mật khẩu...">
-
-                <label style="font-size:12px; color:#ef4444; font-weight:bold;">Điền mã dự phòng / Pass 3 (Nếu có):</label>
-                <input type="text" id="robloxPass3" class="form-input" placeholder="Nhập mã dự phòng 2FA...">
-
-                <button type="submit" class="btn btn-success" style="width:100%; padding:12px; margin-top:10px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- POPUP LỊCH SỬ ĐƠN -->
-    <div class="modal" id="historyModal">
-        <div class="modal-content admin-modal-content">
-            <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
-            <h3><i class="fa-solid fa-clock-rotate-left"></i> LỊCH SỬ MUA TÀI KHOẢN & CÀY THUÊ</h3>
-            <div style="overflow-x: auto;">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Loại Đơn</th>
-                            <th>Tên Sản Phẩm / Gói</th>
-                            <th>Giá Tiền</th>
-                            <th>Thông Tin Nhận / Đã Gửi</th>
-                            <th>Trạng Thái</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- POPUP AUTH & NẠP TIỀN -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
             <h3 id="modalTitle">ĐĂNG NHẬP</h3>
-            <input type="email" id="email" class="form-input" placeholder="Nhập Email...">
+            <input type="email" id="email" class="form-input" placeholder="Nhập Email (Dùng admin@gmail.com để thử QTV)...">
             <input type="password" id="password" class="form-input" placeholder="Mật khẩu...">
             <button class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px; margin-top:10px;">XÁC NHẬN</button>
         </div>
@@ -338,7 +321,6 @@
         }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        /* TOGGLE HAMBURGER MENU */
         function toggleMenu(event) {
             event.stopPropagation();
             const dropdown = document.getElementById('dropdownMenu');
@@ -356,7 +338,6 @@
             }
         };
 
-        /* CẬP NHẬT HEADER BÊN TRÊN CÙNG (Ở GIỮA & TRONG MENU 3 GẠCH) */
         function checkUserStatus() {
             const headerCenter = document.getElementById('headerCenterAuth');
             const dropdownMenu = document.getElementById('dropdownMenu');
@@ -364,7 +345,6 @@
             if (currentUser) {
                 const balance = getUserBalance(currentUser.email);
                 
-                // Hiển thị ở giữa header
                 headerCenter.innerHTML = `
                     <div class="user-header-info">
                         <span class="email"><i class="fa-solid fa-user-circle"></i> ${currentUser.email}</span>
@@ -372,23 +352,19 @@
                     </div>
                 `;
 
-                // Menu 3 gạch
                 dropdownMenu.innerHTML = `
                     <a href="#" class="dropdown-item" onclick="closeMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
                     <button class="dropdown-item" onclick="openDepositModal()"><i class="fa-solid fa-wallet" style="color:#22c55e;"></i> Nạp tiền</button>
-                    <button class="dropdown-item" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left" style="color:#3b82f6;"></i> Lịch Sử Đơn</button>
                     <button class="dropdown-item" onclick="openModal('changePasswordModal')"><i class="fa-solid fa-key" style="color:#f59e0b;"></i> Đổi Mật Khẩu</button>
                     ${currentUser.email === 'admin@gmail.com' ? `<button class="dropdown-item" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear" style="color:#ec4899;"></i> Quản Trị Admin</button>` : ''}
                     <button class="dropdown-item" onclick="logout()" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
             } else {
-                // Hiển thị Đăng nhập / Đăng ký ở GIỮA thanh trên cùng
                 headerCenter.innerHTML = `
                     <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
                     <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
                 `;
 
-                // Menu 3 gạch khi chưa đăng nhập
                 dropdownMenu.innerHTML = `
                     <a href="#" class="dropdown-item" onclick="closeMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
                     <button class="dropdown-item" onclick="openAuthModal('login')"><i class="fa-solid fa-right-to-bracket" style="color:#3b82f6;"></i> Đăng nhập</button>
@@ -397,34 +373,98 @@
             }
         }
 
-        /* --- XỬ LÝ ĐỔI MẬT KHẨU SUPABASE --- */
+        /* TÍNH NĂNG ADMIN DASHBOARD */
+        function openAdminDashboard() {
+            if (!currentUser || currentUser.email !== 'admin@gmail.com') {
+                return showToast('Bạn không phải là Quản Trị Viên!', 'error');
+            }
+            renderAdminAccTable();
+            openModal('adminModal');
+        }
+
+        function renderAdminAccTable() {
+            const tableBody = document.getElementById('adminAccTableBody');
+            tableBody.innerHTML = '';
+            accGameList.forEach((acc, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td><b>${acc.id}</b></td>
+                        <td>${acc.title}</td>
+                        <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
+                        <td>${acc.user} / ${acc.pass}</td>
+                        <td>${acc.isSold ? '<span style="color:#ef4444;">Đã Bán</span>' : '<span style="color:#22c55e;">Đang Bán</span>'}</td>
+                        <td><button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteAccGame(${index})"><i class="fa-solid fa-trash"></i> Xóa</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function handleAddAccGame() {
+            const title = document.getElementById('addAccTitle').value.trim();
+            const price = parseInt(document.getElementById('addAccPrice').value);
+            const user = document.getElementById('addAccUser').value.trim();
+            const pass = document.getElementById('addAccPass').value.trim();
+            const pass3 = document.getElementById('addAccPass3').value.trim();
+            let img = document.getElementById('addAccImg').value.trim();
+
+            if (!title || !price || !user || !pass) {
+                return showToast('Vui lòng điền đầy đủ các trường thông tin cơ bản!', 'error');
+            }
+
+            if (!img) img = 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=400';
+
+            const newAcc = {
+                id: 'ACC' + Math.floor(100 + Math.random() * 900),
+                title,
+                price,
+                user,
+                pass,
+                pass3,
+                img,
+                tag: 'MỚI THÊM',
+                isSold: false
+            };
+
+            accGameList.unshift(newAcc);
+            localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
+            
+            showToast('Thêm tài khoản game thành công!', 'success');
+            renderAdminAccTable();
+            renderShopItems();
+
+            document.getElementById('addAccTitle').value = '';
+            document.getElementById('addAccPrice').value = '';
+            document.getElementById('addAccUser').value = '';
+            document.getElementById('addAccPass').value = '';
+            document.getElementById('addAccPass3').value = '';
+            document.getElementById('addAccImg').value = '';
+        }
+
+        function deleteAccGame(index) {
+            if (confirm('Bạn có chắc muốn xóa tài khoản này khỏi shop?')) {
+                accGameList.splice(index, 1);
+                localStorage.setItem('shop_acc_game_list', JSON.stringify(accGameList));
+                showToast('Đã xóa tài khoản!', 'info');
+                renderAdminAccTable();
+                renderShopItems();
+            }
+        }
+
         async function handleChangePassword() {
             const newPassword = document.getElementById('newPassword').value.trim();
             const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
 
-            if (!newPassword || !confirmNewPassword) {
-                return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
-            }
+            if (!newPassword || !confirmNewPassword) return showToast('Vui lòng nhập đầy đủ thông tin!', 'error');
+            if (newPassword !== confirmNewPassword) return showToast('Mật khẩu xác nhận không trùng khớp!', 'error');
+            if (newPassword.length < 6) return showToast('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
 
-            if (newPassword !== confirmNewPassword) {
-                return showToast('Mật khẩu xác nhận không trùng khớp!', 'error');
-            }
-
-            if (newPassword.length < 6) {
-                return showToast('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
-            }
-
-            const { data, error } = await supabaseClient.auth.updateUser({
-                password: newPassword
-            });
+            const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
 
             if (error) {
                 showToast('Lỗi đổi mật khẩu: ' + error.message, 'error');
             } else {
                 showToast('Đổi mật khẩu thành công!', 'success');
                 closeModal('changePasswordModal');
-                document.getElementById('newPassword').value = '';
-                document.getElementById('confirmNewPassword').value = '';
             }
         }
 
@@ -503,7 +543,7 @@
                             <div class="acc-title">${item.title}</div>
                             <div class="acc-footer">
                                 <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
-                                <button class="btn btn-primary" onclick="openOrderModal('${item.id}', '${item.title}', ${item.price})">Đặt Cày Thuê</button>
+                                <button class="btn btn-primary" onclick="showToast('Tính năng đặt cày thuê đang xử lý', 'info')">Đặt Cày Thuê</button>
                             </div>
                         </div>
                     </div>
@@ -561,7 +601,6 @@
             renderShopItems();
         }
 
-        // Khởi chạy khi load trang
         renderShopItems();
         checkUserStatus();
     </script>
