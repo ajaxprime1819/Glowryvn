@@ -240,23 +240,32 @@
             document.getElementById('authModal').style.display = 'none';
         }
 
+        // Xử lý Đăng ký (Đã tích hợp kiểm tra trùng Email)
         async function handleRegister() {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
             if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
             if(password.length < 6) return alert('Mật khẩu phải từ 6 ký tự trở lên!');
 
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) alert('Lỗi đăng ký: ' + error.message);
-            else {
-                alert('Đăng ký thành công! Bạn có thể bấm Đăng nhập ngay.');
-                closeModal();
+
+            if (error) {
+                alert('Lỗi đăng ký: ' + error.message);
+            } else {
+                // Kiểm tra nếu tài khoản trùng lặp đã tồn tại
+                if (data.user && data.user.identities && data.user.identities.length === 0) {
+                    alert('⚠️ Email này đã được đăng ký tài khoản trước đó! Vui lòng chọn Email khác hoặc bấm Đăng Nhập.');
+                } else {
+                    alert('🎉 Đăng ký thành công! Bạn có thể Đăng nhập ngay bây giờ.');
+                    closeModal();
+                }
             }
         }
 
+        // Xử lý Đăng nhập
         async function handleLogin() {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
             if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
@@ -270,27 +279,30 @@
             }
         }
 
-        async function handleRegister() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    
-    if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
-    if(password.length < 6) return alert('Mật khẩu phải từ 6 ký tự trở lên!');
-
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
-
-    if (error) {
-        alert('Lỗi đăng ký: ' + error.message);
-    } else {
-        // Kiểm tra xem user này đã tồn tại sẵn trong cơ sở dữ liệu chưa
-        if (data.user && data.user.identities && data.user.identities.length === 0) {
-            alert('⚠️ Email này đã được đăng ký tài khoản trước đó! Vui lòng sử dụng Email khác hoặc bấm Đăng Nhập.');
-        } else {
-            alert('🎉 Đăng ký thành công! Bạn có thể Đăng nhập ngay bây giờ.');
-            closeModal();
+        // Xử lý Đăng xuất
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            alert('Đã đăng xuất!');
+            checkUserStatus();
         }
-    }
-}
+
+        // Kiểm tra trạng thái đăng nhập
+        async function checkUserStatus() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const authBtns = document.getElementById('auth-buttons');
+            
+            if (user) {
+                authBtns.innerHTML = `
+                    <span style="color:#4ade80; font-weight:bold;"><i class="fa-solid fa-user-check"></i> ${user.email.split('@')[0]}</span>
+                    <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                `;
+            } else {
+                authBtns.innerHTML = `
+                    <button class="btn btn-login" onclick="openModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
+                    <button class="btn btn-primary" onclick="openModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+                `;
+            }
+        }
 
         // Tự động kiểm tra khi tải trang
         checkUserStatus();
