@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHOPGAME24H - Bán Acc & Dịch Vụ Cày Thuê Game</title>
+    <title>Tạp Hóa Chí Nghĩa - Bán Acc & Dịch Vụ Cày Thuê Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -95,7 +95,7 @@
     <!-- HEADER -->
     <header>
         <div class="navbar">
-            <a href="#" class="logo"><i class="fa-solid fa-gamepad"></i> SHOP<span>GAME</span></a>
+            <a href="#" class="logo"><i class="fa-solid fa-store"></i> TẠP HÓA <span>CHÍ NGHĨA</span></a>
             <ul class="nav-links">
                 <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
                 <li><a href="javascript:void(0)" onclick="openDepositModal()"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
@@ -110,7 +110,7 @@
 
     <!-- HERO BANNER -->
     <section class="hero">
-        <h1>TẤT CẢ DỊCH VỤ VỀ GAME ĐỀU CÓ Ở ĐÂY</h1>
+        <h1>DỊCH VỤ ROBLOX ĐỀU CÓ Ở ĐÂY</h1>
         <p>Bàn giao tài khoản tự động - Mua acc nhận tài khoản mật khẩu ngay!</p>
         <button class="btn btn-success" style="padding: 12px 30px; font-size: 16px;" onclick="openDepositModal()"><i class="fa-solid fa-bolt"></i> NẠP TIỀN NGAY</button>
     </section>
@@ -317,7 +317,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 SHOPGAME24H. All rights reserved.</p>
+        <p>&copy; 2026 TẠP HÓA CHÍ NGHĨA. All rights reserved.</p>
     </footer>
 
     <script>
@@ -370,7 +370,7 @@
                     <span style="font-size:14px; font-weight:bold; color:#22c55e;"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
                     <span style="font-size:14px; color:#94a3b8;"><i class="fa-solid fa-user"></i> ${currentUser.email}</span>
                     ${currentUser.email === 'admin@gmail.com' ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-gear"></i> Admin</button>` : ''}
-                    <button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Tải lại/Đăng xuất</button>
+                    <button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
             } else {
                 authContainer.innerHTML = `
