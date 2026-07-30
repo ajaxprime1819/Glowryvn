@@ -26,6 +26,8 @@
         .btn-login:hover { background: #475569; }
         .btn-primary { background: #3b82f6; color: #fff; }
         .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #22c55e; color: #fff; }
+        .btn-success:hover { background: #16a34a; }
         .btn-warning { background: #f59e0b; color: #fff; }
         .btn-warning:hover { background: #d97706; }
         .btn-danger { background: #ef4444; color: #fff; }
@@ -53,13 +55,20 @@
         .acc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 10px; }
         .price { font-size: 18px; font-weight: 800; color: #22c55e; }
 
-        /* MODAL POPUP AUTH & ADMIN */
+        /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
         .admin-modal-content { max-width: 900px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
         .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
         
+        /* TAB DEPOSIT */
+        .deposit-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .tab-btn { flex: 1; padding: 10px; background: #0f172a; border: 1px solid #334155; color: #fff; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; }
+        .tab-btn.active { background: #3b82f6; border-color: #3b82f6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         /* ADMIN TABLE */
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         .admin-table th, .admin-table td { border: 1px solid #334155; padding: 10px; text-align: left; }
@@ -78,12 +87,12 @@
             <ul class="nav-links">
                 <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
                 <li><a href="#"><i class="fa-solid fa-store"></i> Shop Acc</a></li>
-                <li><a href="#"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
+                <li><a href="javascript:void(0)" onclick="openDepositModal()"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
                 <li><a href="#"><i class="fa-solid fa-newspaper"></i> Tin tức</a></li>
             </ul>
             <div class="auth-btns" id="auth-buttons">
-                <button class="btn btn-login" onclick="openModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
-                <button class="btn btn-primary" onclick="openModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+                <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
+                <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
             </div>
         </div>
     </header>
@@ -92,12 +101,11 @@
     <section class="hero">
         <h1>KHO TÀI KHOẢN GAME VIP #1 VIỆT NAM</h1>
         <p>Giao dịch tự động 24/7 - Bàn giao acc ngay lập tức - Bảo hành vĩnh viễn</p>
-        <button class="btn btn-primary" style="padding: 12px 30px; font-size: 16px;"><i class="fa-solid fa-bolt"></i> NẠP TIỀN NGAY</button>
+        <button class="btn btn-success" style="padding: 12px 30px; font-size: 16px;" onclick="openDepositModal()"><i class="fa-solid fa-bolt"></i> NẠP TIỀN NGAY</button>
     </section>
 
     <!-- MAIN CONTENT -->
     <div class="container">
-        
         <!-- BỘ LỌC TÌM KIẾM -->
         <div class="filter-box">
             <select id="filterGame">
@@ -118,13 +126,62 @@
 
         <!-- DANH SÁCH ACC GAME -->
         <h2 style="margin-bottom: 20px; border-left: 4px solid #3b82f6; padding-left: 10px;">ACC GAME MỚI NHẤT</h2>
-        
-        <div class="shop-grid" id="accGrid">
-            <!-- Render dữ liệu từ JavaScript -->
+        <div class="shop-grid" id="accGrid"></div>
+    </div>
+
+    <!-- POPUP NẠP TIỀN -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
+            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
+            
+            <div class="deposit-tabs">
+                <div class="tab-btn active" onclick="switchDepositTab('bank')"><i class="fa-solid fa-qrcode"></i> Ngân Hàng / QR</div>
+                <div class="tab-btn" onclick="switchDepositTab('card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào</div>
+            </div>
+
+            <!-- Tab Ngân Hàng -->
+            <div class="tab-content active" id="tabBank">
+                <p style="font-size:13px; color:#94a3b8; margin-bottom:10px;">Nhập số tiền muốn nạp để hệ thống tạo mã QR tự động:</p>
+                <input type="number" id="depositAmount" class="form-input" style="margin-bottom:15px;" placeholder="Nhập số tiền (VD: 50000)" oninput="updateQrCode()">
+                
+                <div style="background:#0f172a; padding:15px; border-radius:8px; text-align:center; border:1px dashed #3b82f6;">
+                    <p style="font-size:14px; font-weight:bold; color:#22c55e;">Ngân Hàng: MBBank</p>
+                    <p style="font-size:14px;">Số TK: <strong>0333333333</strong> (Chủ TK: NGUYEN VAN A)</p>
+                    <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=NAPTIEN" style="margin: 10px 0; border-radius:8px; background:#fff; padding:5px;">
+                    <p style="font-size:12px; color:#ef4444;" id="depositMemo">Nội dung CK: <strong>NAP [Email Của Bạn]</strong></p>
+                </div>
+                <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="confirmBankDeposit()">ĐÃ CHUYỂN KHOẢN</button>
+            </div>
+
+            <!-- Tab Thẻ Cào -->
+            <div class="tab-content" id="tabCard">
+                <label style="font-size:12px; color:#94a3b8;">Chọn Loại Thẻ:</label>
+                <select id="cardType" class="form-input" style="margin-bottom:10px;">
+                    <option value="Viettel">Viettel</option>
+                    <option value="Vinaphone">Vinaphone</option>
+                    <option value="Mobifone">Mobifone</option>
+                </select>
+
+                <label style="font-size:12px; color:#94a3b8;">Mệnh Giá:</label>
+                <select id="cardValue" class="form-input" style="margin-bottom:10px;">
+                    <option value="10000">10.000 đ</option>
+                    <option value="20000">20.000 đ</option>
+                    <option value="50000">50.000 đ</option>
+                    <option value="100000">100.000 đ</option>
+                    <option value="200000">200.000 đ</option>
+                    <option value="500000">500.000 đ</option>
+                </select>
+
+                <input type="text" id="cardCode" class="form-input" style="margin-bottom:10px;" placeholder="Nhập Mã Thẻ (PIN)...">
+                <input type="text" id="cardSeri" class="form-input" style="margin-bottom:15px;" placeholder="Nhập Số Seri...">
+
+                <button class="btn btn-primary" style="width:100%;" onclick="submitCardDeposit()">GỬI THẺ CÀO</button>
+            </div>
         </div>
     </div>
 
-    <!-- POPUP AUTH (ĐĂNG NHẬP / ĐĂNG KÝ) -->
+    <!-- POPUP AUTH -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
@@ -143,6 +200,7 @@
             
             <div style="margin-bottom: 20px; display: flex; gap: 10px;">
                 <button class="btn btn-primary" onclick="openAddAccModal()"><i class="fa-solid fa-plus"></i> Thêm Acc Game Mới</button>
+                <button class="btn btn-success" onclick="openAdminDepositManagement()"><i class="fa-solid fa-money-check-dollar"></i> Cộng Tiền Cho Khách</button>
             </div>
 
             <h4 style="color: #94a3b8; margin-bottom: 10px;">Danh sách Acc Game hiện tại:</h4>
@@ -157,11 +215,24 @@
                             <th>Hành Động</th>
                         </tr>
                     </thead>
-                    <tbody id="adminAccTableBody">
-                        <!-- Render danh sách quản lý acc -->
-                    </tbody>
+                    <tbody id="adminAccTableBody"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- POPUP CỘNG TIỀN (ADMIN) -->
+    <div class="modal" id="adminDepositModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('adminDepositModal')">&times;</span>
+            <h3>CỘNG TIỀN CHO KHÁCH HÀNG</h3>
+            <label style="font-size:12px; color:#94a3b8;">Email Khách Hàng:</label>
+            <input type="email" id="adminTargetEmail" class="form-input" style="margin-bottom:10px;" placeholder="Nhập email khách...">
+            
+            <label style="font-size:12px; color:#94a3b8;">Số Tiền Cộng (VNĐ):</label>
+            <input type="number" id="adminAddAmount" class="form-input" style="margin-bottom:15px;" placeholder="Ví dụ: 100000">
+
+            <button class="btn btn-success" style="width:100%; padding:12px;" onclick="handleAddMoneyByAdmin()">XÁC NHẬN CỘNG TIỀN</button>
         </div>
     </div>
 
@@ -172,26 +243,16 @@
             <h3 id="accFormTitle">THÊM ACC GAME MỚI</h3>
             <form id="accForm" onsubmit="handleSaveAcc(event)">
                 <input type="hidden" id="accId">
-                <label style="font-size:12px; color:#94a3b8;">Tên Tiêu Đề Acc:</label>
-                <input type="text" id="accTitle" class="form-input" style="margin-bottom:10px;" required placeholder="Ví dụ: Acc Free Fire #FF998 - Full Skin">
-                
-                <label style="font-size:12px; color:#94a3b8;">Loại Game:</label>
+                <input type="text" id="accTitle" class="form-input" style="margin-bottom:10px;" required placeholder="Tiêu đề Acc...">
                 <select id="accGameType" class="form-input" style="margin-bottom:10px;" required>
                     <option value="Free Fire">Free Fire</option>
                     <option value="Liên Quân">Liên Quân Mobile</option>
                     <option value="Genshin">Genshin Impact</option>
                     <option value="Roblox">Roblox</option>
                 </select>
-
-                <label style="font-size:12px; color:#94a3b8;">Giá bán (VNĐ):</label>
-                <input type="number" id="accPrice" class="form-input" style="margin-bottom:10px;" required placeholder="150000">
-
-                <label style="font-size:12px; color:#94a3b8;">Link Hình Ảnh:</label>
-                <input type="text" id="accImg" class="form-input" style="margin-bottom:10px;" required placeholder="https://images.unsplash.com/photo-...">
-
-                <label style="font-size:12px; color:#94a3b8;">Nhãn / Tag (VD: GIẢM 20%, VIP, MỚI):</label>
-                <input type="text" id="accTag" class="form-input" style="margin-bottom:15px;" placeholder="GIẢM 20%">
-
+                <input type="number" id="accPrice" class="form-input" style="margin-bottom:10px;" required placeholder="Giá bán...">
+                <input type="text" id="accImg" class="form-input" style="margin-bottom:10px;" required placeholder="Link hình ảnh...">
+                <input type="text" id="accTag" class="form-input" style="margin-bottom:15px;" placeholder="Tag (Ví dụ: VIP, GIẢM 20%)...">
                 <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">LƯU TÀI KHOẢN</button>
             </form>
         </div>
@@ -202,15 +263,28 @@
         <p>&copy; 2026 SHOPGAME24H. All rights reserved. Hệ thống bán tài khoản game tự động uy tín hàng đầu.</p>
     </footer>
 
-    <!-- JAVASCRIPT XỬ LÝ SYSTEM & ADMIN -->
+    <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        // 🛠️ DÁN MÃ ANON PUBLIC CỦA BẠN VÀO DÒNG DƯỚI DÂY:
         const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU'; 
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Kho dữ liệu Acc Game mặc định
+        let currentUser = null;
+
+        // Dữ liệu số dư khách hàng lưu trữ
+        let userBalances = JSON.parse(localStorage.getItem('shop_user_balances')) || {};
+
+        function getUserBalance(email) {
+            return userBalances[email] || 0;
+        }
+
+        function updateUserBalance(email, amount) {
+            userBalances[email] = (userBalances[email] || 0) + amount;
+            localStorage.setItem('shop_user_balances', JSON.stringify(userBalances));
+        }
+
+        // Acc game mặc định
         let defaultAccs = [
             { id: '1', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%' },
             { id: '2', title: 'Acc Liên Quân #LQ552 - 110 Tướng 200 Skin', game: 'Liên Quân', price: 350000, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400', tag: 'MỚI' },
@@ -218,14 +292,12 @@
             { id: '4', title: 'Acc Roblox Blox Fruit - Max Level + V4', game: 'Roblox', price: 200000, img: 'https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?q=80&w=400', tag: 'VIP' }
         ];
 
-        // Đọc dữ liệu từ LocalStorage nếu có
         let accList = JSON.parse(localStorage.getItem('shop_acc_list')) || defaultAccs;
 
         function saveAccsToStorage() {
             localStorage.setItem('shop_acc_list', JSON.stringify(accList));
         }
 
-        // Render danh sách Acc Game lên trang chủ
         function renderShopAcc() {
             const accGrid = document.getElementById('accGrid');
             const gameFilter = document.getElementById('filterGame').value;
@@ -245,9 +317,8 @@
             });
 
             accGrid.innerHTML = '';
-
             if (filteredList.length === 0) {
-                accGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding:30px;">Không tìm thấy tài khoản nào phù hợp!</p>';
+                accGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding:30px;">Không tìm thấy tài khoản nào!</p>';
                 return;
             }
 
@@ -264,7 +335,7 @@
                             </div>
                             <div class="acc-footer">
                                 <div class="price">${acc.price.toLocaleString('vi-VN')} đ</div>
-                                <button class="btn btn-primary" style="font-size: 12px;">Xem Chi Tiết</button>
+                                <button class="btn btn-primary" style="font-size: 12px;" onclick="buyAcc('${acc.id}', ${acc.price})">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -272,28 +343,106 @@
             });
         }
 
-        // MODAL MANAGEMENT
-        function openModal(id) {
-            document.getElementById(id).style.display = 'flex';
+        // XỬ LÝ MUA ACC
+        function buyAcc(id, price) {
+            if (!currentUser) {
+                alert('Vui lòng đăng nhập để mua tài khoản!');
+                openAuthModal('login');
+                return;
+            }
+
+            let balance = getUserBalance(currentUser.email);
+            if (balance < price) {
+                alert(`Số dư của bạn không đủ! Hiện tại bạn có ${balance.toLocaleString('vi-VN')} đ. Vui lòng nạp thêm tiền.`);
+                openDepositModal();
+            } else {
+                if (confirm(`Bạn có chắc chắn muốn mua acc này với giá ${price.toLocaleString('vi-VN')} đ?`)) {
+                    updateUserBalance(currentUser.email, -price);
+                    accList = accList.filter(a => a.id !== id);
+                    saveAccsToStorage();
+                    renderShopAcc();
+                    checkUserStatus();
+                    alert('🎉 Mua tài khoản thành công! Cảm ơn bạn đã ủng hộ shop.');
+                }
+            }
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+        // XỬ LÝ POPUP NẠP TIỀN
+        function openDepositModal() {
+            if (!currentUser) {
+                alert('Vui lòng đăng nhập trước khi nạp tiền!');
+                openAuthModal('login');
+                return;
+            }
+            document.getElementById('depositMemo').innerHTML = `Nội dung CK: <strong>NAP ${currentUser.email.split('@')[0]}</strong>`;
+            openModal('depositModal');
         }
 
-        // XỬ LÝ AUTHENTICATION
+        function switchDepositTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tab === 'bank') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tabBank').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tabCard').classList.add('active');
+            }
+        }
+
+        function updateQrCode() {
+            const amount = document.getElementById('depositAmount').value || 50000;
+            const userPrefix = currentUser ? currentUser.email.split('@')[0] : 'KHACH';
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MBBANK-0333333333-NAP_${userPrefix}_${amount}VND`;
+            document.getElementById('qrImage').src = qrUrl;
+        }
+
+        function confirmBankDeposit() {
+            alert('Yêu cầu đã được gửi! Hệ thống sẽ kiểm tra và cộng tiền trong 1-3 phút.');
+            closeModal('depositModal');
+        }
+
+        function submitCardDeposit() {
+            const code = document.getElementById('cardCode').value.trim();
+            const seri = document.getElementById('cardSeri').value.trim();
+            if (!code || !seri) return alert('Vui lòng nhập đầy đủ Mã Thẻ và Số Seri!');
+            
+            alert('Đang xử lý thẻ cào... Thẻ của bạn đã được gửi tới hệ thống.');
+            document.getElementById('cardCode').value = '';
+            document.getElementById('cardSeri').value = '';
+            closeModal('depositModal');
+        }
+
+        // CỘNG TIỀN DÀNH CHO ADMIN
+        function openAdminDepositManagement() {
+            openModal('adminDepositModal');
+        }
+
+        function handleAddMoneyByAdmin() {
+            const targetEmail = document.getElementById('adminTargetEmail').value.trim();
+            const amount = parseInt(document.getElementById('adminAddAmount').value);
+
+            if (!targetEmail || isNaN(amount)) return alert('Vui lòng nhập chính xác Email và Số tiền!');
+
+            updateUserBalance(targetEmail, amount);
+            alert(`Thành công! Đã cộng ${amount.toLocaleString('vi-VN')} đ cho tài khoản ${targetEmail}`);
+            closeModal('adminDepositModal');
+            checkUserStatus();
+        }
+
+        // AUTHENTICATION
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
         async function handleRegister() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            
             if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
-            if(password.length < 6) return alert('Mật khẩu phải từ 6 ký tự trở lên!');
-
+            
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
-
-            if (error) {
-                alert('Lỗi đăng ký: ' + error.message);
-            } else {
+            if (error) alert('Lỗi: ' + error.message);
+            else {
                 if (data.user && data.user.identities && data.user.identities.length === 0) {
                     alert('⚠️ Email này đã được đăng ký trước đó!');
                 } else {
@@ -306,11 +455,10 @@
         async function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            
             if(!email || !password) return alert('Vui lòng nhập đầy đủ Email và Mật khẩu!');
 
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) alert('Lỗi đăng nhập: ' + error.message);
+            if (error) alert('Lỗi: ' + error.message);
             else {
                 alert('Đăng nhập thành công!');
                 closeModal('authModal');
@@ -320,22 +468,27 @@
 
         async function handleLogout() {
             await supabaseClient.auth.signOut();
+            currentUser = null;
             alert('Đã đăng xuất!');
             checkUserStatus();
         }
 
         async function checkUserStatus() {
             const { data: { user } } = await supabaseClient.auth.getUser();
+            currentUser = user;
             const authBtns = document.getElementById('auth-buttons');
             
             if (user) {
-                // Kiểm tra xem user có phải Admin hay không (Email chứa từ admin)
                 const isAdmin = user.email.toLowerCase().includes('admin');
+                const balance = getUserBalance(user.email);
 
                 authBtns.innerHTML = `
-                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-screwdriver-wrench"></i> Quản Lý Admin</button>` : ''}
-                    <span style="color:#4ade80; font-weight:bold;"><i class="fa-solid fa-user-check"></i> ${user.email.split('@')[0]}</span>
-                    <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                    <span style="background:#0f172a; padding:6px 12px; border-radius:20px; border:1px solid #22c55e; color:#22c55e; font-weight:bold;">
+                        <i class="fa-solid fa-coins"></i> ${balance.toLocaleString('vi-VN')} đ
+                    </span>
+                    <button class="btn btn-success" onclick="openDepositModal()"><i class="fa-solid fa-plus"></i> Nạp tiền</button>
+                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Admin</button>` : ''}
+                    <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
                 `;
             } else {
                 authBtns.innerHTML = `
@@ -360,16 +513,11 @@
             openModal('authModal');
         }
 
-        // ================= Quản Lý Admin Dashboard ================= //
-        function openAdminDashboard() {
-            renderAdminTable();
-            openModal('adminModal');
-        }
-
+        // ADMIN FUNCTIONS
+        function openAdminDashboard() { renderAdminTable(); openModal('adminModal'); }
         function renderAdminTable() {
             const tableBody = document.getElementById('adminAccTableBody');
             tableBody.innerHTML = '';
-
             accList.forEach(acc => {
                 tableBody.innerHTML += `
                     <tr>
@@ -378,8 +526,8 @@
                         <td>${acc.game}</td>
                         <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
                         <td>
-                            <button class="btn btn-primary" style="padding:4px 8px; font-size:12px;" onclick="editAcc('${acc.id}')"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
-                            <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteAcc('${acc.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            <button class="btn btn-primary" style="padding:4px 8px; font-size:12px;" onclick="editAcc('${acc.id}')">Sửa</button>
+                            <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteAcc('${acc.id}')">Xóa</button>
                         </td>
                     </tr>
                 `;
@@ -403,31 +551,22 @@
             const tag = document.getElementById('accTag').value;
 
             if (id) {
-                // Cập nhật Acc
                 let index = accList.findIndex(a => a.id === id);
-                if (index !== -1) {
-                    accList[index] = { id, title, game, price, img, tag };
-                }
+                if (index !== -1) accList[index] = { id, title, game, price, img, tag };
             } else {
-                // Thêm Acc Mới
-                const newAcc = {
-                    id: Date.now().toString().slice(-4),
-                    title, game, price, img, tag
-                };
-                accList.unshift(newAcc);
+                accList.unshift({ id: Date.now().toString().slice(-4), title, game, price, img, tag });
             }
 
             saveAccsToStorage();
             renderShopAcc();
             renderAdminTable();
             closeModal('addAccModal');
-            alert('Lưu thông tin Acc thành công!');
+            alert('Lưu Acc thành công!');
         }
 
         function editAcc(id) {
             const acc = accList.find(a => a.id === id);
             if (!acc) return;
-
             document.getElementById('accFormTitle').innerText = 'CHỈNH SỬA ACC GAME';
             document.getElementById('accId').value = acc.id;
             document.getElementById('accTitle').value = acc.title;
@@ -435,12 +574,11 @@
             document.getElementById('accPrice').value = acc.price;
             document.getElementById('accImg').value = acc.img;
             document.getElementById('accTag').value = acc.tag || '';
-
             openModal('addAccModal');
         }
 
         function deleteAcc(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa tài khoản game này không?')) {
+            if (confirm('Xóa tài khoản game này?')) {
                 accList = accList.filter(a => a.id !== id);
                 saveAccsToStorage();
                 renderShopAcc();
@@ -448,7 +586,7 @@
             }
         }
 
-        // Khởi tạo trang
+        // Khởi tạo
         renderShopAcc();
         checkUserStatus();
     </script>
