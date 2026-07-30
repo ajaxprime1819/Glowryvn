@@ -11,14 +11,75 @@
         body { background-color: #0f172a; color: #f8fafc; line-height: 1.6; }
         a { text-decoration: none; color: inherit; }
 
-        /* HEADER */
+        /* HEADER & NAVIGATION */
         header { background: #1e293b; border-bottom: 2px solid #3b82f6; position: sticky; top: 0; z-index: 100; }
         .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .logo { font-size: 24px; font-weight: 800; color: #3b82f6; display: flex; align-items: center; gap: 10px; }
         .logo span { color: #ef4444; }
-        .nav-links { display: flex; gap: 20px; list-style: none; font-weight: 600; }
-        .nav-links a:hover { color: #3b82f6; transition: 0.3s; }
-        .auth-btns { display: flex; gap: 10px; align-items: center; }
+
+        /* HAMBURGER MENU DROPDOWN */
+        .menu-container { position: relative; }
+        .hamburger-btn {
+            background: #334155;
+            color: #fff;
+            border: 1px solid #475569;
+            padding: 10px 14px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hamburger-btn:hover { background: #475569; color: #3b82f6; }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background: #1e293b;
+            min-width: 250px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        .dropdown-menu.show { display: flex; }
+
+        .user-info-box {
+            padding: 12px 15px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+            font-size: 13px;
+        }
+        .user-info-box .email { color: #94a3b8; font-weight: 600; word-break: break-all; margin-bottom: 4px; }
+        .user-info-box .balance { color: #22c55e; font-weight: bold; font-size: 15px; }
+
+        .dropdown-item {
+            padding: 12px 18px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid #334155;
+            transition: 0.2s;
+            background: transparent;
+            border-left: none; border-right: none; border-top: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: #334155; color: #3b82f6; }
+        .dropdown-item i { width: 20px; text-align: center; }
+
+        /* BUTTON STYLES */
         .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-login { background: #334155; color: #fff; }
         .btn-login:hover { background: #475569; }
@@ -54,11 +115,6 @@
         .acc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px; }
         .price { font-size: 17px; font-weight: 800; color: #22c55e; }
 
-        /* BADGE TRẠNG THÁI */
-        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .status-pending { background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b; }
-        .status-completed { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e; }
-
         /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -66,13 +122,6 @@
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
         .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
         .form-input { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; outline: none; width: 100%; margin-bottom: 10px; }
-
-        /* ADMIN TABS */
-        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #334155; padding-bottom: 10px; flex-wrap: wrap; }
-        .tab-btn { background: #0f172a; color: #94a3b8; padding: 10px 18px; border-radius: 6px; border: 1px solid #334155; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
-        .tab-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
 
         /* TABLES */
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
@@ -96,14 +145,13 @@
     <header>
         <div class="navbar">
             <a href="#" class="logo"><i class="fa-solid fa-store"></i> TẠP HÓA <span>CHÍ NGHĨA</span></a>
-            <ul class="nav-links">
-                <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
-                <li><a href="javascript:void(0)" onclick="openDepositModal()"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
-                <li><a href="javascript:void(0)" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Đơn</a></li>
-            </ul>
-            <div class="auth-btns" id="auth-buttons">
-                <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
-                <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+            
+            <!-- MENU 3 GẠCH DROPDOWN -->
+            <div class="menu-container">
+                <button class="hamburger-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-bars"></i></button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <!-- Nội dung sẽ tự động render theo trạng thái Đăng nhập / Chưa đăng nhập -->
+                </div>
             </div>
         </div>
     </header>
@@ -126,7 +174,7 @@
         <div class="shop-grid" id="serviceGrid"></div>
     </div>
 
-    <!-- POPUP ĐỔI MẬT KHẨU (THÊM MỚI) -->
+    <!-- POPUP ĐỔI MẬT KHẨU -->
     <div class="modal" id="changePasswordModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('changePasswordModal')">&times;</span>
@@ -197,141 +245,6 @@
         </div>
     </div>
 
-    <!-- POPUP ADMIN PANEL -->
-    <div class="modal" id="adminModal">
-        <div class="modal-content admin-modal-content">
-            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
-            <h3><i class="fa-solid fa-user-gear"></i> BẢNG QUẢN TRỊ ADMIN</h3>
-
-            <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchAdminTab(event, 'tab-orders')"><i class="fa-solid fa-list-check"></i> Duyệt Đơn Đã Đặt</button>
-                <button class="tab-btn" onclick="switchAdminTab(event, 'tab-services')"><i class="fa-solid fa-plus-circle"></i> Quản Lý Gói Cày Thuê</button>
-                <button class="tab-btn" onclick="switchAdminTab(event, 'tab-acc-sell')" style="background:#22c55e20; color:#22c55e; border-color:#22c55e;"><i class="fa-solid fa-store"></i> Quản Lý Bán Acc Game</button>
-                <button class="tab-btn" onclick="switchAdminTab(event, 'tab-users-balance')" style="background:#f59e0b20; color:#f59e0b; border-color:#f59e0b;"><i class="fa-solid fa-wallet"></i> Quản Lý Số Dư Khách</button>
-            </div>
-
-            <!-- TAB 1: DUYỆT ĐƠN CÀY THUÊ -->
-            <div id="tab-orders" class="tab-content active">
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Mã Đơn</th>
-                                <th>Khách Hàng</th>
-                                <th>Gói Cày Thuê</th>
-                                <th>TK Roblox</th>
-                                <th>MK Roblox</th>
-                                <th>Pass 3 / Mã 2FA</th>
-                                <th>Trạng Thái</th>
-                                <th>Hành Động</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminOrderTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 2: QUẢN LÝ GÓI CÀY THUÊ -->
-            <div id="tab-services" class="tab-content">
-                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #334155;">
-                    <h4 style="color:#3b82f6; margin-bottom:10px;"><i class="fa-solid fa-plus"></i> Thêm Gói Cày Thuê Mới</h4>
-                    <form onsubmit="handleAddNewService(event)">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <input type="text" id="newServiceTitle" class="form-input" placeholder="Tên gói cày thuê..." required>
-                            <input type="number" id="newServicePrice" class="form-input" placeholder="Giá tiền (VNĐ)..." required>
-                            <input type="text" id="newServiceTag" class="form-input" placeholder="Nhãn Badge (HOT, SIÊU TỐC)..." required>
-                            <input type="text" id="newServiceImg" class="form-input" placeholder="Link ảnh Banner..." required>
-                        </div>
-                        <button type="submit" class="btn btn-success" style="width:100%; margin-top:5px;"><i class="fa-solid fa-floppy-disk"></i> THÊM GÓI CÀY THUÊ</button>
-                    </form>
-                </div>
-
-                <h4 style="color:#3b82f6;">Các Gói Cày Hiện Có</h4>
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Mã Gói</th>
-                                <th>Tên Gói Cày</th>
-                                <th>Giá Tiền</th>
-                                <th>Tag</th>
-                                <th>Hành Động</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminServiceTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 3: THÊM VÀ QUẢN LÝ ACC GAME BÁN -->
-            <div id="tab-acc-sell" class="tab-content">
-                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #22c55e;">
-                    <h4 style="color:#22c55e; margin-bottom:10px;"><i class="fa-solid fa-cart-plus"></i> Thêm Acc Game Mới Cần Bán (Nhập TK, MK, Pass 3)</h4>
-                    <form onsubmit="handleAddNewAccGame(event)">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-                            <input type="text" id="newAccTitle" class="form-input" placeholder="Tiêu đề Acc (vd: Acc Blox Fruits Mochi V2)..." required>
-                            <input type="number" id="newAccPrice" class="form-input" placeholder="Giá tiền (VNĐ)..." required>
-                            <input type="text" id="newAccTag" class="form-input" placeholder="Tag (vd: ACC VIP, NICK NGON)..." required>
-                            <input type="text" id="newAccUser" class="form-input" placeholder="Tài Khoản Game (User)..." required>
-                            <input type="text" id="newAccPass" class="form-input" placeholder="Mật Khẩu Game (Pass)..." required>
-                            <input type="text" id="newAccPass3" class="form-input" placeholder="Pass 3 / Mã 2FA (Nếu có)...">
-                        </div>
-                        <input type="text" id="newAccImg" class="form-input" placeholder="Link Ảnh Banner Acc..." required>
-                        <button type="submit" class="btn btn-success" style="width:100%;"><i class="fa-solid fa-upload"></i> ĐĂNG BÁN ACC GAME</button>
-                    </form>
-                </div>
-
-                <h4 style="color:#22c55e;">Kho Acc Game Đã Đăng Bán</h4>
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Mã Acc</th>
-                                <th>Tiêu Đề Acc</th>
-                                <th>Tài Khoản</th>
-                                <th>Mật Khẩu</th>
-                                <th>Pass 3 / 2FA</th>
-                                <th>Giá</th>
-                                <th>Trạng Thái</th>
-                                <th>Hành Động</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminAccSellTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 4: CỘNG TIỀN / TRỪ TIỀN KHÁCH HÀNG -->
-            <div id="tab-users-balance" class="tab-content">
-                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #f59e0b;">
-                    <h4 style="color:#f59e0b; margin-bottom:10px;"><i class="fa-solid fa-coins"></i> Cộng / Trừ Số Dư Tài Khoản Khách</h4>
-                    <form onsubmit="handleAdminAdjustBalance(event)">
-                        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
-                            <input type="email" id="targetUserEmail" class="form-input" placeholder="Nhập Email Khách Hàng..." required>
-                            <input type="number" id="adjustAmount" class="form-input" placeholder="Số tiền (+ Cộng, - Trừ)..." required>
-                        </div>
-                        <button type="submit" class="btn btn-warning" style="width:100%;"><i class="fa-solid fa-floppy-disk"></i> CẬP NHẬT SỐ DƯ KHÁCH HÀNG</button>
-                    </form>
-                </div>
-
-                <h4 style="color:#f59e0b;">Danh Sách Số Dư Tất Cả Khách Hàng</h4>
-                <div style="overflow-x: auto;">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Email Khách Hàng</th>
-                                <th>Số Dư Hiện Tại</th>
-                                <th>Hành Động Nhanh</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUserBalanceTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
     <!-- POPUP LỊCH SỬ ĐƠN -->
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
@@ -395,10 +308,9 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        let serviceOrders = JSON.parse(localStorage.getItem('shop_service_orders')) || [];
-        let purchasedAccs = JSON.parse(localStorage.getItem('shop_purchased_accs')) || [];
         let userBalances = JSON.parse(localStorage.getItem('shop_user_balances')) || {};
-        
+        let purchasedAccs = JSON.parse(localStorage.getItem('shop_purchased_accs')) || [];
+
         let defaultServices = [
             { id: 'CT01', title: 'Cày Thuê Max Level 2550 (Blox Fruits)', price: 50000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400', tag: 'SIÊU TỐC' },
             { id: 'CT02', title: 'Cày Thuê Mở Sức Mạnh Tộc V4 Full Gear', price: 120000, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', tag: 'HOT' }
@@ -417,24 +329,53 @@
             localStorage.setItem('shop_user_balances', JSON.stringify(userBalances));
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function openModal(id) { 
+            closeMenu();
+            document.getElementById(id).style.display = 'flex'; 
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        /* TOGGLE HAMBURGER MENU */
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('show');
+        }
+
+        function closeMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.remove('show');
+        }
+
+        // Đóng dropdown khi click bên ngoài
+        window.onclick = function(e) {
+            if (!e.target.matches('.hamburger-btn') && !e.target.matches('.hamburger-btn *')) {
+                closeMenu();
+            }
+        };
+
+        /* RENDER NỘI DUNG MENU 3 GẠCH DỰA TRÊN TRẠNG THÁI ĐĂNG NHẬP */
         function checkUserStatus() {
-            const authContainer = document.getElementById('auth-buttons');
+            const menu = document.getElementById('dropdownMenu');
             if (currentUser) {
                 const balance = getUserBalance(currentUser.email);
-                authContainer.innerHTML = `
-                    <span style="font-size:14px; font-weight:bold; color:#22c55e;"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
-                    <span style="font-size:14px; color:#94a3b8;"><i class="fa-solid fa-user"></i> ${currentUser.email}</span>
-                    <button class="btn btn-warning" onclick="openModal('changePasswordModal')"><i class="fa-solid fa-key"></i> Đổi MK</button>
-                    ${currentUser.email === 'admin@gmail.com' ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-gear"></i> Admin</button>` : ''}
-                    <button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                menu.innerHTML = `
+                    <div class="user-info-box">
+                        <div class="email"><i class="fa-solid fa-user-circle"></i> ${currentUser.email}</div>
+                        <div class="balance"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</div>
+                    </div>
+                    <a href="#" class="dropdown-item" onclick="closeMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
+                    <button class="dropdown-item" onclick="openDepositModal()"><i class="fa-solid fa-wallet" style="color:#22c55e;"></i> Nạp tiền</button>
+                    <button class="dropdown-item" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left" style="color:#3b82f6;"></i> Lịch Sử Đơn</button>
+                    <button class="dropdown-item" onclick="openModal('changePasswordModal')"><i class="fa-solid fa-key" style="color:#f59e0b;"></i> Đổi Mật Khẩu</button>
+                    ${currentUser.email === 'admin@gmail.com' ? `<button class="dropdown-item" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear" style="color:#ec4899;"></i> Quản Trị Admin</button>` : ''}
+                    <button class="dropdown-item" onclick="logout()" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
                 `;
             } else {
-                authContainer.innerHTML = `
-                    <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
-                    <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+                menu.innerHTML = `
+                    <a href="#" class="dropdown-item" onclick="closeMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
+                    <button class="dropdown-item" onclick="openAuthModal('login')"><i class="fa-solid fa-right-to-bracket" style="color:#3b82f6;"></i> Đăng nhập</button>
+                    <button class="dropdown-item" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus" style="color:#22c55e;"></i> Đăng ký</button>
                 `;
             }
         }
@@ -456,7 +397,6 @@
                 return showToast('Mật khẩu phải có ít nhất 6 ký tự!', 'error');
             }
 
-            // Gọi API Supabase để đổi mật khẩu cho tài khoản hiện tại
             const { data, error } = await supabaseClient.auth.updateUser({
                 password: newPassword
             });
@@ -527,7 +467,7 @@
                             <div class="acc-title">${item.title}</div>
                             <div class="acc-footer">
                                 <div class="price">${item.price.toLocaleString('vi-VN')} đ</div>
-                                ${item.isSold ? `<button class="btn btn-login" disabled>ĐÃ BẢN</button>` : 
+                                ${item.isSold ? `<button class="btn btn-login" disabled>ĐÃ BÁN</button>` : 
                                 `<button class="btn btn-success" onclick="openConfirmBuyModal('${item.id}')"><i class="fa-solid fa-cart-shopping"></i> Mua Ngay</button>`}
                             </div>
                         </div>
@@ -554,7 +494,6 @@
             });
         }
 
-        /* --- MỞ POPUP XÁC NHẬN MUA ACC --- */
         function openConfirmBuyModal(accId) {
             if (!currentUser) return openAuthModal('login');
             
@@ -564,7 +503,6 @@
             document.getElementById('confirmAccTitle').innerText = acc.title;
             document.getElementById('confirmAccPrice').innerText = `${acc.price.toLocaleString('vi-VN')} đ`;
             
-            // Lắng nghe nút ĐỒNG Ý
             document.getElementById('btnConfirmBuyProceed').onclick = function() {
                 closeModal('confirmBuyModal');
                 buyAccGame(accId);
@@ -573,7 +511,6 @@
             openModal('confirmBuyModal');
         }
 
-        /* --- THỰC HIỆN MUA ACC --- */
         function buyAccGame(accId) {
             const acc = accGameList.find(a => a.id === accId);
             if (!acc || acc.isSold) return showToast('Tài khoản không tồn tại hoặc đã bán!', 'error');
