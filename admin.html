@@ -1,0 +1,20 @@
+<div style="background: #1e222d; color: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto;">
+    <h3>➕ Thêm Tài Khoản Mới Vào Kho (Admin)</h3>
+    
+    <label>Loại Game / Danh mục:</label><br>
+    <select id="admin-game-type" style="width: 100%; padding: 10px; margin: 8px 0; background: #2a2e3d; color: #fff; border: 1px solid #444;">
+        <option value="ROBLOX">ROBLOX</option>
+        <option value="FREE FIRE">FREE FIRE</option>
+        <option value="LIÊN QUÂN">LIÊN QUÂN</option>
+    </select>
+
+    <label>Giá bán (VNĐ):</label><br>
+    <input type="number" id="admin-price" placeholder="Ví dụ: 50000" style="width: 100%; padding: 10px; margin: 8px 0; background: #2a2e3d; color: #fff; border: 1px solid #444;">
+
+    <label>Danh sách Tài khoản | Mật khẩu (Mỗi nick 1 dòng):</label><br>
+    <textarea id="admin-acc-list" rows="6" placeholder="acc1|pass1&#10;acc2|pass2&#10;acc3|pass3" style="width: 100%; padding: 10px; margin: 8px 0; background: #2a2e3d; color: #fff; border: 1px solid #444;"></textarea>
+
+    <button onclick="addAccToKho()" style="width: 100%; padding: 12px; background: #28a745; color: #fff; border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">
+        🚀 Đưa Vào Kho
+    </button>
+</div>
