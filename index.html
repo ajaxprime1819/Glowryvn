@@ -74,7 +74,6 @@
         .toast.success { border-left-color: #22c55e; }
         .toast.error { border-left-color: #ef4444; }
 
-        /* Nạp tiền Tabs style */
         .deposit-methods { display: flex; gap: 10px; margin-bottom: 15px; }
         .deposit-tab { flex: 1; padding: 10px; text-align: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; cursor: pointer; font-weight: bold; color: #94a3b8; }
         .deposit-tab.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
@@ -183,7 +182,18 @@
         </div>
     </div>
 
-    <!-- MODAL NẠP TIỀN (QR & THẺ CÀO) -->
+    <!-- MODAL THÔNG BÁO ĐẶT CÀY THUÊ THÀNH CÔNG -->
+    <div class="modal" id="orderSuccessModal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-btn" onclick="closeModal('orderSuccessModal')">&times;</span>
+            <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #22c55e; margin-bottom: 15px;"></i>
+            <h3 style="color: #22c55e; margin-bottom: 10px;">ĐẶT ĐƠN CÀY THUÊ THÀNH CÔNG!</h3>
+            <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 20px;">Đơn hàng của bạn đã được gửi lên hệ thống và chuyển cho Admin xử lý. Bạn có thể kiểm tra tiến độ tại mục "Lịch Sử Đơn".</p>
+            <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="closeModal('orderSuccessModal'); openHistoryModal();">XEM LỊCH SỬ ĐƠN</button>
+        </div>
+    </div>
+
+    <!-- MODAL NẠP TIỀN -->
     <div class="modal" id="depositModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
@@ -194,17 +204,15 @@
                 <div class="deposit-tab" onclick="switchDepositTab(event, 'pane-card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào Điện Thoại</div>
             </div>
 
-            <!-- TAB QR -->
             <div id="pane-qr" class="deposit-pane active">
                 <div style="text-align: center; margin-bottom: 15px;">
                     <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản tự động:</p>
-                    <img src="" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
+                    <img src="https://api.vietqr.io/image/970422-0391234567-xxxxxx.jpg?accountName=CHINGHIA&amount=50000&addInfo=NAP" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
                     <p style="font-size: 13px; color: #f59e0b; margin-top: 8px;">Nội dung chuyển khoản: <b style="color:#fff;" id="qrContentText">NAP TIEN</b></p>
                 </div>
                 <button class="btn btn-primary" style="width:100%;" onclick="showToast('Hệ thống đang kiểm tra giao dịch tự động!', 'success')">TÔI ĐÃ CHUYỂN KHOẢN</button>
             </div>
 
-            <!-- TAB THẺ CÀO -->
             <div id="pane-card" class="deposit-pane">
                 <form onsubmit="handleCardDeposit(event)">
                     <label style="font-size:13px; color:#cbd5e1;">Chọn nhà mạng:</label>
@@ -253,7 +261,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Hành Động</th>
+                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th>
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
@@ -280,7 +288,7 @@
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Mã Acc</th><th>Tiêu Đề</th><th>Tài Khoản</th><th>Mật Khẩu</th><th>2FA</th><th>Giá</th><th>Trạng Thái</th><th>Hành Động</th></tr>
+                            <tr><th>Mã Acc</th><th>Tiêu Đề</th><th>Tài Khoản</th><th>Mật Khẩu</th><th>2FA</th><th>Giá</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="adminAccSellTableBody"></tbody>
                     </table>
@@ -301,7 +309,7 @@
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Email Khách Hàng</th><th>Số Dư Hiện Tại</th><th>Hành Động Nhanh</th></tr>
+                            <tr><th>Email Khách Hàng</th><th>Số Dư Hiện Tại</th></tr>
                         </thead>
                         <tbody id="adminUserBalanceTableBody"></tbody>
                     </table>
@@ -318,7 +326,7 @@
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
-                        <tr><th>Loại Đơn</th><th>Tên Sản Phẩm / Gói Cày</th><th>Giá Tiền</th><th>Thông Tin</th><th>Trạng Thái</th></tr>
+                        <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản Roblox</th><th>Trạng Thái</th></tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
                 </table>
@@ -527,9 +535,9 @@
             await updateUserBalance(currentUser.email, -selectedAccToBuy.price);
             await supabaseClient.from('acc_games').update({ is_sold: true, buyer_email: currentUser.email }).eq('id', selectedAccToBuy.id);
 
-            document.getElementById('resUser').innerText = selectedAccToBuy.user || selectedAccToBuy.acc_user || 'N/A';
-            document.getElementById('resPass').innerText = selectedAccToBuy.pass || selectedAccToBuy.acc_pass || 'N/A';
-            document.getElementById('resPass3').innerText = selectedAccToBuy.pass3 || selectedAccToBuy.acc_pass3 || 'Không có';
+            document.getElementById('resUser').innerText = selectedAccToBuy.user || 'N/A';
+            document.getElementById('resPass').innerText = selectedAccToBuy.pass || 'N/A';
+            document.getElementById('resPass3').innerText = selectedAccToBuy.pass3 || 'Không có';
 
             closeModal('confirmBuyModal');
             openModal('buyAccResultModal');
@@ -569,7 +577,8 @@
             }
 
             await updateUserBalance(currentUser.email, -price);
-            await supabaseClient.from('orders').insert([{
+            
+            const { error } = await supabaseClient.from('orders').insert([{
                 email: currentUser.email,
                 service_name: serviceName,
                 price: price,
@@ -579,8 +588,12 @@
                 status: 'Đang chờ duyệt'
             }]);
 
+            if (error) {
+                return showToast('Lỗi khi lưu đơn hàng: ' + error.message, 'error');
+            }
+
             closeModal('orderServiceModal');
-            showToast('Đặt dịch vụ cày thuê thành công!', 'success');
+            openModal('orderSuccessModal');
             checkUserStatus();
         }
 
@@ -599,24 +612,45 @@
         }
 
         async function loadAdminOrders() {
-            const { data } = await supabaseClient.from('orders').select('*');
+            const { data } = await supabaseClient.from('orders').select('*').order('id', { ascending: false });
             const tbody = document.getElementById('adminOrderTableBody');
             tbody.innerHTML = '';
-            if (data) {
+            if (data && data.length > 0) {
                 data.forEach(o => {
-                    tbody.innerHTML += `<tr><td>#${o.id}</td><td>${o.email}</td><td>${o.service_name}</td><td>${o.price}đ</td><td>${o.roblox_user}</td><td>${o.roblox_pass}</td><td>${o.roblox_pass3 || ''}</td><td>${o.status}</td><td>-</td></tr>`;
+                    tbody.innerHTML += `<tr>
+                        <td>#${o.id}</td>
+                        <td>${o.email}</td>
+                        <td><b>${o.service_name}</b></td>
+                        <td style="color:#22c55e;">${Number(o.price).toLocaleString('vi-VN')}đ</td>
+                        <td>${o.roblox_user}</td>
+                        <td>${o.roblox_pass}</td>
+                        <td>${o.roblox_pass3 || 'Không'}</td>
+                        <td><span style="background:#f59e0b; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:#000;">${o.status}</span></td>
+                    </tr>`;
                 });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8;">Chưa có đơn cày thuê nào.</td></tr>`;
             }
         }
 
         async function loadAdminAccs() {
-            const { data } = await supabaseClient.from('acc_games').select('*');
+            const { data } = await supabaseClient.from('acc_games').select('*').order('id', { ascending: false });
             const tbody = document.getElementById('adminAccSellTableBody');
             tbody.innerHTML = '';
-            if (data) {
+            if (data && data.length > 0) {
                 data.forEach(a => {
-                    tbody.innerHTML += `<tr><td>${a.id}</td><td>${a.title}</td><td>${a.user || ''}</td><td>${a.pass || ''}</td><td>${a.pass3 || ''}</td><td>${a.price}đ</td><td>${a.is_sold ? 'Đã bán' : 'Còn'}</td><td>-</td></tr>`;
+                    tbody.innerHTML += `<tr>
+                        <td>${a.id}</td>
+                        <td>${a.title}</td>
+                        <td>${a.user || ''}</td>
+                        <td>${a.pass || ''}</td>
+                        <td>${a.pass3 || ''}</td>
+                        <td style="color:#22c55e;">${Number(a.price).toLocaleString('vi-VN')}đ</td>
+                        <td>${a.is_sold ? '<span style="color:#ef4444;">Đã bán</span>' : '<span style="color:#22c55e;">Còn</span>'}</td>
+                    </tr>`;
                 });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Chưa có tài khoản game nào.</td></tr>`;
             }
         }
 
@@ -624,16 +658,21 @@
             const { data } = await supabaseClient.from('user_balances').select('*');
             const tbody = document.getElementById('adminUserBalanceTableBody');
             tbody.innerHTML = '';
-            if (data) {
+            if (data && data.length > 0) {
                 data.forEach(u => {
-                    tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.balance}đ</td><td>-</td></tr>`;
+                    tbody.innerHTML += `<tr>
+                        <td>${u.email}</td>
+                        <td style="color:#22c55e; font-weight:bold;">${Number(u.balance).toLocaleString('vi-VN')}đ</td>
+                    </tr>`;
                 });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#94a3b8;">Chưa có thông tin ví người dùng.</td></tr>`;
             }
         }
 
         async function handleAddNewAccGame(e) {
             e.preventDefault();
-            await supabaseClient.from('acc_games').insert([{
+            const { error } = await supabaseClient.from('acc_games').insert([{
                 title: document.getElementById('newAccTitle').value,
                 price: parseFloat(document.getElementById('newAccPrice').value),
                 tag: document.getElementById('newAccTag').value,
@@ -643,6 +682,7 @@
                 img: document.getElementById('newAccImg').value,
                 is_sold: false
             }]);
+            if (error) return showToast('Lỗi thêm acc: ' + error.message, 'error');
             showToast('Đăng bán acc thành công!', 'success');
             loadAdminAccs();
             renderShopItems();
@@ -659,12 +699,18 @@
 
         async function openHistoryModal() {
             if (!currentUser) return openAuthModal('login');
-            const { data } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
+            const { data } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email).order('id', { ascending: false });
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.forEach(h => {
-                    tbody.innerHTML += `<tr><td>Cày thuê</td><td>${h.service_name}</td><td>${h.price}đ</td><td>TK: ${h.roblox_user}</td><td>${h.status}</td></tr>`;
+                    tbody.innerHTML += `<tr>
+                        <td>Cày Thuê</td>
+                        <td><b>${h.service_name}</b></td>
+                        <td style="color:#22c55e;">${Number(h.price).toLocaleString('vi-VN')}đ</td>
+                        <td>${h.roblox_user}</td>
+                        <td><span style="background:#f59e0b; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:#000;">${h.status}</span></td>
+                    </tr>`;
                 });
             } else {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch nào.</td></tr>`;
