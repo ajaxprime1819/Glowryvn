@@ -1,3 +1,16 @@
+<!-- 1. Thêm thư viện Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 2. Khởi tạo kết nối Supabase -->
+<script>
+    const SUPABASE_URL = 'https://ybrqeguquwwzeonblmvo.supabase.co';
+    // LƯU Ý: Thay đoạn chữ dưới đây bằng ANON / PUBLIC KEY của bạn trên Supabase (Project Settings -> API -> anon/public)
+    const SUPABASE_KEY = 'sb_publishable_OKt965Ba1R5lGF0ogTxloQ_2XwrPBBU'; 
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<!-- 3. Giao diện Form Admin -->
 <div style="background: #1e222d; color: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto;">
     <h3>➕ Thêm Tài Khoản Mới Vào Kho (Admin)</h3>
     
@@ -18,3 +31,37 @@
         🚀 Đưa Vào Kho
     </button>
 </div>
+
+<!-- 4. Logic xử lý thêm kho -->
+<script>
+    async function addAccToKho() {
+        const gameType = document.getElementById('admin-game-type').value;
+        const price = parseInt(document.getElementById('admin-price').value);
+        const rawAccList = document.getElementById('admin-acc-list').value.trim();
+
+        if (!price || !rawAccList) {
+            alert("Vui lòng nhập đầy đủ giá tiền và danh sách tài khoản!");
+            return;
+        }
+
+        // Tách danh sách tài khoản theo từng dòng
+        const lines = rawAccList.split('\n').filter(line => line.trim() !== '');
+        
+        // Tạo mảng dữ liệu đẩy lên Supabase
+        const insertData = lines.map(line => ({
+            game_type: gameType,
+            price: price,
+            account_info: line.trim(),
+            status: 'AVAILABLE'
+        }));
+
+        const { data, error } = await supabase.from('accounts_kho').insert(insertData);
+
+        if (error) {
+            alert("Lỗi thêm kho: " + error.message);
+        } else {
+            alert(`Thành công! Đã thêm ${lines.length} tài khoản vào kho!`);
+            document.getElementById('admin-acc-list').value = '';
+        }
+    }
+</script>
