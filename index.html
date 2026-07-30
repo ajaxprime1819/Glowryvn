@@ -31,7 +31,7 @@
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
 
-        /* HERO BANNER - ĐÃ CẬP NHẬT TÊN THÀNH "TẤT CẢ DỊCH VỤ VỀ GAME ĐỀU CÓ Ở ĐÂY" */
+        /* HERO BANNER */
         .hero { 
             background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), 
                         url('https://i.ibb.co/4wcD0R4k/image.jpg') center/cover no-repeat; 
@@ -168,7 +168,7 @@
         </div>
     </div>
 
-    <!-- POPUP ADMIN PANEL (VỚI 3 TAB QUẢN LÝ) -->
+    <!-- POPUP ADMIN PANEL -->
     <div class="modal" id="adminModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
@@ -233,7 +233,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: THÊM VÀ QUẢN LÝ ACC GAME BÁN (TÀI KHOẢN, MẬT KHẨU, PASS 3) -->
+            <!-- TAB 3: THÊM VÀ QUẢN LÝ ACC GAME BÁN -->
             <div id="tab-acc-sell" class="tab-content">
                 <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #22c55e;">
                     <h4 style="color:#22c55e; margin-bottom:10px;"><i class="fa-solid fa-cart-plus"></i> Thêm Acc Game Mới Cần Bán (Nhập TK, MK, Pass 3)</h4>
@@ -274,7 +274,7 @@
         </div>
     </div>
 
-    <!-- POPUP LỊCH SỬ ĐƠN (CỦA KHÁCH) -->
+    <!-- POPUP LỊCH SỬ ĐƠN -->
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
@@ -326,6 +326,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
+        let authMode = 'login';
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
@@ -356,6 +357,66 @@
         function updateUserBalance(email, amount) {
             userBalances[email] = (userBalances[email] || 0) + amount;
             localStorage.setItem('shop_user_balances', JSON.stringify(userBalances));
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function checkUserStatus() {
+            const authContainer = document.getElementById('auth-buttons');
+            if (currentUser) {
+                const balance = getUserBalance(currentUser.email);
+                authContainer.innerHTML = `
+                    <span style="font-size:14px; font-weight:bold; color:#22c55e;"><i class="fa-solid fa-wallet"></i> ${balance.toLocaleString('vi-VN')} đ</span>
+                    <span style="font-size:14px; color:#94a3b8;"><i class="fa-solid fa-user"></i> ${currentUser.email}</span>
+                    ${currentUser.email === 'admin@gmail.com' ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-gear"></i> Admin</button>` : ''}
+                    <button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Tải lại/Đăng xuất</button>
+                `;
+            } else {
+                authContainer.innerHTML = `
+                    <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
+                    <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
+                `;
+            }
+        }
+
+        function openAuthModal(mode) {
+            authMode = mode;
+            document.getElementById('modalTitle').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ';
+            document.getElementById('modalSubmitBtn').onclick = handleAuth;
+            openModal('authModal');
+        }
+
+        function handleAuth() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if (!email || !password) return showToast('Vui lòng điền đầy đủ thông tin!', 'error');
+
+            currentUser = { email };
+            showToast(authMode === 'login' ? 'Đăng nhập thành công!' : 'Đăng ký thành công!', 'success');
+            closeModal('authModal');
+            checkUserStatus();
+        }
+
+        function logout() {
+            currentUser = null;
+            checkUserStatus();
+            showToast('Đã đăng xuất!', 'info');
+        }
+
+        function openDepositModal() {
+            if (!currentUser) return openAuthModal('login');
+            openModal('depositModal');
+        }
+
+        function confirmBankDeposit() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            if (!amount || amount <= 0) return showToast('Số tiền nạp không hợp lệ!', 'error');
+
+            updateUserBalance(currentUser.email, amount);
+            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ vào tài khoản!`, 'success');
+            closeModal('depositModal');
+            checkUserStatus();
         }
 
         function renderShopItems() {
@@ -566,9 +627,9 @@
         function openOrderModal(id, title, price) {
             if (!currentUser) return openAuthModal('login');
             document.getElementById('serviceId').value = id;
-            document.getElementById('serviceName').value = title;
             document.getElementById('servicePrice').value = price;
-            document.getElementById('serviceTitleDisplay').innerText = `Gói: ${title} - Giá: ${price.toLocaleString('vi-VN')} đ`;
+            document.getElementById('serviceName').value = title;
+            document.getElementById('serviceTitleDisplay').innerText = `${title} - Giá: ${price.toLocaleString('vi-VN')} đ`;
             openModal('orderServiceModal');
         }
 
@@ -578,37 +639,39 @@
             const balance = getUserBalance(currentUser.email);
 
             if (balance < price) {
-                showToast(`Số dư không đủ để đặt gói!`, 'error');
+                showToast(`Số dư không đủ! Nạp thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
                 closeModal('orderServiceModal');
                 return openDepositModal();
             }
 
-            updateUserBalance(currentUser.email, -price);
-
-            serviceOrders.unshift({
-                orderId: 'CT-' + Math.floor(10000 + Math.random() * 90000),
+            const newOrder = {
+                orderId: 'ORD' + Math.floor(1000 + Math.random() * 9000),
                 userEmail: currentUser.email,
                 serviceName: document.getElementById('serviceName').value,
-                price: price,
                 robloxUser: document.getElementById('robloxUser').value.trim(),
                 robloxPass: document.getElementById('robloxPass').value.trim(),
                 robloxPass3: document.getElementById('robloxPass3').value.trim() || 'Không có',
+                price: price,
                 status: 'pending'
-            });
+            };
+
+            updateUserBalance(currentUser.email, -price);
+            serviceOrders.unshift(newOrder);
             localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
 
+            e.target.reset();
             closeModal('orderServiceModal');
             checkUserStatus();
-            showToast('🎉 Đặt đơn thành công! Admin sẽ duyệt cày nhanh nhất.', 'success');
+            showToast('Đặt đơn cày thuê thành công! Admin sẽ xử lý sớm.', 'success');
         }
 
         function approveOrder(orderId) {
-            let order = serviceOrders.find(o => o.orderId === orderId);
+            const order = serviceOrders.find(o => o.orderId === orderId);
             if (order) {
                 order.status = 'completed';
                 localStorage.setItem('shop_service_orders', JSON.stringify(serviceOrders));
                 renderAdminOrdersTable();
-                showToast(`Đã hoàn tất duyệt cày xong đơn ${orderId}!`, 'success');
+                showToast('Đã duyệt đơn cày thuê thành công!', 'success');
             }
         }
 
@@ -617,31 +680,32 @@
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
 
-            const myOrders = serviceOrders.filter(o => o.userEmail === currentUser.email);
             const myAccs = purchasedAccs.filter(a => a.userEmail === currentUser.email);
+            const myOrders = serviceOrders.filter(o => o.userEmail === currentUser.email);
 
-            if (myOrders.length === 0 && myAccs.length === 0) {
+            if (myAccs.length === 0 && myOrders.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Bạn chưa thực hiện giao dịch nào!</td></tr>`;
             } else {
-                myAccs.forEach(a => {
+                myAccs.forEach(acc => {
                     tbody.innerHTML += `
                         <tr>
-                            <td><span class="acc-tag" style="position:static; background:#22c55e;">Mua Acc</span></td>
-                            <td>${a.title}</td>
-                            <td style="color:#22c55e; font-weight:bold;">${a.price.toLocaleString('vi-VN')} đ</td>
-                            <td>TK: <b>${a.user}</b> | MK: <b>${a.pass}</b> | Pass 3: <b>${a.pass3}</b></td>
-                            <td><span class="status-badge status-completed">✅ Đã Nhận Acc</span></td>
+                            <td><span class="status-badge status-completed">Mua Acc</span></td>
+                            <td>${acc.title}</td>
+                            <td style="color:#22c55e;">${acc.price.toLocaleString('vi-VN')} đ</td>
+                            <td>TK: <b>${acc.user}</b> | MK: <b>${acc.pass}</b> | Pass3: <b>${acc.pass3}</b></td>
+                            <td><span class="status-badge status-completed">Thành công</span></td>
                         </tr>
                     `;
                 });
-                myOrders.forEach(o => {
+
+                myOrders.forEach(ord => {
                     tbody.innerHTML += `
                         <tr>
-                            <td><span class="acc-tag" style="position:static; background:#3b82f6;">Cày Thuê</span></td>
-                            <td>${o.serviceName}</td>
-                            <td style="color:#22c55e; font-weight:bold;">${o.price.toLocaleString('vi-VN')} đ</td>
-                            <td>Roblox TK: <b>${o.robloxUser}</b></td>
-                            <td><span class="status-badge ${o.status === 'pending' ? 'status-pending' : 'status-completed'}">${o.status === 'pending' ? '⏳ Đang Cày' : '🎉 Đã cày xong'}</span></td>
+                            <td><span class="status-badge status-pending">Cày Thuê</span></td>
+                            <td>${ord.serviceName}</td>
+                            <td style="color:#22c55e;">${ord.price.toLocaleString('vi-VN')} đ</td>
+                            <td>TK Roblox: <b>${ord.robloxUser}</b></td>
+                            <td><span class="status-badge ${ord.status === 'pending' ? 'status-pending' : 'status-completed'}">${ord.status === 'pending' ? 'Đang cày' : 'Hoàn thành'}</span></td>
                         </tr>
                     `;
                 });
@@ -649,82 +713,7 @@
             openModal('historyModal');
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function openDepositModal() { if (!currentUser) return openAuthModal('login'); openModal('depositModal'); }
-
-        function confirmBankDeposit() {
-            const amount = parseInt(document.getElementById('depositAmount').value);
-            if (amount > 0 && currentUser) {
-                updateUserBalance(currentUser.email, amount);
-                showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ!`, 'success');
-                closeModal('depositModal');
-                checkUserStatus();
-            }
-        }
-
-        async function handleLogin() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) showToast(error.message, 'error');
-            else { showToast('Đăng nhập thành công!', 'success'); closeModal('authModal'); checkUserStatus(); }
-        }
-
-        async function handleRegister() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const { error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) showToast(error.message, 'error');
-            else { showToast('Đăng ký thành công!', 'success'); closeModal('authModal'); }
-        }
-
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            currentUser = null;
-            checkUserStatus();
-        }
-
-        async function checkUserStatus() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            currentUser = user;
-            const authBtns = document.getElementById('auth-buttons');
-
-            if (user) {
-                const isAdmin = user.email.toLowerCase().includes('admin');
-                const balance = getUserBalance(user.email);
-
-                authBtns.innerHTML = `
-                    <span style="background:#0f172a; padding:6px 12px; border-radius:20px; border:1px solid #22c55e; color:#22c55e; font-weight:bold;">
-                        <i class="fa-solid fa-coins"></i> ${balance.toLocaleString('vi-VN')} đ
-                    </span>
-                    <button class="btn btn-success" onclick="openDepositModal()"><i class="fa-solid fa-plus"></i></button>
-                    ${isAdmin ? `<button class="btn btn-warning" onclick="openAdminDashboard()"><i class="fa-solid fa-user-gear"></i> Panel Admin</button>` : ''}
-                    <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
-                `;
-            } else {
-                authBtns.innerHTML = `
-                    <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
-                    <button class="btn btn-primary" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>
-                `;
-            }
-        }
-
-        function openAuthModal(mode) {
-            const title = document.getElementById('modalTitle');
-            const btn = document.getElementById('modalSubmitBtn');
-            if(mode === 'login') {
-                title.innerText = 'ĐĂNG NHẬP TÀI KHOẢN';
-                btn.innerText = 'ĐĂNG NHẬP';
-                btn.onclick = handleLogin;
-            } else {
-                title.innerText = 'ĐĂNG KÝ TÀI KHOẢN MỚI';
-                btn.innerText = 'ĐĂNG KÝ';
-                btn.onclick = handleRegister;
-            }
-            openModal('authModal');
-        }
-
+        // Khởi chạy ban đầu
         renderShopItems();
         checkUserStatus();
     </script>
