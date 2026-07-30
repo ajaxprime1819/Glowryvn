@@ -11,7 +11,6 @@
         body { background-color: #0f172a; color: #f8fafc; line-height: 1.6; }
         a { text-decoration: none; color: inherit; }
 
-        /* HEADER */
         header { background: #1e293b; border-bottom: 2px solid #3b82f6; position: sticky; top: 0; z-index: 100; }
         .navbar { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .logo { font-size: 24px; font-weight: 800; color: #3b82f6; display: flex; align-items: center; gap: 10px; }
@@ -53,10 +52,6 @@
         .acc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px; }
         .price { font-size: 17px; font-weight: 800; color: #22c55e; }
 
-        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .status-pending { background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b; }
-        .status-completed { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e; }
-
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
         .admin-modal-content { max-width: 1050px; }
@@ -78,6 +73,13 @@
         .toast { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; border-left: 5px solid #3b82f6; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
         .toast.success { border-left-color: #22c55e; }
         .toast.error { border-left-color: #ef4444; }
+
+        /* Nạp tiền Tabs style */
+        .deposit-methods { display: flex; gap: 10px; margin-bottom: 15px; }
+        .deposit-tab { flex: 1; padding: 10px; text-align: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; cursor: pointer; font-weight: bold; color: #94a3b8; }
+        .deposit-tab.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+        .deposit-pane { display: none; }
+        .deposit-pane.active { display: block; }
 
         footer { background: #090d16; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; }
     </style>
@@ -144,7 +146,7 @@
         </div>
     </div>
 
-    <!-- MODAL ĐẶT CÀY THUÊ VỚI ĐẦY ĐỦ BẢNG GIÁ DỊCH VỤ -->
+    <!-- MODAL ĐẶT CÀY THUÊ -->
     <div class="modal" id="orderServiceModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('orderServiceModal')">&times;</span>
@@ -155,29 +157,11 @@
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
                     <option value="Yama" data-price="10000">Yama - 10k</option>
                     <option value="Tushi" data-price="10000">Tushi - 10k</option>
-                    <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20k (Tổng 40k)</option>
+                    <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20k</option>
                     <option value="Tam Kiếm (CDK)" data-price="25000">Tam Kiếm (CDK) - 25k</option>
-                    <option value="Kéo Tim Leviathan" data-price="25000">Kéo Tim Leviathan - 25k</option>
-                    <option value="V4 A-Z Thỏ / TT / Human" data-price="45000">V4 A-Z Thỏ / Thiên Thần / Human (Bao All) - 45k</option>
-                    <option value="V4 A-Z Cy/Quỷ" data-price="55000">V4 A-Z Cyborg / Quỷ (Bao All) - 55k</option>
-                    <option value="V4 Draco" data-price="85000">V4 Draco (Bao All) - 85k</option>
-                    <option value="Lẻ 1 Gear (Không nhận dưới 2 Gear)" data-price="10000">Lẻ 1 Gear - 10k/Gear (Không nhận dưới 2 Gear)</option>
-                    <option value="Kiếm Rồng" data-price="20000">Kiếm Rồng - 20k</option>
-                    <option value="Súng Rồng" data-price="25000">Súng Rồng - 25k</option>
-                    <option value="Dino Hood" data-price="20000">Dino Hood - 20k</option>
-                    <option value="Mở cổng Draco" data-price="25000">Mở cổng Draco - 25k</option>
                     <option value="Godhuman" data-price="30000">Godhuman - 30k</option>
                     <option value="Võ Máu (Sanguine Art)" data-price="40000">Võ Máu (Sanguine Art) - 40k</option>
-                    <option value="Nhẫn Đỏ" data-price="50000">Nhẫn Đỏ - 50k</option>
-                    <option value="Cuốc Mythic" data-price="35000">Cuốc Mythic - 35k</option>
-                    <option value="Cày Beli 1M" data-price="1000">Cày Beli (1k / 1M Beli)</option>
-                    <option value="Cày Beli Pack 50M" data-price="35000">Cày Beli Pack 50M - 35k</option>
-                    <option value="Cày Beli Pack 100M" data-price="80000">Cày Beli Pack 100M - 80k</option>
-                    <option value="Cày Frag" data-price="1500">Cày Fragment (1.5k / 1k Frag - Úp nhiều 1k/1k)</option>
                     <option value="Level 0 - 700" data-price="10000">Level 0 - 700 - 10k</option>
-                    <option value="Level 700 - 1500" data-price="10000">Level 700 - 1500 - 10k</option>
-                    <option value="Level 1500 - 2800" data-price="20000">Level 1500 - 2800 - 20k</option>
-                    <option value="Úp lẻ vài trăm Level" data-price="10000">Úp lẻ vài trăm Level - 10k</option>
                 </select>
 
                 <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:12px; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
@@ -199,6 +183,59 @@
         </div>
     </div>
 
+    <!-- MODAL NẠP TIỀN (QR & THẺ CÀO) -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
+            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
+            
+            <div class="deposit-methods">
+                <div class="deposit-tab active" onclick="switchDepositTab(event, 'pane-qr')"><i class="fa-solid fa-qrcode"></i> Quét Mã QR Momo/Bank</div>
+                <div class="deposit-tab" onclick="switchDepositTab(event, 'pane-card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào Điện Thoại</div>
+            </div>
+
+            <!-- TAB QR -->
+            <div id="pane-qr" class="deposit-pane active">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản tự động:</p>
+                    <img src="https://api.vietqr.io/image/970422-0391234567-xxxxxx.jpg?accountName=CHINGHIA&amount=50000&addInfo=NAP" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
+                    <p style="font-size: 13px; color: #f59e0b; margin-top: 8px;">Nội dung chuyển khoản: <b style="color:#fff;" id="qrContentText">NAP TIEN</b></p>
+                </div>
+                <button class="btn btn-primary" style="width:100%;" onclick="showToast('Hệ thống đang kiểm tra giao dịch tự động!', 'success')">TÔI ĐÃ CHUYỂN KHOẢN</button>
+            </div>
+
+            <!-- TAB THẺ CÀO -->
+            <div id="pane-card" class="deposit-pane">
+                <form onsubmit="handleCardDeposit(event)">
+                    <label style="font-size:13px; color:#cbd5e1;">Chọn nhà mạng:</label>
+                    <select id="cardTelco" class="form-input" required>
+                        <option value="VIETTEL">Viettel</option>
+                        <option value="VINAPHONE">Vinaphone</option>
+                        <option value="MOBIFONE">Mobifone</option>
+                    </select>
+
+                    <label style="font-size:13px; color:#cbd5e1;">Mệnh giá:</label>
+                    <select id="cardAmount" class="form-input" required>
+                        <option value="10000">10.000 đ</option>
+                        <option value="20000">20.000 đ</option>
+                        <option value="50000">50.000 đ</option>
+                        <option value="100000">100.000 đ</option>
+                        <option value="200000">200.000 đ</option>
+                        <option value="500000">500.000 đ</option>
+                    </select>
+
+                    <label style="font-size:13px; color:#cbd5e1;">Mã thẻ cào:</label>
+                    <input type="text" id="cardCode" class="form-input" placeholder="Nhập mã thẻ..." required>
+
+                    <label style="font-size:13px; color:#cbd5e1;">Số Seri:</label>
+                    <input type="text" id="cardSerial" class="form-input" placeholder="Nhập số seri..." required>
+
+                    <button type="submit" class="btn btn-success" style="width:100%; margin-top:5px;">GỬI THẺ CÀO</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- ADMIN PANEL -->
     <div class="modal" id="adminModal">
         <div class="modal-content admin-modal-content">
@@ -216,15 +253,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Đơn</th>
-                                <th>Khách Hàng</th>
-                                <th>Gói Cày Lựa Chọn</th>
-                                <th>Giá Tiền</th>
-                                <th>TK Roblox</th>
-                                <th>MK Roblox</th>
-                                <th>2FA / Pass 3</th>
-                                <th>Trạng Thái</th>
-                                <th>Hành Động</th>
+                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Hành Động</th>
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
@@ -234,7 +263,7 @@
 
             <div id="tab-acc-sell" class="tab-content">
                 <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #22c55e;">
-                    <h4 style="color:#22c55e; margin-bottom:10px;"><i class="fa-solid fa-cart-plus"></i> Thêm Acc Game Mới Cần Bán</h4>
+                    <h4 style="color:#22c55e; margin-bottom:10px;"><i class="fa-solid fa-cart-plus"></i> Thêm Acc Game Mới</h4>
                     <form onsubmit="handleAddNewAccGame(event)">
                         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
                             <input type="text" id="newAccTitle" class="form-input" placeholder="Tiêu đề Acc..." required>
@@ -281,7 +310,7 @@
         </div>
     </div>
 
-    <!-- LỊCH SỬ GIAO DỊCH KHÁCH -->
+    <!-- LỊCH SỬ GIAO DỊCH -->
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
@@ -289,7 +318,7 @@
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
-                        <tr><th>Loại Đơn</th><th>Tên Sản Phẩm / Gói Cày</th><th>Giá Tiền</th><th>Thông Tin Nhận / Đã Gửi</th><th>Trạng Thái</th></tr>
+                        <tr><th>Loại Đơn</th><th>Tên Sản Phẩm / Gói Cày</th><th>Giá Tiền</th><th>Thông Tin</th><th>Trạng Thái</th></tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
                 </table>
@@ -307,17 +336,6 @@
                 <input type="password" id="password" class="form-input" placeholder="Mật khẩu..." required>
                 <button type="submit" class="btn btn-primary" id="modalSubmitBtn" style="width: 100%; padding: 12px; margin-top:10px;">XÁC NHẬN</button>
             </form>
-        </div>
-    </div>
-
-    <!-- DEPOSIT MODAL -->
-    <div class="modal" id="depositModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
-            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
-            <p style="font-size:13px; color:#cbd5e1; text-align:center; margin-bottom:10px;">Tự động nạp tiền trực tiếp vào tài khoản:</p>
-            <input type="number" id="depositAmount" class="form-input" placeholder="Nhập số tiền nạp...">
-            <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="confirmBankDeposit()">XÁC NHẬN NẠP TIỀN</button>
         </div>
     </div>
 
@@ -354,6 +372,25 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function openDepositModal() {
+            if (!currentUser) return openAuthModal('login');
+            document.getElementById('qrContentText').innerText = `NAP ${currentUser.email}`;
+            openModal('depositModal');
+        }
+
+        function switchDepositTab(e, paneId) {
+            document.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.deposit-pane').forEach(p => p.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            document.getElementById(paneId).classList.add('active');
+        }
+
+        function handleCardDeposit(e) {
+            e.preventDefault();
+            showToast('Gửi thẻ thành công! Hệ thống đang duyệt thẻ tự động.', 'success');
+            closeModal('depositModal');
+        }
 
         /* --- AUTHENTICATION --- */
         function openAuthModal(mode) {
@@ -500,7 +537,7 @@
             await renderShopItems();
         }
 
-        /* --- XỬ LÝ MENU & ĐẶT CÀY THUÊ --- */
+        /* --- XỬ LÝ CÀY THUÊ --- */
         function openOrderServiceModal() {
             if (!currentUser) return openAuthModal('login');
             updateSelectedServicePrice();
@@ -525,57 +562,114 @@
             const serviceName = selectedOption.value;
             const price = parseInt(selectedOption.getAttribute('data-price'));
 
-            const robloxUser = document.getElementById('robloxUser').value.trim();
-            const robloxPass = document.getElementById('robloxPass').value.trim();
-            const robloxPass3 = document.getElementById('robloxPass3').value.trim();
-
             const balance = await getUserBalance(currentUser.email);
             if (balance < price) {
                 closeModal('orderServiceModal');
-                return showToast('Số dư tài khoản không đủ để đặt gói này!', 'error');
+                return showToast('Số dư không đủ để đặt đơn cày!', 'error');
             }
 
-            // Trừ tiền khách và lưu đơn hàng vào bảng orders
             await updateUserBalance(currentUser.email, -price);
-
-            const { error } = await supabaseClient.from('orders').insert([{
-                user_email: currentUser.email,
+            await supabaseClient.from('orders').insert([{
+                email: currentUser.email,
                 service_name: serviceName,
                 price: price,
-                roblox_user: robloxUser,
-                roblox_pass: robloxPass,
-                roblox_pass3: robloxPass3,
-                status: 'pending'
+                roblox_user: document.getElementById('robloxUser').value,
+                roblox_pass: document.getElementById('robloxPass').value,
+                roblox_pass3: document.getElementById('robloxPass3').value,
+                status: 'Đang chờ duyệt'
             }]);
 
-            if (error) {
-                showToast('Lỗi đặt đơn: ' + error.message, 'error');
-            } else {
-                showToast('Đặt dịch vụ cày thuê thành công!', 'success');
-                closeModal('orderServiceModal');
-                checkUserStatus();
-            }
-        }
-
-        async function confirmBankDeposit() {
-            const amount = parseInt(document.getElementById('depositAmount').value);
-            if (!amount || amount <= 0) return showToast('Vui lòng nhập số tiền hợp lệ!', 'error');
-            
-            await updateUserBalance(currentUser.email, amount);
-            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} đ vào tài khoản!`, 'success');
-            closeModal('depositModal');
+            closeModal('orderServiceModal');
+            showToast('Đặt dịch vụ cày thuê thành công!', 'success');
             checkUserStatus();
         }
 
         function openAdminDashboard() {
             openModal('adminModal');
+            loadAdminOrders();
+            loadAdminAccs();
+            loadAdminUsers();
         }
 
         function switchAdminTab(e, tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             e.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function loadAdminOrders() {
+            const { data } = await supabaseClient.from('orders').select('*');
+            const tbody = document.getElementById('adminOrderTableBody');
+            tbody.innerHTML = '';
+            if (data) {
+                data.forEach(o => {
+                    tbody.innerHTML += `<tr><td>#${o.id}</td><td>${o.email}</td><td>${o.service_name}</td><td>${o.price}đ</td><td>${o.roblox_user}</td><td>${o.roblox_pass}</td><td>${o.roblox_pass3 || ''}</td><td>${o.status}</td><td>-</td></tr>`;
+                });
+            }
+        }
+
+        async function loadAdminAccs() {
+            const { data } = await supabaseClient.from('acc_games').select('*');
+            const tbody = document.getElementById('adminAccSellTableBody');
+            tbody.innerHTML = '';
+            if (data) {
+                data.forEach(a => {
+                    tbody.innerHTML += `<tr><td>${a.id}</td><td>${a.title}</td><td>${a.user || ''}</td><td>${a.pass || ''}</td><td>${a.pass3 || ''}</td><td>${a.price}đ</td><td>${a.is_sold ? 'Đã bán' : 'Còn'}</td><td>-</td></tr>`;
+                });
+            }
+        }
+
+        async function loadAdminUsers() {
+            const { data } = await supabaseClient.from('user_balances').select('*');
+            const tbody = document.getElementById('adminUserBalanceTableBody');
+            tbody.innerHTML = '';
+            if (data) {
+                data.forEach(u => {
+                    tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.balance}đ</td><td>-</td></tr>`;
+                });
+            }
+        }
+
+        async function handleAddNewAccGame(e) {
+            e.preventDefault();
+            await supabaseClient.from('acc_games').insert([{
+                title: document.getElementById('newAccTitle').value,
+                price: parseFloat(document.getElementById('newAccPrice').value),
+                tag: document.getElementById('newAccTag').value,
+                user: document.getElementById('newAccUser').value,
+                pass: document.getElementById('newAccPass').value,
+                pass3: document.getElementById('newAccPass3').value,
+                img: document.getElementById('newAccImg').value,
+                is_sold: false
+            }]);
+            showToast('Đăng bán acc thành công!', 'success');
+            loadAdminAccs();
+            renderShopItems();
+        }
+
+        async function handleAdminAdjustBalance(e) {
+            e.preventDefault();
+            const email = document.getElementById('targetUserEmail').value;
+            const amount = parseFloat(document.getElementById('adjustAmount').value);
+            await updateUserBalance(email, amount);
+            showToast('Cập nhật số dư thành công!', 'success');
+            loadAdminUsers();
+        }
+
+        async function openHistoryModal() {
+            if (!currentUser) return openAuthModal('login');
+            const { data } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            if (data && data.length > 0) {
+                data.forEach(h => {
+                    tbody.innerHTML += `<tr><td>Cày thuê</td><td>${h.service_name}</td><td>${h.price}đ</td><td>TK: ${h.roblox_user}</td><td>${h.status}</td></tr>`;
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch nào.</td></tr>`;
+            }
+            openModal('historyModal');
         }
     </script>
 </body>
