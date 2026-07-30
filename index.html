@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHOPGAME24H - Hệ Thống Bán Acc Game Uy Tín</title>
+    <title>SHOPGAME24H - Hệ Thống Bán Acc & Dịch Vụ Game Uy Tín</title>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase JS SDK -->
@@ -34,9 +34,14 @@
         .btn-danger:hover { background: #dc2626; }
 
         /* HERO BANNER */
-        .hero { background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200') center/cover; padding: 60px 20px; text-align: center; }
-        .hero h1 { font-size: 36px; margin-bottom: 10px; text-transform: uppercase; color: #f8fafc; }
-        .hero p { color: #94a3b8; font-size: 18px; margin-bottom: 25px; }
+        .hero { 
+            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), 
+                        url('https://i.ibb.co/4wcD0R4k/image.jpg') center/cover no-repeat; 
+            padding: 80px 20px; 
+            text-align: center; 
+        }
+        .hero h1 { font-size: 36px; margin-bottom: 10px; text-transform: uppercase; color: #f8fafc; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .hero p { color: #cbd5e1; font-size: 18px; margin-bottom: 25px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
         /* FILTER & SEARCH */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
@@ -98,7 +103,7 @@
                 <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
                 <li><a href="#"><i class="fa-solid fa-store"></i> Shop Acc</a></li>
                 <li><a href="javascript:void(0)" onclick="openDepositModal()"><i class="fa-solid fa-wallet"></i> Nạp tiền</a></li>
-                <li><a href="javascript:void(0)" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> Acc Đã Mua</a></li>
+                <li><a href="javascript:void(0)" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Mua</a></li>
             </ul>
             <div class="auth-btns" id="auth-buttons">
                 <button class="btn btn-login" onclick="openAuthModal('login')"><i class="fa-solid fa-user"></i> Đăng nhập</button>
@@ -109,21 +114,27 @@
 
     <!-- HERO BANNER -->
     <section class="hero">
-        <h1>KHO TÀI KHOẢN GAME VIP #1 VIỆT NAM</h1>
-        <p>Giao dịch tự động 24/7 - Bàn giao acc ngay lập tức - Bảo hành vĩnh viễn</p>
+        <h1>KHO TÀI KHOẢN & DỊCH VỤ GAME VIP #1 VIỆT NAM</h1>
+        <p>Giao dịch tự động 24/7 - Blox Fruits, Grow a Garden, Xu TikTok, Cày thuê, Trái Vĩnh Viễn</p>
         <button class="btn btn-success" style="padding: 12px 30px; font-size: 16px;" onclick="openDepositModal()"><i class="fa-solid fa-bolt"></i> NẠP TIỀN NGAY</button>
     </section>
 
     <!-- MAIN CONTENT -->
     <div class="container">
-        <!-- BỘ LỌC TÌM KIẾM -->
+        <!-- BỘ LỌC TÌM KIẾM CẬP NHẬT -->
         <div class="filter-box">
             <select id="filterGame">
-                <option value="">-- Chọn Game --</option>
+                <option value="">-- tất cả Danh mục --</option>
+                <option value="Roblox">Roblox General</option>
+                <option value="Blox Fruits">Roblox Blox Fruits</option>
+                <option value="Grow a Garden">Grow a Garden</option>
+                <option value="Trái Vĩnh Viễn">Trái Vĩnh Viễn (Blox Fruits)</option>
+                <option value="Skin Trái - Trái Rương">Skin Trái / Trái Rương</option>
+                <option value="Cày Thuê Roblox">Cày Thuê Blox Fruits</option>
+                <option value="Xu TikTok">Xu TikTok</option>
                 <option value="Free Fire">Free Fire</option>
                 <option value="Liên Quân">Liên Quân Mobile</option>
                 <option value="Genshin">Genshin Impact</option>
-                <option value="Roblox">Roblox</option>
             </select>
             <select id="filterPrice">
                 <option value="">-- Mức giá --</option>
@@ -131,12 +142,12 @@
                 <option value="2">200.000đ - 500.000đ</option>
                 <option value="3">Trên 500.000đ</option>
             </select>
-            <input type="text" id="searchInput" placeholder="Nhập mã acc hoặc từ khóa...">
+            <input type="text" id="searchInput" placeholder="Nhập tên vật phẩm, gói dịch vụ hoặc từ khóa...">
             <button class="btn btn-primary" onclick="renderShopAcc()"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
         </div>
 
-        <!-- DANH SÁCH ACC GAME -->
-        <h2 style="margin-bottom: 20px; border-left: 4px solid #3b82f6; padding-left: 10px;">ACC GAME MỚI NHẤT</h2>
+        <!-- DANH SÁCH SẢN PHẨM / DỊCH VỤ -->
+        <h2 style="margin-bottom: 20px; border-left: 4px solid #3b82f6; padding-left: 10px;">SẢN PHẨM & DỊCH VỤ HOT</h2>
         <div class="shop-grid" id="accGrid"></div>
     </div>
 
@@ -203,20 +214,20 @@
         </div>
     </div>
 
-    <!-- POPUP TÀI KHOẢN ĐÃ MUA -->
+    <!-- POPUP TÀI KHOẢN / DỊCH VỤ ĐÃ MUA -->
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
-            <h3><i class="fa-solid fa-box-open"></i> LỊCH SỬ ĐƠN HÀNG & ACC ĐÃ MUA</h3>
+            <h3><i class="fa-solid fa-box-open"></i> LỊCH SỬ ĐƠN HÀNG & BÀN GIAO</h3>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Mã Đơn Hàng</th>
-                            <th>Mã Acc</th>
+                            <th>Mã Item</th>
                             <th>Tên Tiêu Đề</th>
                             <th>Giá Mua</th>
-                            <th>Tài Khoản / Mật Khẩu Bàn Giao</th>
+                            <th>Tài Khoản / Mã Quà / Thông Tin Bàn Giao</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
@@ -232,18 +243,18 @@
             <h3><i class="fa-solid fa-user-gear"></i> QUẢN LÝ HỆ THỐNG SHOP GAME</h3>
             
             <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="openAddAccModal()"><i class="fa-solid fa-plus"></i> Thêm Acc Game Mới</button>
+                <button class="btn btn-primary" onclick="openAddAccModal()"><i class="fa-solid fa-plus"></i> Thêm Sản Phẩm / Dịch Vụ Mới</button>
                 <button class="btn btn-success" onclick="openAdminDepositManagement()"><i class="fa-solid fa-money-check-dollar"></i> Cộng Tiền Cho Khách</button>
             </div>
 
-            <h4 style="color: #94a3b8; margin-bottom: 10px;">Danh sách Acc Game hiện tại:</h4>
+            <h4 style="color: #94a3b8; margin-bottom: 10px;">Danh sách Sản phẩm / Dịch vụ hiện tại:</h4>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Mã Acc</th>
+                            <th>Mã</th>
                             <th>Tên Tiêu Đề</th>
-                            <th>Loại Game</th>
+                            <th>Danh Mục</th>
                             <th>Giá Bán</th>
                             <th>Hành Động</th>
                         </tr>
@@ -269,32 +280,38 @@
         </div>
     </div>
 
-    <!-- POPUP THÊM/SỬA ACC GAME (ADMIN) -->
+    <!-- POPUP THÊM/SỬA ACC & DỊCH VỤ (ADMIN) -->
     <div class="modal" id="addAccModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('addAccModal')">&times;</span>
-            <h3 id="accFormTitle">THÊM ACC GAME MỚI</h3>
+            <h3 id="accFormTitle">THÊM MỚI SẢN PHẨM / DỊCH VỤ</h3>
             <form id="accForm" onsubmit="handleSaveAcc(event)">
                 <input type="hidden" id="accId">
-                <input type="text" id="accTitle" class="form-input" style="margin-bottom:10px;" required placeholder="Tiêu đề Acc...">
+                <input type="text" id="accTitle" class="form-input" style="margin-bottom:10px;" required placeholder="Tiêu đề...">
                 <select id="accGameType" class="form-input" style="margin-bottom:10px;" required>
+                    <option value="Blox Fruits">Roblox Blox Fruits</option>
+                    <option value="Grow a Garden">Grow a Garden</option>
+                    <option value="Trái Vĩnh Viễn">Trái Vĩnh Viễn (Blox Fruits)</option>
+                    <option value="Skin Trái - Trái Rương">Skin Trái / Trái Rương</option>
+                    <option value="Cày Thuê Roblox">Cày Thuê Blox Fruits</option>
+                    <option value="Xu TikTok">Xu TikTok</option>
+                    <option value="Roblox">Roblox General</option>
                     <option value="Free Fire">Free Fire</option>
                     <option value="Liên Quân">Liên Quân Mobile</option>
                     <option value="Genshin">Genshin Impact</option>
-                    <option value="Roblox">Roblox</option>
                 </select>
                 <input type="number" id="accPrice" class="form-input" style="margin-bottom:10px;" required placeholder="Giá bán...">
                 <input type="text" id="accImg" class="form-input" style="margin-bottom:10px;" required placeholder="Link hình ảnh...">
-                <input type="text" id="accTag" class="form-input" style="margin-bottom:10px;" placeholder="Tag (Ví dụ: VIP, GIẢM 20%)...">
-                <input type="text" id="accAccountData" class="form-input" style="margin-bottom:15px;" placeholder="Tài khoản|Mật khẩu (VD: user123|pass123)...">
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">LƯU TÀI KHOẢN</button>
+                <input type="text" id="accTag" class="form-input" style="margin-bottom:10px;" placeholder="Tag (Ví dụ: VIP, GIAO NHANH, GIẢM 20%)...">
+                <input type="text" id="accAccountData" class="form-input" style="margin-bottom:15px;" placeholder="Nội dung bàn giao (TK|MK hoặc Mã Quà)...">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">LƯU SẢN PHẨM</button>
             </form>
         </div>
     </div>
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; 2026 SHOPGAME24H. All rights reserved. Hệ thống bán tài khoản game tự động uy tín hàng đầu.</p>
+        <p>&copy; 2026 SHOPGAME24H. All rights reserved. Hệ thống bán tài khoản game & Dịch vụ cày thuê uy tín.</p>
     </footer>
 
     <!-- JAVASCRIPT XỬ LÝ -->
@@ -324,7 +341,7 @@
         // Sao chép tài khoản vào bộ nhớ tạm
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text);
-            showToast('Đã sao chép tài khoản/mật khẩu!', 'success');
+            showToast('Đã sao chép thông tin bàn giao!', 'success');
         }
 
         // Dữ liệu số dư & Lịch sử mua acc của khách hàng
@@ -340,12 +357,14 @@
             localStorage.setItem('shop_user_balances', JSON.stringify(userBalances));
         }
 
-        // Acc game mặc định
+        // Danh sách mẫu đa dạng bao gồm các mục mới
         let defaultAccs = [
-            { id: '1001', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%', credentials: 'ff_user01|pass_ff_vip1' },
-            { id: '1002', title: 'Acc Liên Quân #LQ552 - 110 Tướng 200 Skin', game: 'Liên Quân', price: 350000, img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400', tag: 'MỚI', credentials: 'lq_user02|pass_lq_vip2' },
-            { id: '1003', title: 'Acc Genshin Impact AR56 - 8 Nhân Vật 5 Sao', game: 'Genshin', price: 500000, img: 'https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=400', tag: '', credentials: 'genshin_03|genshin_pass3' },
-            { id: '1004', title: 'Acc Roblox Blox Fruit - Max Level + V4', game: 'Roblox', price: 200000, img: 'https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?q=80&w=400', tag: 'VIP', credentials: 'roblox_04|roblox_pass4' }
+            { id: '2001', title: 'Trái Vĩnh Viễn Dragon (Rồng) - Blox Fruits', game: 'Trái Vĩnh Viễn', price: 450000, img: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', tag: 'HOT', credentials: 'CODE-DRAGON-PERM-992' },
+            { id: '2002', title: 'Gói 10,000 Xu TikTok - Nạp Trực Tiếp Qua ID', game: 'Xu TikTok', price: 180000, img: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=400', tag: 'CHIẾT KHẤU', credentials: 'Lên đơn tự động vào ID TikTok' },
+            { id: '2003', title: 'Grow a Garden - Nông Trại Trái Cây Đầy Đủ Vật Phẩm', game: 'Grow a Garden', price: 120000, img: 'https://images.unsplash.com/photo-1595855759920-86582396756a?q=80&w=400', tag: 'MỚI', credentials: 'garden_user01|pass_garden' },
+            { id: '2004', title: 'Rương Skin Trái Leopard + Dough VIP', game: 'Skin Trái - Trái Rương', price: 250000, img: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=400', tag: 'RƯƠNG VIP', credentials: 'Mã Quà: RUNG-SKIN-8839' },
+            { id: '2005', title: 'Cày Thuê Max Level 2550 + Mở Melee VIP', game: 'Cày Thuê Roblox', price: 90000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400', tag: 'SIÊU TỐC', credentials: 'Vui lòng liên hệ Admin để gửi Acc cày' },
+            { id: '1001', title: 'Acc Free Fire #FF998 - Full Skin VIP', game: 'Free Fire', price: 150000, img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400', tag: 'GIẢM 20%', credentials: 'ff_user01|pass_ff_vip1' }
         ];
 
         let accList = JSON.parse(localStorage.getItem('shop_acc_list')) || defaultAccs;
@@ -374,7 +393,7 @@
 
             accGrid.innerHTML = '';
             if (filteredList.length === 0) {
-                accGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding:30px;">Không tìm thấy tài khoản nào!</p>';
+                accGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding:30px;">Không tìm thấy sản phẩm nào!</p>';
                 return;
             }
 
@@ -387,7 +406,7 @@
                             <div class="acc-title">#${acc.id} - ${acc.title}</div>
                             <div class="acc-info">
                                 <span><i class="fa-solid fa-gamepad"></i> ${acc.game}</span>
-                                <span><i class="fa-solid fa-check"></i> Bảo hành 100%</span>
+                                <span><i class="fa-solid fa-shield-halved"></i> Tự động 24/7</span>
                             </div>
                             <div class="acc-footer">
                                 <div class="price">${acc.price.toLocaleString('vi-VN')} đ</div>
@@ -399,10 +418,10 @@
             });
         }
 
-        // XỬ LÝ MUA ACC
+        // XỬ LÝ MUA ACC / DỊCH VỤ
         function buyAcc(id, price) {
             if (!currentUser) {
-                showToast('Vui lòng đăng nhập để mua tài khoản!', 'error');
+                showToast('Vui lòng đăng nhập để thực hiện giao dịch!', 'error');
                 openAuthModal('login');
                 return;
             }
@@ -412,10 +431,9 @@
                 showToast(`Số dư không đủ! Cần thêm ${(price - balance).toLocaleString('vi-VN')} đ`, 'error');
                 openDepositModal();
             } else {
-                if (confirm(`Xác nhận mua tài khoản #${id} với giá ${price.toLocaleString('vi-VN')} đ?`)) {
+                if (confirm(`Xác nhận thanh toán #${id} với giá ${price.toLocaleString('vi-VN')} đ?`)) {
                     let purchasedAcc = accList.find(a => a.id === id);
                     
-                    // Tạo mã đơn hàng ngẫu nhiên cho đơn này
                     const orderId = generateOrderId();
                     const orderItem = {
                         orderId: orderId,
@@ -425,18 +443,17 @@
 
                     updateUserBalance(currentUser.email, -price);
                     
-                    // Lưu đơn hàng vào lịch sử đã mua
                     if (!userPurchases[currentUser.email]) userPurchases[currentUser.email] = [];
                     userPurchases[currentUser.email].push(orderItem);
                     localStorage.setItem('shop_user_purchases', JSON.stringify(userPurchases));
 
-                    // Xóa Acc khỏi shop
+                    // Xóa item sau khi bán (hoặc giữ lại nếu là gói dịch vụ)
                     accList = accList.filter(a => a.id !== id);
                     saveAccsToStorage();
                     renderShopAcc();
                     checkUserStatus();
                     
-                    showToast(`🎉 Mua thành công! Mã đơn hàng: ${orderId}`, 'success');
+                    showToast(`🎉 Mua thành công! Mã đơn: ${orderId}`, 'success');
                 }
             }
         }
@@ -463,7 +480,7 @@
                             <td><strong>${acc.title}</strong></td>
                             <td style="color:#22c55e; font-weight:bold;">${acc.price.toLocaleString('vi-VN')} đ</td>
                             <td>
-                                <code style="background:#0f172a; padding:4px 8px; border-radius:4px; color:#f59e0b;">${acc.credentials || 'TK: demo | MK: demo123'}</code>
+                                <code style="background:#0f172a; padding:4px 8px; border-radius:4px; color:#f59e0b;">${acc.credentials || 'Tự động kích hoạt'}</code>
                                 <button class="btn btn-login" style="padding: 2px 6px; font-size:11px; margin-left:5px;" onclick="copyToClipboard('${acc.credentials}')"><i class="fa-solid fa-copy"></i> Copy</button>
                             </td>
                         </tr>
@@ -641,7 +658,7 @@
         }
 
         function openAddAccModal() {
-            document.getElementById('accFormTitle').innerText = 'THÊM ACC GAME MỚI';
+            document.getElementById('accFormTitle').innerText = 'THÊM MỚI SẢN PHẨM / DỊCH VỤ';
             document.getElementById('accForm').reset();
             document.getElementById('accId').value = '';
             openModal('addAccModal');
@@ -655,7 +672,7 @@
             const price = parseInt(document.getElementById('accPrice').value);
             const img = document.getElementById('accImg').value;
             const tag = document.getElementById('accTag').value;
-            const credentials = document.getElementById('accAccountData').value || 'tk_demo|mk_demo';
+            const credentials = document.getElementById('accAccountData').value || 'Thanh toán thành công!';
 
             if (id) {
                 let index = accList.findIndex(a => a.id === id);
@@ -668,13 +685,13 @@
             renderShopAcc();
             renderAdminTable();
             closeModal('addAccModal');
-            showToast('Lưu Acc thành công!', 'success');
+            showToast('Lưu thành công!', 'success');
         }
 
         function editAcc(id) {
             const acc = accList.find(a => a.id === id);
             if (!acc) return;
-            document.getElementById('accFormTitle').innerText = 'CHỈNH SỬA ACC GAME';
+            document.getElementById('accFormTitle').innerText = 'CHỈNH SỬA SẢN PHẨM / DỊCH VỤ';
             document.getElementById('accId').value = acc.id;
             document.getElementById('accTitle').value = acc.title;
             document.getElementById('accGameType').value = acc.game;
@@ -686,12 +703,12 @@
         }
 
         function deleteAcc(id) {
-            if (confirm('Xóa tài khoản game này?')) {
+            if (confirm('Xóa mục này khỏi danh sách?')) {
                 accList = accList.filter(a => a.id !== id);
                 saveAccsToStorage();
                 renderShopAcc();
                 renderAdminTable();
-                showToast('Đã xóa tài khoản khỏi danh sách!', 'info');
+                showToast('Đã xóa thành công!', 'info');
             }
         }
 
