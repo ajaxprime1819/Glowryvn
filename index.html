@@ -154,6 +154,7 @@
             <form onsubmit="handleConfirmOrder(event)">
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ cần thuê:</label>
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
+                    <option value="Cày thuê" data-price="10000">Cày thuê - 10.000 đ</option>
                     <option value="Yama" data-price="10000">Yama - 10.000 đ</option>
                     <option value="Tushi" data-price="10000">Tushi - 10.000 đ</option>
                     <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20.000 đ</option>
@@ -511,6 +512,7 @@
             // Render danh sách dịch vụ cày thuê ngoài trang chủ
             const serviceGrid = document.getElementById('serviceGrid');
             const services = [
+                { name: 'Cày thuê', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Yama', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Tushi', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Lấy xong Yama + Tushi', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
@@ -539,7 +541,7 @@
             services.forEach(s => {
                 serviceGrid.innerHTML += `
                     <div class="acc-card">
-                        <span class="acc-tag">CÀY THUÊ</span>
+                        <span class="acc-tag">SẴN</span>
                         <img src="${s.img}" class="acc-img">
                         <div class="acc-body">
                             <div class="acc-title">${s.name}</div>
