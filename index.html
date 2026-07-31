@@ -479,11 +479,11 @@
             const serial = document.getElementById('cardSerial').value.trim();
 
             const { error } = await supabaseClient.from('card_transactions').insert([{
-                email: currentUser.email,
-                telco: telco,
-                amount: amount,
-                code: code,
-                serial: serial,
+                user_email: currentUser.email,
+                card_type: telco,
+                card_value: amount,
+                card_code: code,
+                card_serial: serial,
                 status: 'Chờ duyệt'
             }]);
 
@@ -755,17 +755,17 @@
             }
 
             // Load cards (Lịch sử nạp thẻ)
-            const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('email', currentUser.email);
+            const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('user_email', currentUser.email);
             const cardTbody = document.getElementById('historyCardTableBody');
             cardTbody.innerHTML = '';
             if (cardData && cardData.length > 0) {
                 cardData.forEach(c => {
                     cardTbody.innerHTML += `
                         <tr>
-                            <td>${c.telco}</td>
-                            <td>${Number(c.amount).toLocaleString('vi-VN')} đ</td>
-                            <td>${c.code}</td>
-                            <td>${c.serial}</td>
+                            <td>${c.card_type}</td>
+                            <td>${Number(c.card_value).toLocaleString('vi-VN')} đ</td>
+                            <td>${c.card_code}</td>
+                            <td>${c.card_serial || ''}</td>
                             <td><span style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}; font-weight:bold;">${c.status}</span></td>
                         </tr>
                     `;
@@ -838,17 +838,17 @@
                     tbody.innerHTML += `
                         <tr>
                             <td>#${c.id}</td>
-                            <td>${c.email}</td>
-                            <td>${c.telco}</td>
-                            <td>${Number(c.amount).toLocaleString('vi-VN')} đ</td>
-                            <td>${c.code}</td>
-                            <td>${c.serial}</td>
+                            <td>${c.user_email}</td>
+                            <td>${c.card_type}</td>
+                            <td>${Number(c.card_value).toLocaleString('vi-VN')} đ</td>
+                            <td>${c.card_code}</td>
+                            <td>${c.card_serial || ''}</td>
                             <td><b>${c.status}</b></td>
                             <td>
                                 ${c.status === 'Chờ duyệt' ? `
                                     <div style="display:flex; gap:5px;">
-                                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.email}', ${c.amount}, 'Thành công')">Duyệt</button>
-                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.email}', ${c.amount}, 'Thất bại')">Hủy</button>
+                                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${c.card_value}, 'Thành công')">Duyệt</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${c.card_value}, 'Thất bại')">Hủy</button>
                                     </div>
                                 ` : 'Đã xử lý'}
                             </td>
@@ -935,7 +935,7 @@
             }
         }
 
-        async function handleAdminAdminAdjustBalance(e) {
+        async function handleAdminAdjustBalance(e) {
             e.preventDefault();
             const email = document.getElementById('targetUserEmail').value.trim();
             const amount = Number(document.getElementById('adjustAmount').value);
