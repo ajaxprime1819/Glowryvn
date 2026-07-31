@@ -481,7 +481,7 @@
             const { error } = await supabaseClient.from('card_transactions').insert([{
                 user_email: currentUser.email,
                 card_type: telco,
-                card_value: amount,
+                amount: amount,
                 card_code: code,
                 card_serial: serial,
                 status: 'Chờ duyệt'
@@ -763,7 +763,7 @@
                     cardTbody.innerHTML += `
                         <tr>
                             <td>${c.card_type}</td>
-                            <td>${Number(c.card_value).toLocaleString('vi-VN')} đ</td>
+                            <td>${Number(c.amount || c.card_value || 0).toLocaleString('vi-VN')} đ</td>
                             <td>${c.card_code}</td>
                             <td>${c.card_serial || ''}</td>
                             <td><span style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}; font-weight:bold;">${c.status}</span></td>
@@ -835,20 +835,21 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.forEach(c => {
+                    const cardValue = c.amount || c.card_value || 0;
                     tbody.innerHTML += `
                         <tr>
                             <td>#${c.id}</td>
                             <td>${c.user_email}</td>
                             <td>${c.card_type}</td>
-                            <td>${Number(c.card_value).toLocaleString('vi-VN')} đ</td>
+                            <td>${Number(cardValue).toLocaleString('vi-VN')} đ</td>
                             <td>${c.card_code}</td>
                             <td>${c.card_serial || ''}</td>
                             <td><b>${c.status}</b></td>
                             <td>
                                 ${c.status === 'Chờ duyệt' ? `
                                     <div style="display:flex; gap:5px;">
-                                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${c.card_value}, 'Thành công')">Duyệt</button>
-                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${c.card_value}, 'Thất bại')">Hủy</button>
+                                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thành công')">Duyệt</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Hủy</button>
                                     </div>
                                 ` : 'Đã xử lý'}
                             </td>
