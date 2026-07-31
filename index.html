@@ -54,7 +54,7 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #334155; position: relative; max-height: 90vh; overflow-y: auto; }
-        .admin-modal-content { max-width: 1050px; }
+        .admin-modal-content { max-width: 1100px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #94a3b8; cursor: pointer; }
         .modal-content h3 { margin-bottom: 20px; color: #3b82f6; text-align: center; }
         .form-input { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; outline: none; width: 100%; margin-bottom: 10px; }
@@ -261,7 +261,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th>
+                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Thao Tác</th>
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
@@ -578,7 +578,6 @@
 
             await updateUserBalance(currentUser.email, -price);
             
-            // Đã tối ưu hóa tránh lỗi schema cache bằng lệnh gọi trực tiếp an toàn
             const { error } = await supabaseClient.from('orders').insert({
                 email: currentUser.email,
                 service_name: serviceName,
@@ -618,6 +617,7 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.forEach(o => {
+                    const isCompleted = o.status === 'Đã hoàn thành';
                     tbody.innerHTML += `<tr>
                         <td>#${o.id}</td>
                         <td>${o.email}</td>
@@ -626,12 +626,25 @@
                         <td>${o.roblox_user}</td>
                         <td>${o.roblox_pass}</td>
                         <td>${o.roblox_pass3 || 'Không'}</td>
-                        <td><span style="background:#f59e0b; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:#000;">${o.status}</span></td>
+                        <td><span style="background:${isCompleted ? '#22c55e' : '#f59e0b'}; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:${isCompleted ? '#fff' : '#000'};">${o.status}</span></td>
+                        <td>
+                            ${isCompleted ? '<span style="color:#22c55e; font-weight:bold;">Đã xong</span>' : 
+                            `<button class="btn btn-success" style="padding:5px 10px; font-size:12px;" onclick="completeOrder(${o.id})"><i class="fa-solid fa-check"></i> Duyệt Xong</button>`}
+                        </td>
                     </tr>`;
                 });
             } else {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8;">Chưa có đơn cày thuê nào.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#94a3b8;">Chưa có đơn cày thuê nào.</td></tr>`;
             }
+        }
+
+        async function completeOrder(orderId) {
+            const { error } = await supabaseClient.from('orders').update({ status: 'Đã hoàn thành' }).eq('id', orderId);
+            if (error) {
+                return showToast('Lỗi cập nhật trạng thái: ' + error.message, 'error');
+            }
+            showToast('Đã duyệt hoàn thành đơn hàng #' + orderId, 'success');
+            loadAdminOrders();
         }
 
         async function loadAdminAccs() {
@@ -691,7 +704,7 @@
 
         async function handleAdminAdjustBalance(e) {
             e.preventDefault();
-            const email = document.getElementById('targetUserEmail').value;
+            const email = document.getElementById('targetUserEmail',).value;
             const amount = parseFloat(document.getElementById('adjustAmount').value);
             await updateUserBalance(email, amount);
             showToast('Cập nhật số dư thành công!', 'success');
@@ -705,12 +718,13 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.forEach(h => {
+                    const isCompleted = h.status === 'Đã hoàn thành';
                     tbody.innerHTML += `<tr>
                         <td>Cày Thuê</td>
                         <td><b>${h.service_name}</b></td>
                         <td style="color:#22c55e;">${Number(h.price).toLocaleString('vi-VN')}đ</td>
                         <td>${h.roblox_user}</td>
-                        <td><span style="background:#f59e0b; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:#000;">${h.status}</span></td>
+                        <td><span style="background:${isCompleted ? '#22c55e' : '#f59e0b'}; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:${isCompleted ? '#fff' : '#000'};">${h.status}</span></td>
                     </tr>`;
                 });
             } else {
