@@ -157,12 +157,12 @@
                     <option value="Yama" data-price="10000">Yama - 10k</option>
                     <option value="Tushi" data-price="10000">Tushi - 10k</option>
                     <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20k</option>
-                    <option value="Tam Kiếm (CDK)" data-price="25000">Tam Kiếm (CDK) - 25k</option>
+                    <option value="Tam kiếm (CDK)" data-price="25000">Tam kiếm (CDK) - 25k</option>
                     <option value="Kéo tim" data-price="25000">Kéo tim - 25k</option>
-                    <option value="V4 a-z thỏ cả tt human" data-price="45000">V4 a-z thỏ cả tt human (Bao all) - 45k</option>
-                    <option value="V4 a-z cy quỷ" data-price="55000">V4 a-z cy quỷ (Bao all) - 55k</option>
+                    <option value="V4 a-z thỏ cả tt human (Bao all)" data-price="45000">V4 a-z thỏ cả tt human (Bao all) - 45k</option>
+                    <option value="V4 a-z cy quỷ (Bao all)" data-price="55000">V4 a-z cy quỷ (Bao all) - 55k</option>
                     <option value="V4 draco bao all" data-price="85000">V4 draco bao all - 85k</option>
-                    <option value="Lẻ 1 gear" data-price="10000">Lẻ 1 gear (Không nhận 2 gear đổ xuống) - 10k</option>
+                    <option value="Lẻ 1 gear (Không nhận 2 gear đổ xuống)" data-price="10000">Lẻ 1 gear (Không nhận 2 gear đổ xuống) - 10k</option>
                     <option value="Kiếm rồng" data-price="20000">Kiếm rồng - 20k</option>
                     <option value="Súng rồng" data-price="25000">Súng rồng - 25k</option>
                     <option value="Dino hood" data-price="20000">Dino hood - 20k</option>
@@ -173,7 +173,7 @@
                     <option value="Cuộc mythic" data-price="35000">Cuộc mythic - 35k</option>
                     <option value="Beli 100m" data-price="80000">Beli 100m (Úp nhiều) - 80k</option>
                     <option value="Beli 50m" data-price="35000">Beli 50m (Úp nhiều) - 35k</option>
-                    <option value="Frag 1k" data-price="1500">Frag (1k5/1k, nhiều thì 1/1) - 1.500đ</option>
+                    <option value="Frag (1k5/1k, nhiều thì 1/1)" data-price="1500">Frag (1k5/1k, nhiều thì 1/1) - 1.500đ</option>
                     <option value="Level 0 - 700" data-price="10000">Level 0 - 700 - 10k</option>
                     <option value="Level 700 - 1500" data-price="10000">Level 700 - 1500 - 10k</option>
                     <option value="Level 1500 - 2800" data-price="20000">Level 1500 - 2800 - 20k</option>
@@ -508,15 +508,21 @@
                 accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào bán.</p>';
             }
 
-            // Render danh sách dịch vụ cày thuê
+            // Render danh sách dịch vụ cày thuê ngoài trang chủ
             const serviceGrid = document.getElementById('serviceGrid');
             const services = [
-                { name: 'Yama / Tushi', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Yama', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Tushi', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Lấy xong Yama + Tushi', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Tam Kiếm (CDK)', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Kéo tim', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'V4 a-z thỏ cả tt human (Bao all)', price: 45000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'V4 a-z cy quỷ (Bao all)', price: 55000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'V4 draco bao all', price: 85000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Godhuman', price: 30000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Võ máu (Sanguine Art)', price: 40000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'V4 A-Z (Bao All)', price: 45000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cày Level 0 - 700', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { name: 'Cày Level 0 - 700', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Cày Level 700 - 1500', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
             ];
             serviceGrid.innerHTML = '';
             services.forEach(s => {
@@ -591,7 +597,7 @@
             document.getElementById('confirmAccTitle').innerText = data.title;
             document.getElementById('confirmAccPrice').innerText = Number(data.price).toLocaleString('vi-VN') + ' đ';
             
-            document.getElementById('btnConfirmBuyProceed.onclick').onclick = async () => {
+            document.getElementById('btnConfirmBuyProceed').onclick = async () => {
                 const balance = await getUserBalance(currentUser.email);
                 if (balance < data.price) {
                     closeModal('confirmBuyModal');
