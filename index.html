@@ -754,7 +754,7 @@
                 orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
             }
 
-            // Load cards
+            // Load cards (Lịch sử nạp thẻ)
             const { data: cardData } = await supabaseClient.from('card_deposits').select('*').eq('email', currentUser.email);
             const cardTbody = document.getElementById('historyCardTableBody');
             cardTbody.innerHTML = '';
@@ -935,7 +935,7 @@
             }
         }
 
-        async function handleAdminAdjustBalance(e) {
+        async function handleAdminAdminAdjustBalance(e) {
             e.preventDefault();
             const email = document.getElementById('targetUserEmail').value.trim();
             const amount = Number(document.getElementById('adjustAmount').value);
