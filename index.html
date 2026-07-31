@@ -478,7 +478,7 @@
             const code = document.getElementById('cardCode').value.trim();
             const serial = document.getElementById('cardSerial').value.trim();
 
-            const { error } = await supabaseClient.from('card_deposits').insert([{
+            const { error } = await supabaseClient.from('card_transactions').insert([{
                 email: currentUser.email,
                 telco: telco,
                 amount: amount,
@@ -755,7 +755,7 @@
             }
 
             // Load cards (Lịch sử nạp thẻ)
-            const { data: cardData } = await supabaseClient.from('card_deposits').select('*').eq('email', currentUser.email);
+            const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('email', currentUser.email);
             const cardTbody = document.getElementById('historyCardTableBody');
             cardTbody.innerHTML = '';
             if (cardData && cardData.length > 0) {
@@ -830,7 +830,7 @@
         }
 
         async function loadAdminCards() {
-            const { data } = await supabaseClient.from('card_deposits').select('*');
+            const { data } = await supabaseClient.from('card_transactions').select('*');
             const tbody = document.getElementById('adminCardTableBody');
             tbody.innerHTML = '';
             if (data && data.length > 0) {
@@ -861,7 +861,7 @@
         }
 
         async function processCard(id, email, amount, status) {
-            await supabaseClient.from('card_deposits').update({ status: status }).eq('id', id);
+            await supabaseClient.from('card_transactions').update({ status: status }).eq('id', id);
             
             if (status === 'Thành công') {
                 const currentBal = await getUserBalance(email);
