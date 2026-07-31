@@ -289,6 +289,7 @@
 
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchAdminTab(event, 'tab-orders')"><i class="fa-solid fa-list-check"></i> Duyệt Đơn Đã Đặt</button>
+                <button class="tab-btn" onclick="switchAdminTab(event, 'tab-cards')"><i class="fa-solid fa-credit-card"></i> Duyệt Thẻ Cào</button>
                 <button class="tab-btn" onclick="switchAdminTab(event, 'tab-acc-sell')"><i class="fa-solid fa-store"></i> Quản Lý Bán Acc Game</button>
                 <button class="tab-btn" onclick="switchAdminTab(event, 'tab-users-balance')"><i class="fa-solid fa-wallet"></i> Quản Lý Số Dư Khách</button>
             </div>
@@ -302,6 +303,19 @@
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-cards" class="tab-content">
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Thẻ</th><th>Khách Hàng</th><th>Nhà Mạng</th><th>Mệnh Giá</th><th>Mã Thẻ</th><th>Số Seri</th><th>Trạng Thái</th><th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminCardTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -359,14 +373,30 @@
     <div class="modal" id="historyModal">
         <div class="modal-content admin-modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
-            <h3><i class="fa-solid fa-clock-rotate-left"></i> LỊCH SỬ MUA ACC & ĐẶT CÀY THUÊ</h3>
-            <div style="overflow-x: auto;">
-                <table class="admin-table">
-                    <thead>
-                        <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản Roblox</th><th>Trạng Thái</th></tr>
-                    </thead>
-                    <tbody id="historyTableBody"></tbody>
-                </table>
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> LỊCH SỬ GIAO DỊCH & NẠP THẺ</h3>
+            <div class="admin-tabs" style="margin-top: 10px;">
+                <button class="tab-btn active" onclick="switchHistoryTab(event, 'history-orders')">Lịch Sử Đơn Hàng</button>
+                <button class="tab-btn" onclick="switchHistoryTab(event, 'history-cards')">Lịch Sử Nạp Thẻ</button>
+            </div>
+            <div id="history-orders" class="tab-content active">
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản Roblox</th><th>Trạng Thái</th></tr>
+                        </thead>
+                        <tbody id="historyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="history-cards" class="tab-content">
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr><th>Nhà Mạng</th><th>Mệnh Giá</th><th>Mã Thẻ</th><th>Số Seri</th><th>Trạng Thái</th></tr>
+                        </thead>
+                        <tbody id="historyCardTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -431,9 +461,38 @@
             document.getElementById(paneId).classList.add('active');
         }
 
-        function handleCardDeposit(e) {
+        function switchHistoryTab(e, tabId) {
+            const parent = e.currentTarget.parentElement.parentElement;
+            parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function handleCardDeposit(e) {
             e.preventDefault();
-            showToast('Gửi thẻ thành công! Hệ thống đang duyệt thẻ tự động.', 'success');
+            if (!currentUser) return openAuthModal('login');
+
+            const telco = document.getElementById('cardTelco').value;
+            const amount = Number(document.getElementById('cardAmount').value);
+            const code = document.getElementById('cardCode').value.trim();
+            const serial = document.getElementById('cardSerial').value.trim();
+
+            const { error } = await supabaseClient.from('card_deposits').insert([{
+                email: currentUser.email,
+                telco: telco,
+                amount: amount,
+                code: code,
+                serial: serial,
+                status: 'Chờ duyệt'
+            }]);
+
+            if (error) {
+                return showToast('Lỗi gửi thẻ: ' + error.message, 'error');
+            }
+
+            showToast('Gửi thẻ cào thành công! Đang chờ Admin duyệt.', 'success');
+            e.target.reset();
             closeModal('depositModal');
         }
 
@@ -556,7 +615,6 @@
                 accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào bán.</p>';
             }
 
-            // Render danh sách dịch vụ cày thuê (chỉ giữ lại 1 dịch vụ đầu tiên)
             const serviceGrid = document.getElementById('serviceGrid');
             const services = [
                 { name: 'Yama', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
@@ -675,12 +733,14 @@
 
         async function openHistoryModal() {
             if (!currentUser) return openAuthModal('login');
-            const { data } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-            if (data && data.length > 0) {
-                data.forEach(o => {
-                    tbody.innerHTML += `
+            
+            // Load orders
+            const { data: orderData } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
+            const orderTbody = document.getElementById('historyTableBody');
+            orderTbody.innerHTML = '';
+            if (orderData && orderData.length > 0) {
+                orderData.forEach(o => {
+                    orderTbody.innerHTML += `
                         <tr>
                             <td>${o.service_name.includes('Mua Acc') ? 'Mua Tài Khoản' : 'Cày Thuê'}</td>
                             <td>${o.service_name}</td>
@@ -691,8 +751,29 @@
                     `;
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
+                orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
             }
+
+            // Load cards
+            const { data: cardData } = await supabaseClient.from('card_deposits').select('*').eq('email', currentUser.email);
+            const cardTbody = document.getElementById('historyCardTableBody');
+            cardTbody.innerHTML = '';
+            if (cardData && cardData.length > 0) {
+                cardData.forEach(c => {
+                    cardTbody.innerHTML += `
+                        <tr>
+                            <td>${c.telco}</td>
+                            <td>${Number(c.amount).toLocaleString('vi-VN')} đ</td>
+                            <td>${c.code}</td>
+                            <td>${c.serial}</td>
+                            <td><span style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}; font-weight:bold;">${c.status}</span></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                cardTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử nạp thẻ nào.</td></tr>';
+            }
+
             openModal('historyModal');
         }
 
@@ -702,6 +783,7 @@
                 return showToast('Bạn không có quyền truy cập trang quản trị!', 'error');
             }
             await loadAdminOrders();
+            await loadAdminCards();
             await loadAdminAccSell();
             await loadAdminUsersBalance();
             openModal('adminModal');
@@ -747,6 +829,54 @@
             loadAdminOrders();
         }
 
+        async function loadAdminCards() {
+            const { data } = await supabaseClient.from('card_deposits').select('*');
+            const tbody = document.getElementById('adminCardTableBody');
+            tbody.innerHTML = '';
+            if (data && data.length > 0) {
+                data.forEach(c => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>#${c.id}</td>
+                            <td>${c.email}</td>
+                            <td>${c.telco}</td>
+                            <td>${Number(c.amount).toLocaleString('vi-VN')} đ</td>
+                            <td>${c.code}</td>
+                            <td>${c.serial}</td>
+                            <td><b>${c.status}</b></td>
+                            <td>
+                                ${c.status === 'Chờ duyệt' ? `
+                                    <div style="display:flex; gap:5px;">
+                                        <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.email}', ${c.amount}, 'Thành công')">Duyệt</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.email}', ${c.amount}, 'Thất bại')">Hủy</button>
+                                    </div>
+                                ` : 'Đã xử lý'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#94a3b8;">Không có thẻ cào nào.</td></tr>';
+            }
+        }
+
+        async function processCard(id, email, amount, status) {
+            await supabaseClient.from('card_deposits').update({ status: status }).eq('id', id);
+            
+            if (status === 'Thành công') {
+                const currentBal = await getUserBalance(email);
+                const newBal = currentBal + amount;
+                await supabaseClient.from('user_balances').upsert({ email: email, balance: newBal });
+                showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
+            } else {
+                showToast('Đã từ chối thẻ cào!', 'error');
+            }
+
+            loadAdminCards();
+            loadAdminUsersBalance();
+            checkUserStatus();
+        }
+
         async function handleAddNewAccGame(e) {
             e.preventDefault();
             const title = document.getElementById('newAccTitle').value;
@@ -790,7 +920,7 @@
         async function loadAdminUsersBalance() {
             const { data } = await supabaseClient.from('user_balances').select('*');
             const tbody = document.getElementById('adminUserBalanceTableBody');
-            tbody.innerHTML = '';
+            tbody.innerHTML = ``;
             if (data && data.length > 0) {
                 data.forEach(u => {
                     tbody.innerHTML += `
