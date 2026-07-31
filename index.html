@@ -509,33 +509,10 @@
                 accGameGrid.innerHTML = '<p style="color:#94a3b8;">Chưa có tài khoản nào bán.</p>';
             }
 
-            // Render danh sách dịch vụ cày thuê ngoài trang chủ
+            // Render danh sách dịch vụ cày thuê (chỉ giữ lại 1 dịch vụ đầu tiên)
             const serviceGrid = document.getElementById('serviceGrid');
             const services = [
-                { name: 'Cày thuê', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Yama', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Tushi', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Lấy xong Yama + Tushi', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Tam Kiếm (CDK)', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Kéo tim', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'V4 a-z thỏ cả tt human (Bao all)', price: 45000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'V4 a-z cy quỷ (Bao all)', price: 55000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'V4 draco bao all', price: 85000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Lẻ 1 gear', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Kiếm rồng', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Súng rồng', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Dino hood', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Mở cổng draco', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Godhuman', price: 30000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Võ máu (Sanguine Art)', price: 40000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Nhẫn đỏ', price: 50000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cuộc mythic', price: 35000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Beli 100m', price: 80000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Beli 50m', price: 35000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Frag', price: 1500, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cày Level 0 - 700', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cày Level 700 - 1500', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cày Level 1500 - 2800', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { name: 'Cày thuê', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
             ];
             serviceGrid.innerHTML = '';
             services.forEach(s => {
