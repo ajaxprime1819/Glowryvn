@@ -152,34 +152,34 @@
             <h3><i class="fa-solid fa-gamepad"></i> ĐẶT DỊCH VỤ CÀY THUÊ</h3>
             
             <form onsubmit="handleConfirmOrder(event)">
-                <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn loại dịch vụ cày thuê:</label>
+                <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ cần thuê:</label>
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
-                    <option value="Yama" data-price="10000">Yama - 10k</option>
-                    <option value="Tushi" data-price="10000">Tushi - 10k</option>
-                    <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20k</option>
-                    <option value="Tam kiếm (CDK)" data-price="25000">Tam kiếm (CDK) - 25k</option>
-                    <option value="Kéo tim" data-price="25000">Kéo tim - 25k</option>
-                    <option value="V4 a-z thỏ cả tt human (Bao all)" data-price="45000">V4 a-z thỏ cả tt human (Bao all) - 45k</option>
-                    <option value="V4 a-z cy quỷ (Bao all)" data-price="55000">V4 a-z cy quỷ (Bao all) - 55k</option>
-                    <option value="V4 draco bao all" data-price="85000">V4 draco bao all - 85k</option>
-                    <option value="Lẻ 1 gear (Không nhận 2 gear đổ xuống)" data-price="10000">Lẻ 1 gear (Không nhận 2 gear đổ xuống) - 10k</option>
-                    <option value="Kiếm rồng" data-price="20000">Kiếm rồng - 20k</option>
-                    <option value="Súng rồng" data-price="25000">Súng rồng - 25k</option>
-                    <option value="Dino hood" data-price="20000">Dino hood - 20k</option>
-                    <option value="Mở cổng draco" data-price="25000">Mở cổng draco - 25k</option>
-                    <option value="Godhuman" data-price="30000">Godhuman - 30k</option>
-                    <option value="Võ máu (Sanguine Art)" data-price="40000">Võ máu (Sanguine Art) - 40k</option>
-                    <option value="Nhẫn đỏ" data-price="50000">Nhẫn đỏ - 50k</option>
-                    <option value="Cuộc mythic" data-price="35000">Cuộc mythic - 35k</option>
-                    <option value="Beli 100m" data-price="80000">Beli 100m (Úp nhiều) - 80k</option>
-                    <option value="Beli 50m" data-price="35000">Beli 50m (Úp nhiều) - 35k</option>
-                    <option value="Frag (1k5/1k, nhiều thì 1/1)" data-price="1500">Frag (1k5/1k, nhiều thì 1/1) - 1.500đ</option>
-                    <option value="Level 0 - 700" data-price="10000">Level 0 - 700 - 10k</option>
-                    <option value="Level 700 - 1500" data-price="10000">Level 700 - 1500 - 10k</option>
-                    <option value="Level 1500 - 2800" data-price="20000">Level 1500 - 2800 - 20k</option>
+                    <option value="Yama" data-price="10000">Yama - 10.000 đ</option>
+                    <option value="Tushi" data-price="10000">Tushi - 10.000 đ</option>
+                    <option value="Lấy xong Yama + Tushi" data-price="20000">Lấy xong Yama + Tushi - 20.000 đ</option>
+                    <option value="Tam kiếm (CDK)" data-price="25000">Tam kiếm (CDK) - 25.000 đ</option>
+                    <option value="Kéo tim" data-price="25000">Kéo tim - 25.000 đ</option>
+                    <option value="V4 a-z thỏ cả tt human (Bao all)" data-price="45000">V4 a-z thỏ cả tt human (Bao all) - 45.000 đ</option>
+                    <option value="V4 a-z cy quỷ (Bao all)" data-price="55000">V4 a-z cy quỷ (Bao all) - 55.000 đ</option>
+                    <option value="V4 draco bao all" data-price="85000">V4 draco bao all - 85.000 đ</option>
+                    <option value="Lẻ 1 gear (Không nhận 2 gear đổ xuống)" data-price="10000">Lẻ 1 gear (Không nhận 2 gear đổ xuống) - 10.000 đ</option>
+                    <option value="Kiếm rồng" data-price="20000">Kiếm rồng - 20.000 đ</option>
+                    <option value="Súng rồng" data-price="25000">Súng rồng - 25.000 đ</option>
+                    <option value="Dino hood" data-price="20000">Dino hood - 20.000 đ</option>
+                    <option value="Mở cổng draco" data-price="25000">Mở cổng draco - 25.000 đ</option>
+                    <option value="Godhuman" data-price="30000">Godhuman - 30.000 đ</option>
+                    <option value="Võ máu (Sanguine Art)" data-price="40000">Võ máu (Sanguine Art) - 40.000 đ</option>
+                    <option value="Nhẫn đỏ" data-price="50000">Nhẫn đỏ - 50.000 đ</option>
+                    <option value="Cuộc mythic" data-price="35000">Cuộc mythic - 35.000 đ</option>
+                    <option value="Beli 100m (Úp nhiều)" data-price="80000">Beli 100m (Úp nhiều) - 80.000 đ</option>
+                    <option value="Beli 50m (Úp nhiều)" data-price="35000">Beli 50m (Úp nhiều) - 35.000 đ</option>
+                    <option value="Frag (1k5/1k, nhiều thì 1/1)" data-price="1500">Frag (1k5/1k, nhiều thì 1/1) - 1.500 đ</option>
+                    <option value="Cày Level 0 - 700" data-price="10000">Cày Level 0 - 700 - 10.000 đ</option>
+                    <option value="Cày Level 700 - 1500" data-price="10000">Cày Level 700 - 1500 - 10.000 đ</option>
+                    <option value="Cày Level 1500 - 2800" data-price="20000">Cày Level 1500 - 2800 - 20.000 đ</option>
                 </select>
 
-                <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:12px; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+                <div style="background:#0f172a; padding:12px; border-radius:6px; margin: 12px 0; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
                     <span>Giá tiền thanh toán:</span>
                     <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">10.000 đ</b>
                 </div>
@@ -193,7 +193,7 @@
                 <label style="font-size:13px; color:#cbd5e1;">Mã 2FA / Pass dự phòng (Nếu có):</label>
                 <input type="text" id="robloxPass3" class="form-input" placeholder="Nhập mã dự phòng 2FA...">
 
-                <button type="submit" class="btn btn-success" style="width:100%; padding:12px; margin-top:10px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
+                <button type="submit" class="btn btn-success" style="width:100%; padding:12px; margin-top:5px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
             </form>
         </div>
     </div>
@@ -519,10 +519,21 @@
                 { name: 'V4 a-z thỏ cả tt human (Bao all)', price: 45000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'V4 a-z cy quỷ (Bao all)', price: 55000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'V4 draco bao all', price: 85000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Lẻ 1 gear', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Kiếm rồng', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Súng rồng', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Dino hood', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Mở cổng draco', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Godhuman', price: 30000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Võ máu (Sanguine Art)', price: 40000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Nhẫn đỏ', price: 50000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Cuộc mythic', price: 35000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Beli 100m', price: 80000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Beli 50m', price: 35000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Frag', price: 1500, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
                 { name: 'Cày Level 0 - 700', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cày Level 700 - 1500', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { name: 'Cày Level 700 - 1500', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Cày Level 1500 - 2800', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
             ];
             serviceGrid.innerHTML = '';
             services.forEach(s => {
@@ -534,7 +545,7 @@
                             <div class="acc-title">${s.name}</div>
                             <div class="acc-footer">
                                 <div class="price">${s.price.toLocaleString('vi-VN')} đ</div>
-                                <button class="btn btn-primary" onclick="openOrderServiceModal()"><i class="fa-solid fa-gamepad"></i> Thuê Ngay</button>
+                                <button class="btn btn-primary" onclick="openOrderServiceModal('${s.name}')"><i class="fa-solid fa-gamepad"></i> Thuê Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -542,8 +553,18 @@
             });
         }
 
-        function openOrderServiceModal() {
+        function openOrderServiceModal(defaultServiceName = '') {
             if (!currentUser) return openAuthModal('login');
+            if (defaultServiceName) {
+                const select = document.getElementById('serviceSelectMenu');
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text.includes(defaultServiceName)) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+                updateSelectedServicePrice();
+            }
             openModal('orderServiceModal');
         }
 
@@ -571,7 +592,6 @@
                 return;
             }
 
-            // Trừ tiền khách và lưu đơn cày thuê vào Supabase
             await supabaseClient.from('user_balances').upsert({ email: currentUser.email, balance: currentBalance - price });
             await supabaseClient.from('orders').insert([{
                 email: currentUser.email,
@@ -604,11 +624,9 @@
                     return showToast('Số dư tài khoản không đủ mua acc này!', 'error');
                 }
 
-                // Trừ tiền, cập nhật trạng thái đã bán
                 await supabaseClient.from('user_balances').upsert({ email: currentUser.email, balance: balance - data.price });
                 await supabaseClient.from('acc_games').update({ is_sold: true }).eq('id', accId);
                 
-                // Lưu vào lịch sử
                 await supabaseClient.from('orders').insert([{
                     email: currentUser.email,
                     service_name: `Mua Acc: ${data.title}`,
