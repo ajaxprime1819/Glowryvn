@@ -8,8 +8,8 @@ export default async function handler(req, res) {
 
     const { telco, amount, serial, pin, username } = req.body;
 
-    const PARTNER_ID = 'DIEN_PARTNER_ID_CUA_BAN_VAO_DAY'; 
-    const PARTNER_KEY = 'DIEN_PARTNER_KEY_CUA_BAN_VAO_DAY'; 
+    const PARTNER_ID = '7215070297'; 
+    const PARTNER_KEY = 'bf6e5a00abe0c272af210e736107a858'; 
     
     const requestId = 'NAPS_' + Date.now();
     const signature = md5(PARTNER_KEY + pin + serial);
