@@ -912,44 +912,46 @@
             }
         }
 
-        async function processCard(id, email, amount, status) {
-            const actionTd = document.getElementById(`card-actions-${id}`);
-            if (actionTd) actionTd.innerHTML = 'Đang xử lý...';
+async function processCard(id, email, amount, status) {
+    const actionTd = document.getElementById(`card-actions-${id}`);
+    if (actionTd) actionTd.innerHTML = 'Đang xử lý...';
 
-            const dbStatus = (status === 'Thành công') ? 'Thành công' : 'Thất bại';
+    const dbStatus = (status === 'Thành công') ? 'Thành công' : 'Thất bại';
 
-            const { error } = await supabaseClient
-                .from('card_transactions')
-                .update({ status: dbStatus })
-                .eq('id', id);
+    // 1. Cập nhật trạng thái thẻ trong cơ sở dữ liệu (Ép kiểu id sang số hoặc giữ nguyên tùy cấu trúc bảng)
+    const { error } = await supabaseClient
+        .from('card_transactions')
+        .update({ status: dbStatus })
+        .eq('id', id);
 
-            if (error) {
-                showToast('Lỗi cập nhật CSDL: ' + error.message, 'error');
-                loadAdminCards();
-                return;
-            }
+    if (error) {
+        showToast('Lỗi cập nhật CSDL: ' + error.message, 'error');
+        loadAdminCards();
+        return;
+    }
 
-            if (status === 'Thành công') {
-                const currentBal = await getUserBalance(email);
-                const newBal = currentBal + amount;
-                
-                const { error: balError } = await supabaseClient
-                    .from('user_balances')
-                    .upsert({ email: email, balance: newBal });
+    // 2. Nếu duyệt thành công thì tiến hành cộng tiền vào ví của khách hàng
+    if (status === 'Thành công') {
+        const currentBal = await getUserBalance(email);
+        const newBal = currentBal + amount;
+        
+        const { error: balError } = await supabaseClient
+            .from('user_balances')
+            .upsert({ email: email, balance: newBal });
 
-                if (!balError) {
-                    showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
-                } else {
-                    showToast('Lỗi cộng số dư cho khách!', 'error');
-                }
-            } else {
-                showToast('Đã cập nhật trạng thái thẻ thành công (Thẻ lỗi)!', 'error');
-            }
-
-            loadAdminCards();
-            loadAdminUsersBalance();
-            checkUserStatus();
+        if (!balError) {
+            showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
+        } else {
+            showToast('Lỗi cộng số dư cho khách: ' + balError.message, 'error');
         }
+    } else {
+        showToast('Đã cập nhật trạng thái thẻ thành Thất bại!', 'info');
+    }
+
+    // 3. Tải lại bảng quản trị thẻ và số dư
+    loadAdminCards();
+    loadAdminUsersBalance();
+}
 
         async function handleAddNewAccGame(e) {
             e.preventDefault();
