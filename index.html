@@ -770,7 +770,7 @@
                     cardTbody.innerHTML += `
                         <tr>
                             <td>${c.card_type}</td>
-                            <td>${Number(c.amount || c.card_value || 0).toLocaleString('vi-VN')} đ</td>
+                            <td>${Number(c.amount || 0).toLocaleString('vi-VN')} đ</td>
                             <td>${c.card_code}</td>
                             <td>${c.card_serial || ''}</td>
                             <td><span style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}; font-weight:bold;">${c.status}</span></td>
@@ -842,7 +842,7 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.forEach(c => {
-                    const cardValue = c.amount || c.card_value || 0;
+                    const cardValue = c.amount || 0;
                     tbody.innerHTML += `
                         <tr>
                             <td>#${c.id}</td>
