@@ -210,55 +210,60 @@
         </div>
     </div>
 
-<!-- Modal Nạp Tiền (ID có thể là depositModal) -->
-<div id="depositModal" class="modal" style="display: none;">
-    <div class="modal-content" style="background: #1e293b; padding: 20px; border-radius: 8px; width: 400px; color: #fff; position: relative;">
-        <span class="close-btn" onclick="closeModal('depositModal')" style="position: absolute; right: 15px; top: 10px; cursor: pointer; font-size: 20px;">&times;</span>
-        
-        <h2 style="text-align: center; margin-bottom: 15px; font-size: 18px;">NẠP TIỀN VÀO TÀI KHOẢN</h2>
-        
-        <!-- Tab chuyển đổi (nếu có) -->
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button type="button" class="tab-btn active" style="flex: 1; padding: 8px; background: #3b82f6; border: none; color: #fff; border-radius: 4px; cursor: pointer;">Thẻ Cào Điện Thoại</button>
+    <!-- MODAL NẠP TIỀN -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
+            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
+            
+            <div class="deposit-methods">
+                <div class="deposit-tab active" onclick="switchDepositTab(event, 'pane-qr')"><i class="fa-solid fa-qrcode"></i> Quét Mã QR Momo/Bank</div>
+                <div class="deposit-tab" onclick="switchDepositTab(event, 'pane-card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào Điện Thoại</div>
+            </div>
+
+            <div id="pane-qr" class="deposit-pane active">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản tự động:</p>
+                    <img src="https://api.vietqr.io/image/970422-0391234567-xxxxxx.jpg?accountName=CHINGHIA&amount=50000&addInfo=NAP" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
+                    <p style="font-size: 13px; color: #f59e0b; margin-top: 8px;">Nội dung chuyển khoản: <b style="color:#fff;" id="qrContentText">NAP TIEN</b></p>
+                </div>
+                <button class="btn btn-primary" style="width:100%;" onclick="showToast('Hệ thống đang kiểm tra giao dịch tự động!', 'success')">TÔI ĐÃ CHUYỂN KHOẢN</button>
+            </div>
+
+            <div id="pane-card" class="deposit-pane">
+                <form onsubmit="handleCardDeposit(event)">
+                    <label style="font-size:13px; color:#cbd5e1;">Chọn nhà mạng:</label>
+                    <select id="cardTelco" class="form-input" required>
+                        <option value="VIETTEL">Viettel</option>
+                        <option value="VINAPHONE">Vinaphone</option>
+                        <option value="GARENA">Garena ⭐</option>
+                        <option value="MOBIFONE">Mobifone</option>
+                        <option value="ZING">Zing</option>
+                        <option value="VCOIN">Vcoin</option>
+                        <option value="SCOIN">Scoin</option>
+                    </select>
+
+                    <label style="font-size:13px; color:#cbd5e1;">Mệnh giá:</label>
+                    <select id="cardAmount" class="form-input" required>
+                        <option value="10000">10.000 đ</option>
+                        <option value="20000">20.000 đ</option>
+                        <option value="50000">50.000 đ</option>
+                        <option value="100000">100.000 đ</option>
+                        <option value="200000">200.000 đ</option>
+                        <option value="500000">500.000 đ</option>
+                    </select>
+
+                    <label style="font-size:13px; color:#cbd5e1;">Mã thẻ cào:</label>
+                    <input type="text" id="cardCode" class="form-input" placeholder="Nhập mã thẻ..." required>
+
+                    <label style="font-size:13px; color:#cbd5e1;">Số Seri:</label>
+                    <input type="text" id="cardSerial" class="form-input" placeholder="Nhập số seri..." required>
+
+                    <button type="submit" class="btn btn-success" style="width:100%; margin-top:5px;">GỬI THẺ CÀO</button>
+                </form>
+            </div>
         </div>
-
-        <!-- Form nạp thẻ cào chuẩn -->
-        <form id="cardDepositForm" onsubmit="handleCardDeposit(event)">
-            <div style="margin-bottom: 10px;">
-                <label style="display: block; font-size: 13px; margin-bottom: 5px;">Chọn nhà mạng:</label>
-                <select id="cardTelco" style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px;">
-                    <option value="Viettel">Viettel</option>
-                    <option value="Mobifone">Mobifone</option>
-                    <option value="Vinaphone">Vinaphone</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 10px;">
-                <label style="display: block; font-size: 13px; margin-bottom: 5px;">Mệnh giá:</label>
-                <select id="cardAmount" style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px;">
-                    <option value="10000">10.000 đ</option>
-                    <option value="20000">20.000 đ</option>
-                    <option value="50000">50.000 đ</option>
-                    <option value="100000">100.000 đ</option>
-                    <option value="200000">200.000 đ</option>
-                    <option value="500000">500.000 đ</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 10px;">
-                <label style="display: block; font-size: 13px; margin-bottom: 5px;">Mã thẻ cào:</label>
-                <input type="text" id="cardCode" placeholder="Nhập mã thẻ cào" required style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px; box-sizing: border-box;">
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-size: 13px; margin-bottom: 5px;">Số Seri:</label>
-                <input type="text" id="cardSerial" placeholder="Nhập số seri" required style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px; box-sizing: border-box;">
-            </div>
-
-            <button type="submit" style="width: 100%; padding: 10px; background: #22c55e; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">GỬI THẺ CÁO</button>
-        </form>
     </div>
-</div>
 
     <!-- MODAL ĐỔI MẬT KHẨU -->
     <div class="modal" id="changePasswordModal">
@@ -308,7 +313,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Giao Dịch</th><th>Khách Hàng</th><th>Nhà Mạng</th><th>Mệnh Giá</th><th>Mã Thẻ</th><th>Số Seri</th><th>Trạng Thái</th><th>Thao Tác</th>
+                                <th>Mã Thẻ</th><th>Khách Hàng</th><th>Nhà Mạng</th><th>Mệnh Giá</th><th>Mã Thẻ</th><th>Số Seri</th><th>Trạng Thái</th><th>Thao Tác</th>
                             </tr>
                         </thead>
                         <tbody id="adminCardTableBody"></tbody>
@@ -465,41 +470,39 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-async function handleCardDeposit(e) {
-    e.preventDefault();
-    if (!currentUser) return openAuthModal('login');
+        async function handleCardDeposit(e) {
+            e.preventDefault();
+            if (!currentUser) return openAuthModal('login');
 
-    const telco = document.getElementById('cardTelco').value;       
-    const amount = Number(document.getElementById('cardAmount').value); 
-    const code = document.getElementById('cardCode').value.trim();      
-    const serial = document.getElementById('cardSerial').value.trim();  
-    
-    const requestId = 'CARD_' + Date.now();
-    showToast('Đang gửi thẻ lên hệ thống...', 'info');
+            const telco = document.getElementById('cardTelco').value;
+            const amount = Number(document.getElementById('cardAmount').value);
+            const code = document.getElementById('cardCode').value.trim();
+            const serial = document.getElementById('cardSerial').value.trim();
 
-    try {
-        const { error } = await supabaseClient.from('card_transactions').insert([{
-            user_email: currentUser.email,
-            card_type: telco,
-            amount: amount,
-            card_value: amount, // Bổ sung dòng này để khớp với cột card_value trong Supabase
-            card_code: code,
-            card_serial: serial,
-            status: 'Chờ duyệt',
-            request_id: requestId
-        }]);
+            showToast('Đang gửi thẻ lên hệ thống...', 'info');
 
-        if (error) {
-            showToast('Lỗi: ' + error.message, 'error');
-        } else {
-            showToast('Gửi thẻ thành công! Vui lòng chờ admin duyệt.', 'success');
-            closeModal('depositModal');
-            e.target.reset();
+            try {
+                const { error } = await supabaseClient.from('card_transactions').insert([{
+                    user_email: currentUser.email,
+                    card_type: telco,
+                    amount: amount,
+                    card_code: code,
+                    card_serial: serial,
+                    status: 'Chờ duyệt'
+                }]);
+
+                if (error) {
+                    showToast('Lỗi gửi thẻ: ' + error.message, 'error');
+                } else {
+                    showToast('Gửi thẻ thành công! Vui lòng chờ admin duyệt.', 'success');
+                    e.target.reset();
+                    closeModal('depositModal');
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối tới hệ thống!', 'error');
+            }
         }
-    } catch (error) {
-        showToast('Lỗi kết nối tới hệ thống!', 'error');
-    }
-}
+
         /* --- AUTHENTICATION --- */
         function openAuthModal(mode) {
             authMode = mode;
@@ -735,55 +738,52 @@ async function handleCardDeposit(e) {
             openModal('confirmBuyModal');
         }
 
-async function openHistoryModal() {
-    if (!currentUser) return openAuthModal('login');
-    
-    // Load lịch sử đơn hàng
-    const { data: orderData } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
-    const orderTbody = document.getElementById('historyTableBody');
-    orderTbody.innerHTML = '';
-    if (orderData && orderData.length > 0) {
-        orderData.forEach(o => {
-            orderTbody.innerHTML += `
-                <tr>
-                    <td>${o.service_name.includes('Mua Acc') ? 'Mua Tài Khoản' : 'Cày Thuê'}</td>
-                    <td>${o.service_name}</td>
-                    <td>${Number(o.price).toLocaleString('vi-VN')} đ</td>
-                    <td>${o.roblox_user || 'N/A'}</td>
-                    <td><span style="color:${o.status === 'Hoàn thành' ? '#22c55e' : '#f59e0b'}; font-weight:bold;">${o.status}</span></td>
-                </tr>
-            `;
-        });
-    } else {
-        orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
-    }
+        async function openHistoryModal() {
+            if (!currentUser) return openAuthModal('login');
+            
+            // Load orders
+            const { data: orderData } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
+            const orderTbody = document.getElementById('historyTableBody');
+            orderTbody.innerHTML = '';
+            if (orderData && orderData.length > 0) {
+                orderData.forEach(o => {
+                    orderTbody.innerHTML += `
+                        <tr>
+                            <td>${o.service_name.includes('Mua Acc') ? 'Mua Tài Khoản' : 'Cày Thuê'}</td>
+                            <td>${o.service_name}</td>
+                            <td>${Number(o.price).toLocaleString('vi-VN')} đ</td>
+                            <td>${o.roblox_user || 'N/A'}</td>
+                            <td><span style="color:${o.status === 'Hoàn thành' ? '#22c55e' : '#f59e0b'}; font-weight:bold;">${o.status}</span></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
+            }
 
-    // Load lịch sử nạp thẻ của cá nhân khách hàng
-    const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('user_email', currentUser.email);
-    const cardTbody = document.getElementById('historyCardTableBody');
-    cardTbody.innerHTML = '';
-    if (cardData && cardData.length > 0) {
-        cardData.forEach(c => {
-            let badgeColor = '#f59e0b';
-            if (c.status === 'Thành công') badgeColor = '#22c55e';
-            if (c.status === 'Thẻ lỗi' || c.status === 'Thất bại') badgeColor = '#ef4444';
+            // Load cards (Lịch sử nạp thẻ)
+            const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('user_email', currentUser.email);
+            const cardTbody = document.getElementById('historyCardTableBody');
+            cardTbody.innerHTML = '';
+            if (cardData && cardData.length > 0) {
+                cardData.forEach(c => {
+                    cardTbody.innerHTML += `
+                        <tr>
+                            <td>${c.card_type}</td>
+                            <td>${Number(c.amount || c.card_value || 0).toLocaleString('vi-VN')} đ</td>
+                            <td>${c.card_code}</td>
+                            <td>${c.card_serial || ''}</td>
+                            <td><span style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}; font-weight:bold;">${c.status}</span></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                cardTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử nạp thẻ nào.</td></tr>';
+            }
 
-            cardTbody.innerHTML += `
-                <tr>
-                    <td>${c.card_type}</td>
-                    <td>${Number(c.amount || c.card_value || 0).toLocaleString('vi-VN')} đ</td>
-                    <td>${c.card_code}</td>
-                    <td>${c.card_serial || ''}</td>
-                    <td><span style="color:${badgeColor}; font-weight:bold;">${c.status}</span></td>
-                </tr>
-            `;
-        });
-    } else {
-        cardTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử nạp thẻ nào.</td></tr>';
-    }
+            openModal('historyModal');
+        }
 
-    openModal('historyModal');
-}
         /* --- ADMIN PANEL --- */
         async function openAdminDashboard() {
             if (!currentUser || currentUser.email !== 'admin@gmail.com') {
@@ -856,7 +856,7 @@ async function openHistoryModal() {
                                 ${c.status === 'Chờ duyệt' ? `
                                     <div style="display:flex; gap:5px;">
                                         <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thành công')">Duyệt</button>
-                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Thẻ lỗi</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Hủy</button>
                                     </div>
                                 ` : 'Đã xử lý'}
                             </td>
