@@ -6,7 +6,6 @@
     <title>Tạp Hóa Chí Nghĩa - Bán Acc & Dịch Vụ Cày Thuê Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; line-height: 1.6; }
@@ -628,22 +627,42 @@
             }
 
             const serviceGrid = document.getElementById('serviceGrid');
-            // Gói dịch vụ của Roblox Fruits được cấu hình chính xác theo ảnh mẫu bạn cung cấp
+            // Cập nhật các gói dịch vụ Roblox Fruits chuẩn xác theo yêu cầu mới nhất của bạn
             const services = [
                 { 
                     name: 'Roblox Fruits', 
                     img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
                     packages: [
-                        { name: 'Cày Level Max (Blox Fruits)', price: 50000 },
-                        { name: 'Săn Đổi Kiếm Cursed Dual Katana', price: 120000 },
-                        { name: 'Awakening Full Tộc V4', price: 200000 }
+                        { name: 'Yama', price: 10000 },
+                        { name: 'Tushita', price: 10000 },
+                        { name: 'Lấy Song Kiếm Oden (Song 20)', price: 40000 },
+                        { name: 'Tam Kiếm', price: 25000 },
+                        { name: 'Kéo Tim', price: 25000 },
+                        { name: 'V4 A-Z Thỏ Cả TT Human (Bao All)', price: 45000 },
+                        { name: 'V4 A-Z Cả Quỷ (Bao All)', price: 55000 },
+                        { name: 'V4 Draco (Bao All)', price: 85000 },
+                        { name: 'Lẻ 1 Gear (Không nhận 2 gear đổ xuống)', price: 10000 },
+                        { name: 'Kiếm Rồng', price: 20000 },
+                        { name: 'Súng Rồng', price: 25000 },
+                        { name: 'Dino Hood', price: 20000 },
+                        { name: 'Mở Cổng Draco', price: 25000 },
+                        { name: 'Godhuman', price: 30000 },
+                        { name: 'Võ Máu', price: 40000 },
+                        { name: 'Nhẫn Đỏ', price: 50000 },
+                        { name: 'Cuộc Mythic', price: 35000 },
+                        { name: 'Beli 100m (Ủp nhiều)', price: 80000 },
+                        { name: 'Beli 50m (Ủp nhiều)', price: 35000 },
+                        { name: 'Frag 1k5 (Nhiều thì 1/1)', price: 1500 },
+                        { name: 'Level 0-700', price: 10000 },
+                        { name: 'Level 700-1500', price: 10000 },
+                        { name: 'Level 1500-2800', price: 20000 }
                     ]
                 },
                 { 
                     name: 'Pet gag2', 
                     img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
                     packages: [
-                        { name: 'FIREFLY (ĐOM ĐÖM) - 8 CON', price: 15000 },
+                        { name: 'FIREFLY (ĐOM ĐỎM) - 8 CON', price: 15000 },
                         { name: 'BLACK DRAGON - 1 CON', price: 600000 },
                         { name: 'CHÓN RACCOON - 1 CON', price: 20000 },
                         { name: 'VET ROBIN - 1 CON', price: 1000 },
