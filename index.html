@@ -155,15 +155,7 @@
             <form onsubmit="handleConfirmOrder(event)">
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ cần thuê:</label>
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
-                    <option value="Rồng Bằng Ice Serpent (1 con)" data-price="1200000">Rồng Bằng Ice Serpent - 1 con - 1.200.000 đ[cite: 3]</option>
-                    <option value="FIREFLY (ĐOM ĐỎM) (8 con)" data-price="15000">FIREFLY (ĐOM ĐỎM) - 8 CON - 15.000 đ[cite: 3]</option>
-                    <option value="BLACK DRAGON (1 con)" data-price="600000">BLACK DRAGON - 1 CON - 600.000 đ[cite: 3]</option>
-                    <option value="CHÓN RACCOON (1 con)" data-price="20000">CHÓN RACCOON - 1 CON - 20.000 đ[cite: 3]</option>
-                    <option value="VET ROBIN (1 con)" data-price="1000">VET ROBIN - 1 CON - 1.000 đ[cite: 3]</option>
-                    <option value="KHI MONKEY (1 con)" data-price="5000">KHI MONKEY - 1 CON - 5.000 đ[cite: 3]</option>
-                    <option value="GAU BEAR (8 con)" data-price="16000">GAU BEAR - 8 CON - 16.000 đ[cite: 3]</option>
-                    <option value="CHUỐN CHUÔN DRAGONFLY (10 con)" data-price="16000">CHUỐN CHUÔN DRAGONFLY - 10 CON - 16.000 đ[cite: 3]</option>
-                    <option value="KI LAN UNICORN EA (10 con)" data-price="16000">KI LAN UNICORN EA - 10 CON - 16.000 đ[cite: 3]</option>
+                    <option value="Pet gag2" data-price="20000">Pet gag2 - 20.000 đ</option>
                     <option value="Tushi" data-price="10000">Tushi - 10.000 đ</option>
                     <option value="Lấy xong Roblox Fruits + Tushi" data-price="40000">Lấy xong Roblox Fruits + Tushi - 40.000 đ</option>
                     <option value="Tam kiếm (CDK)" data-price="25000">Tam kiếm (CDK) - 25.000 đ</option>
@@ -190,7 +182,7 @@
 
                 <div style="background:#0f172a; padding:12px; border-radius:6px; margin: 12px 0; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
                     <span>Giá tiền thanh toán:</span>
-                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">1.200.000 đ</b>
+                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">10.000 đ</b>
                 </div>
 
                 <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
@@ -660,12 +652,13 @@
             }
 
             const serviceGrid = document.getElementById('serviceGrid');
+            // Giữ nguyên Roblox Fruits và cập nhật 4 mục dịch vụ còn lại theo yêu cầu
             const services = [
                 { name: 'Roblox Fruits', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Rồng Bằng Ice Serpent', price: 1200000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'FIREFLY (ĐOM ĐỎM)', price: 15000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'BLACK DRAGON', price: 600000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'CHÓN RACCOON', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { name: 'Pet gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Tiền game gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Hạt giống gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Shop gaer gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
             ];
             serviceGrid.innerHTML = '';
             services.forEach(s => {
