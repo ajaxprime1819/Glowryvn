@@ -486,7 +486,7 @@ async function handleCardDeposit(e) {
         // === ĐIỀN THÔNG TIN TÀI KHOẢN GACHTHEFAST CỦA BẠN VÀO ĐÂY ===
         const PARTNER_ID = '7215070297'; 
         const PARTNER_KEY = 'bf6e5a00abe0c272af210e736107a858';
-        const API_URL = 'https://gachthefast.com/api/card-charging'; // Đường dẫn API gạch thẻ
+        const API_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://gachthefast.com/api/card-charging');
 
         // Tạo mã sign bảo mật (chuẩn chung của các web api gạch thẻ)
         // Lưu ý: Nếu web gachthefast dùng thư viện md5, đảm bảo trang web có nhúng thư viện md5, hoặc bạn có thể thay đổi cách tạo sign theo tài liệu API của họ.
