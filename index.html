@@ -478,7 +478,6 @@ async function handleCardDeposit(e) {
     const code = document.getElementById('cardCode').value.trim();
     const serial = document.getElementById('cardSerial').value.trim();
     
-    // Tạo mã request_id tự động ngẫu nhiên để không bị lỗi Not-Null
     const requestId = 'CARD_' + Date.now();
 
     const { error } = await supabaseClient.from('card_transactions').insert([{
@@ -487,7 +486,7 @@ async function handleCardDeposit(e) {
         card_type: telco,
         card_value: amount,     
         card_code: code,        
-        card_serial: serial,    
+        card_seri: serial,      // Khớp đúng tên cột "card_seri" trong CSDL của bạn
         status: 'Chờ duyệt'
     }]);
 
