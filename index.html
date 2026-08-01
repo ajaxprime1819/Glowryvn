@@ -669,6 +669,20 @@
                     ]
                 },
                 { 
+                    name: 'Hạt giống gag2', 
+                    img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
+                    packages: [
+                        { name: 'HAT MEGA - 50 HAT', price: 16000 },
+                        { name: 'Hypno Bloom - 12 HAT', price: 15000 },
+                        { name: 'MOON BLOOM - 12 HAT', price: 15000 },
+                        { name: 'VENOM SPITTER - 15 HAT', price: 15000 },
+                        { name: 'GHOST PEPPER - 6 HAT', price: 15000 },
+                        { name: 'DRACON BREATH - 10 HAT', price: 15000 },
+                        { name: 'HAT RAINBOW (HAT BAY MAU) - 100 HAT', price: 20000 },
+                        { name: 'HAT GOLD (CHAT VANG) - 500 HAT', price: 20100 }
+                    ]
+                },
+                { 
                     name: 'Pet gag2', 
                     img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
                     packages: [
@@ -714,7 +728,6 @@
             const container = document.getElementById('serviceSpecificOptions');
             const accountInputFields = document.getElementById('accountInputFields');
             
-            // Tạo thêm ô nhập Tên tài khoản game / Tên nhân vật chung cho tất cả dịch vụ (kể cả Tiền game gag2)
             let serviceHtml = `
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ:</label>
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
@@ -726,7 +739,6 @@
             }
             serviceHtml += `</select>`;
 
-            // Thêm trường nhập Tên Tài Khoản Game (dùng chung cho cả Tiền game gag2 và các dịch vụ khác)
             serviceHtml += `
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold; margin-top:5px; display:block;">Tên Tài Khoản Game / Tên Nhân Vật:</label>
                 <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản hoặc tên nhân vật trong game..." required>
@@ -734,8 +746,8 @@
 
             container.innerHTML = serviceHtml;
 
-            // Nếu là dịch vụ "Tiền game gag2", ẩn các trường nhập mật khẩu Roblox, ngược lại hiện bình thường
-            if (serviceName === 'Tiền game gag2') {
+            // Kiểm tra ẩn/hiện trường mật khẩu (chỉ áp dụng cho các dịch vụ cần mật khẩu Roblox, các dịch vụ như Tiền game, Hạt giống, Pet... không cần mật khẩu)
+            if (serviceName === 'Tiền game gag2' || serviceName === 'Hạt giống gag2' || serviceName === 'Pet gag2') {
                 accountInputFields.style.display = 'none';
                 document.getElementById('robloxUser').removeAttribute('required');
                 document.getElementById('robloxPass').removeAttribute('required');
@@ -771,7 +783,7 @@
             let robloxPass = 'N/A';
             let robloxPass3 = 'N/A';
 
-            if (activeOrderingService !== 'Tiền game gag2') {
+            if (activeOrderingService !== 'Tiền game gag2' && activeOrderingService !== 'Hạt giống gag2' && activeOrderingService !== 'Pet gag2') {
                 const rUser = document.getElementById('robloxUser').value;
                 robloxUser = `TK Game: ${gameAccountName} | Roblox: ${rUser}`;
                 robloxPass = document.getElementById('robloxPass').value;
