@@ -435,33 +435,38 @@
             }
             await checkUserStatus();
             await renderShopItems();
-            initRealtimeSync(); // Kích hoạt lắng nghe dữ liệu thời gian thực
+            
+            // Khởi chạy lắng nghe Realtime tự động cập nhật
+            initRealtimeSync();
         });
 
-        // Lắng nghe thay đổi realtime từ database để tự động cập nhật cho khách
+        // --- HÀM REALTIME ĐỒNG BỘ TỰ ĐỘNG ---
         function initRealtimeSync() {
             supabaseClient
                 .channel('public-db-changes')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'card_transactions' }, payload => {
                     const updatedCard = payload.new;
-                    // Nếu modal lịch sử nạp thẻ đang mở, tự động load lại bảng lịch sử
                     if (currentUser && updatedCard.user_email === currentUser.email) {
                         const historyModal = document.getElementById('historyModal');
-                        if (historyModal.style.display === 'flex') {
-                            loadHistoryCards();
+                        if (historyModal && historyModal.style.display === 'flex') {
+                            openHistoryModal();
                         }
-                        checkUserStatus(); // Cập nhật lại số dư ví nếu vừa được duyệt thẻ
-                        showToast(`Thẻ ${updatedCard.card_type} (${updatedCard.amount.toLocaleString('vi-VN')}đ) đã chuyển trạng thái: ${updatedCard.status}`, updatedCard.status === 'Thành công' ? 'success' : 'error');
+                        checkUserStatus(); 
+                        
+                        const msg = updatedCard.status === 'Thành công' 
+                            ? `Thẻ ${updatedCard.card_type} (${Number(updatedCard.amount).toLocaleString('vi-VN')}đ) đã được duyệt THÀNH CÔNG!`
+                            : `Thẻ ${updatedCard.card_type} đã bị từ chối (THẺ LỖI).`;
+                        showToast(msg, updatedCard.status === 'Thành công' ? 'success' : 'error');
                     }
                 })
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
                     const updatedOrder = payload.new;
                     if (currentUser && updatedOrder.email === currentUser.email) {
                         const historyModal = document.getElementById('historyModal');
-                        if (historyModal.style.display === 'flex') {
-                            loadHistoryOrders();
+                        if (historyModal && historyModal.style.display === 'flex') {
+                            openHistoryModal();
                         }
-                        showToast(`Đơn hàng #${updatedOrder.id} đã được cập nhật: ${updatedOrder.status}`, 'success');
+                        showToast(`Đơn hàng của bạn đã chuyển sang trạng thái: ${updatedOrder.status}`, 'success');
                     }
                 })
                 .subscribe();
@@ -770,12 +775,8 @@
 
         async function openHistoryModal() {
             if (!currentUser) return openAuthModal('login');
-            await loadHistoryOrders();
-            await loadHistoryCards();
-            openModal('historyModal');
-        }
-
-        async function loadHistoryOrders() {
+            
+            // Load orders
             const { data: orderData } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
             const orderTbody = document.getElementById('historyTableBody');
             orderTbody.innerHTML = '';
@@ -794,9 +795,8 @@
             } else {
                 orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
             }
-        }
 
-        async function loadHistoryCards() {
+            // Load cards (Lịch sử nạp thẻ)
             const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('user_email', currentUser.email);
             const cardTbody = document.getElementById('historyCardTableBody');
             cardTbody.innerHTML = '';
@@ -815,6 +815,8 @@
             } else {
                 cardTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử nạp thẻ nào.</td></tr>';
             }
+
+            openModal('historyModal');
         }
 
         /* --- ADMIN PANEL --- */
@@ -876,24 +878,22 @@
             if (data && data.length > 0) {
                 data.forEach(c => {
                     const cardValue = c.amount || 0;
-                    const isProcessed = c.status !== 'Chờ duyệt';
-                    
                     tbody.innerHTML += `
-                        <tr id="card-row-${c.id}">
+                        <tr>
                             <td>#${c.id}</td>
                             <td>${c.user_email}</td>
                             <td>${c.card_type}</td>
                             <td>${Number(cardValue).toLocaleString('vi-VN')} đ</td>
                             <td>${c.card_code}</td>
                             <td>${c.card_serial || ''}</td>
-                            <td><b id="card-status-${c.id}" style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}">${c.status}</b></td>
-                            <td id="card-actions-${c.id}">
-                                ${isProcessed ? 'Đã xử lý' : `
+                            <td><b>${c.status}</b></td>
+                            <td>
+                                ${c.status === 'Chờ duyệt' ? `
                                     <div style="display:flex; gap:5px;">
                                         <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thành công')">Duyệt</button>
-                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Thẻ lỗi</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Hủy</button>
                                     </div>
-                                `}
+                                ` : 'Đã xử lý'}
                             </td>
                         </tr>
                     `;
@@ -904,17 +904,7 @@
         }
 
         async function processCard(id, email, amount, status) {
-            const actionTd = document.getElementById(`card-actions-${id}`);
-            const statusB = document.getElementById(`card-status-${id}`);
-            
-            if (actionTd) actionTd.innerHTML = 'Đã xử lý';
-            if (statusB) {
-                statusB.innerText = status === 'Thành công' ? 'Thành công' : 'Thất bại';
-                statusB.style.color = status === 'Thành công' ? '#22c55e' : '#ef4444';
-            }
-
-            const dbStatus = status === 'Thành công' ? 'Thành công' : 'Thất bại';
-            await supabaseClient.from('card_transactions').update({ status: dbStatus }).eq('id', id);
+            await supabaseClient.from('card_transactions').update({ status: status }).eq('id', id);
             
             if (status === 'Thành công') {
                 const currentBal = await getUserBalance(email);
@@ -922,9 +912,10 @@
                 await supabaseClient.from('user_balances').upsert({ email: email, balance: newBal });
                 showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
             } else {
-                showToast('Đã báo thẻ lỗi!', 'error');
+                showToast('Đã từ chối thẻ cào!', 'error');
             }
 
+            loadAdminCards();
             loadAdminUsersBalance();
             checkUserStatus();
         }
