@@ -740,52 +740,55 @@ async function handleCardDeposit(e) {
             openModal('confirmBuyModal');
         }
 
-        async function openHistoryModal() {
-            if (!currentUser) return openAuthModal('login');
-            
-            // Load orders
-            const { data: orderData } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
-            const orderTbody = document.getElementById('historyTableBody');
-            orderTbody.innerHTML = '';
-            if (orderData && orderData.length > 0) {
-                orderData.forEach(o => {
-                    orderTbody.innerHTML += `
-                        <tr>
-                            <td>${o.service_name.includes('Mua Acc') ? 'Mua Tài Khoản' : 'Cày Thuê'}</td>
-                            <td>${o.service_name}</td>
-                            <td>${Number(o.price).toLocaleString('vi-VN')} đ</td>
-                            <td>${o.roblox_user || 'N/A'}</td>
-                            <td><span style="color:${o.status === 'Hoàn thành' ? '#22c55e' : '#f59e0b'}; font-weight:bold;">${o.status}</span></td>
-                        </tr>
-                    `;
-                });
-            } else {
-                orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
-            }
+async function openHistoryModal() {
+    if (!currentUser) return openAuthModal('login');
+    
+    // Load lịch sử đơn hàng
+    const { data: orderData } = await supabaseClient.from('orders').select('*').eq('email', currentUser.email);
+    const orderTbody = document.getElementById('historyTableBody');
+    orderTbody.innerHTML = '';
+    if (orderData && orderData.length > 0) {
+        orderData.forEach(o => {
+            orderTbody.innerHTML += `
+                <tr>
+                    <td>${o.service_name.includes('Mua Acc') ? 'Mua Tài Khoản' : 'Cày Thuê'}</td>
+                    <td>${o.service_name}</td>
+                    <td>${Number(o.price).toLocaleString('vi-VN')} đ</td>
+                    <td>${o.roblox_user || 'N/A'}</td>
+                    <td><span style="color:${o.status === 'Hoàn thành' ? '#22c55e' : '#f59e0b'}; font-weight:bold;">${o.status}</span></td>
+                </tr>
+            `;
+        });
+    } else {
+        orderTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử giao dịch.</td></tr>';
+    }
 
-            // Load cards (Lịch sử nạp thẻ)
-            const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('user_email', currentUser.email);
-            const cardTbody = document.getElementById('historyCardTableBody');
-            cardTbody.innerHTML = '';
-            if (cardData && cardData.length > 0) {
-                cardData.forEach(c => {
-                    cardTbody.innerHTML += `
-                        <tr>
-                            <td>${c.card_type}</td>
-                            <td>${Number(c.amount || c.card_value || 0).toLocaleString('vi-VN')} đ</td>
-                            <td>${c.card_code}</td>
-                            <td>${c.card_serial || ''}</td>
-                            <td><span style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}; font-weight:bold;">${c.status}</span></td>
-                        </tr>
-                    `;
-                });
-            } else {
-                cardTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử nạp thẻ nào.</td></tr>';
-            }
+    // Load lịch sử nạp thẻ của cá nhân khách hàng
+    const { data: cardData } = await supabaseClient.from('card_transactions').select('*').eq('user_email', currentUser.email);
+    const cardTbody = document.getElementById('historyCardTableBody');
+    cardTbody.innerHTML = '';
+    if (cardData && cardData.length > 0) {
+        cardData.forEach(c => {
+            let badgeColor = '#f59e0b';
+            if (c.status === 'Thành công') badgeColor = '#22c55e';
+            if (c.status === 'Thẻ lỗi' || c.status === 'Thất bại') badgeColor = '#ef4444';
 
-            openModal('historyModal');
-        }
+            cardTbody.innerHTML += `
+                <tr>
+                    <td>${c.card_type}</td>
+                    <td>${Number(c.amount || c.card_value || 0).toLocaleString('vi-VN')} đ</td>
+                    <td>${c.card_code}</td>
+                    <td>${c.card_serial || ''}</td>
+                    <td><span style="color:${badgeColor}; font-weight:bold;">${c.status}</span></td>
+                </tr>
+            `;
+        });
+    } else {
+        cardTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Chưa có lịch sử nạp thẻ nào.</td></tr>';
+    }
 
+    openModal('historyModal');
+}
         /* --- ADMIN PANEL --- */
         async function openAdminDashboard() {
             if (!currentUser || currentUser.email !== 'admin@gmail.com') {
@@ -858,7 +861,7 @@ async function handleCardDeposit(e) {
                                 ${c.status === 'Chờ duyệt' ? `
                                     <div style="display:flex; gap:5px;">
                                         <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thành công')">Duyệt</button>
-                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Hủy</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Thẻ lỗi</button>
                                     </div>
                                 ` : 'Đã xử lý'}
                             </td>
