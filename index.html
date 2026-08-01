@@ -210,49 +210,40 @@
         </div>
     </div>
 
-    <!-- MODAL NẠP TIỀN -->
-    <div class="modal" id="depositModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
-            <h3><i class="fa-solid fa-wallet"></i> NẠP TIỀN VÀO TÀI KHOẢN</h3>
-            
-            <div class="deposit-methods">
-                <div class="deposit-tab active" onclick="switchDepositTab(event, 'pane-qr')"><i class="fa-solid fa-qrcode"></i> Quét Mã QR Momo/Bank</div>
-                <div class="deposit-tab" onclick="switchDepositTab(event, 'pane-card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào Điện Thoại</div>
+<!-- Modal Nạp Tiền (ID có thể là depositModal) -->
+<div id="depositModal" class="modal" style="display: none;">
+    <div class="modal-content" style="background: #1e293b; padding: 20px; border-radius: 8px; width: 400px; color: #fff; position: relative;">
+        <span class="close-btn" onclick="closeModal('depositModal')" style="position: absolute; right: 15px; top: 10px; cursor: pointer; font-size: 20px;">&times;</span>
+        
+        <h2 style="text-align: center; margin-bottom: 15px; font-size: 18px;">NẠP TIỀN VÀO TÀI KHOẢN</h2>
+        
+        <!-- Tab chuyển đổi (nếu có) -->
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button type="button" class="tab-btn active" style="flex: 1; padding: 8px; background: #3b82f6; border: none; color: #fff; border-radius: 4px; cursor: pointer;">Thẻ Cào Điện Thoại</button>
+        </div>
+
+        <!-- Form nạp thẻ cào chuẩn -->
+        <form id="cardDepositForm" onsubmit="handleCardDeposit(event)">
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-size: 13px; margin-bottom: 5px;">Chọn nhà mạng:</label>
+                <select id="cardTelco" style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px;">
+                    <option value="Viettel">Viettel</option>
+                    <option value="Mobifone">Mobifone</option>
+                    <option value="Vinaphone">Vinaphone</option>
+                </select>
             </div>
 
-            <div id="pane-qr" class="deposit-pane active">
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản tự động:</p>
-                    <img src="https://api.vietqr.io/image/970422-0391234567-xxxxxx.jpg?accountName=CHINGHIA&amount=50000&addInfo=NAP" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
-                    <p style="font-size: 13px; color: #f59e0b; margin-top: 8px;">Nội dung chuyển khoản: <b style="color:#fff;" id="qrContentText">NAP TIEN</b></p>
-                </div>
-                <button class="btn btn-primary" style="width:100%;" onclick="showToast('Hệ thống đang kiểm tra giao dịch tự động!', 'success')">TÔI ĐÃ CHUYỂN KHOẢN</button>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-size: 13px; margin-bottom: 5px;">Mệnh giá:</label>
+                <select id="cardAmount" style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px;">
+                    <option value="10000">10.000 đ</option>
+                    <option value="20000">20.000 đ</option>
+                    <option value="50000">50.000 đ</option>
+                    <option value="100000">100.000 đ</option>
+                    <option value="200000">200.000 đ</option>
+                    <option value="500000">500.000 đ</option>
+                </select>
             </div>
-
-            <div id="pane-card" class="deposit-pane">
-                <form onsubmit="handleCardDeposit(event)">
-                    <label style="font-size:13px; color:#cbd5e1;">Chọn nhà mạng:</label>
-                    <select id="cardTelco" class="form-input" required>
-                        <option value="VIETTEL">Viettel</option>
-                        <option value="VINAPHONE">Vinaphone</option>
-                        <option value="GARENA">Garena ⭐</option>
-                        <option value="MOBIFONE">Mobifone</option>
-                        <option value="ZING">Zing</option>
-                        <option value="VCOIN">Vcoin</option>
-                        <option value="SCOIN">Scoin</option>
-                    </select>
-
-                    <label style="font-size:13px; color:#cbd5e1;">Mệnh giá:</label>
-                    <select id="cardAmount" class="form-input" required>
-                        <option value="10000">10.000 đ</option>
-                        <option value="20000">20.000 đ</option>
-                        <option value="50000">50.000 đ</option>
-                        <option value="100000">100.000 đ</option>
-                        <option value="200000">200.000 đ</option>
-                        <option value="500000">500.000 đ</option>
-                    </select>
-                </div>
 
             <div style="margin-bottom: 10px;">
                 <label style="display: block; font-size: 13px; margin-bottom: 5px;">Mã thẻ cào:</label>
@@ -265,24 +256,8 @@
             </div>
 
             <button type="submit" style="width: 100%; padding: 10px; background: #22c55e; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">GỬI THẺ CÁO</button>
-
-<!-- Phần hiển thị lịch sử nạp thẻ trong Modal lịch sử của khách -->
-<div style="margin-top: 20px;">
-    <h3 style="font-size: 16px; margin-bottom: 10px; color: #fff;">Lịch sử nạp thẻ cào</h3>
-    <table style="width: 100%; border-collapse: collapse; color: #fff; text-align: left;">
-        <thead>
-            <tr style="border-bottom: 1px solid #334155; color: #94a3b8;">
-                <th style="padding: 8px;">Nhà mạng</th>
-                <th style="padding: 8px;">Mệnh giá</th>
-                <th style="padding: 8px;">Mã thẻ</th>
-                <th style="padding: 8px;">Số Seri</th>
-                <th style="padding: 8px;">Trạng thái</th>
-            </tr>
-        </thead>
-        <tbody id="historyCardTableBody">
-            <!-- Dữ liệu thẻ cào sẽ tự động load vào đây -->
-        </tbody>
-    </table>
+        </form>
+    </div>
 </div>
 
     <!-- MODAL ĐỔI MẬT KHẨU -->
