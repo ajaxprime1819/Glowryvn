@@ -481,9 +481,9 @@ async function handleCardDeposit(e) {
             const { error } = await supabaseClient.from('card_transactions').insert([{
                 user_email: currentUser.email,
                 card_type: telco,
-                amount: amount,
-                card_code: code,
-                card_serial: serial,
+                card_value: amount,     // Khớp với cột card_value trên Supabase
+                card_code: code,        // Khớp với cột card_code trên Supabase
+                card_serial: serial,    // Khớp với cột card_serial trên Supabase
                 status: 'Chờ duyệt'
             }]);
 
