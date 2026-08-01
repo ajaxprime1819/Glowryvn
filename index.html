@@ -363,7 +363,7 @@
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tên TK Game</th><th>Trạng Thái</th></tr>
+                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tên Tài Khoản</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="historyTableBody"></tbody>
                     </table>
@@ -740,8 +740,8 @@
             serviceHtml += `</select>`;
 
             serviceHtml += `
-                <label style="font-size:13px; color:#cbd5e1; font-weight:bold; margin-top:5px; display:block;">Tên Tài Khoản Game / Tên Nhân Vật:</label>
-                <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản hoặc tên nhân vật trong game..." required>
+                <label style="font-size:13px; color:#cbd5e1; font-weight:bold; margin-top:5px; display:block;">Tên Tài Khoản:</label>
+                <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản..." required>
             `;
 
             container.innerHTML = serviceHtml;
