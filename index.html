@@ -150,39 +150,14 @@
     <div class="modal" id="orderServiceModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('orderServiceModal')">&times;</span>
-            <h3><i class="fa-solid fa-gamepad"></i> ĐẶT DỊCH VỤ CÀY THUÊ</h3>
+            <h3 id="orderModalTitle"><i class="fa-solid fa-gamepad"></i> ĐẶT DỊCH VỤ CÀY THUÊ</h3>
             
             <form onsubmit="handleConfirmOrder(event)">
-                <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ cần thuê:</label>
-                <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
-                    <option value="Pet gag2" data-price="20000">Pet gag2 - 20.000 đ</option>
-                    <option value="Tushi" data-price="10000">Tushi - 10.000 đ</option>
-                    <option value="Lấy xong Roblox Fruits + Tushi" data-price="40000">Lấy xong Roblox Fruits + Tushi - 40.000 đ</option>
-                    <option value="Tam kiếm (CDK)" data-price="25000">Tam kiếm (CDK) - 25.000 đ</option>
-                    <option value="Kéo tim" data-price="25000">Kéo tim - 25.000 đ</option>
-                    <option value="V4 a-z thỏ cả tt human (Bao all)" data-price="45000">V4 a-z thỏ cả tt human (Bao all) - 45.000 đ</option>
-                    <option value="V4 a-z cy quỷ (Bao all)" data-price="55000">V4 a-z cy quỷ (Bao all) - 55.000 đ</option>
-                    <option value="V4 draco bao all" data-price="85000">V4 draco bao all - 85.000 đ</option>
-                    <option value="Lẻ 1 gear (Không nhận 2 gear đổ xuống)" data-price="10000">Lẻ 1 gear (Không nhận 2 gear đổ xuống) - 10.000 đ</option>
-                    <option value="Kiếm rồng" data-price="20000">Kiếm rồng - 20.000 đ</option>
-                    <option value="Súng rồng" data-price="25000">Súng rồng - 25.000 đ</option>
-                    <option value="Dino hood" data-price="20000">Dino hood - 20.000 đ</option>
-                    <option value="Mở cổng draco" data-price="25000">Mở cổng draco - 25.000 đ</option>
-                    <option value="Godhuman" data-price="30000">Godhuman - 30.000 đ</option>
-                    <option value="Võ máu (Sanguine Art)" data-price="40000">Võ máu (Sanguine Art) - 40.000 đ</option>
-                    <option value="Nhẫn đỏ" data-price="50000">Nhẫn đỏ - 50.000 đ</option>
-                    <option value="Cuộc mythic" data-price="35000">Cuộc mythic - 35.000 đ</option>
-                    <option value="Beli 100m (Úp nhiều)" data-price="80000">Beli 100m (Úp nhiều) - 80.000 đ</option>
-                    <option value="Beli 50m (Úp nhiều)" data-price="35000">Beli 50m (Úp nhiều) - 35.000 đ</option>
-                    <option value="Frag (1k5/1k, nhiều thì 1/1)" data-price="1500">Frag (1k5/1k, nhiều thì 1/1) - 1.500 đ</option>
-                    <option value="Cày Level 0 - 700" data-price="10000">Cày Level 0 - 700 - 10.000 đ</option>
-                    <option value="Cày Level 700 - 1500" data-price="10000">Cày Level 700 - 1500 - 10.000 đ</option>
-                    <option value="Cày Level 1500 - 2800" data-price="20000">Cày Level 1500 - 2800 - 20.000 đ</option>
-                </select>
+                <div id="serviceSpecificOptions"></div>
 
                 <div style="background:#0f172a; padding:12px; border-radius:6px; margin: 12px 0; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
                     <span>Giá tiền thanh toán:</span>
-                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">10.000 đ</b>
+                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">0 đ</b>
                 </div>
 
                 <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
@@ -431,6 +406,7 @@
         let currentUser = null;
         let authMode = 'login';
         let selectedAccToBuy = null;
+        let activeOrderingService = '';
 
         window.addEventListener('DOMContentLoaded', async () => {
             const { data } = await supabaseClient.auth.getSession();
@@ -652,24 +628,45 @@
             }
 
             const serviceGrid = document.getElementById('serviceGrid');
-            // Giữ nguyên Roblox Fruits và cập nhật 4 mục dịch vụ còn lại theo yêu cầu
+            // Mỗi dịch vụ có danh sách các gói riêng biệt đúng theo yêu cầu
             const services = [
-                { name: 'Roblox Fruits', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Pet gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Tiền game gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Hạt giống gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Shop gaer gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { 
+                    name: 'Roblox Fruits', 
+                    img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
+                    packages: [
+                        { name: 'Cày Level Max (Blox Fruits)', price: 50000 },
+                        { name: 'Săn Đổi Kiếm Cursed Dual Katana', price: 120000 },
+                        { name: 'Awakening Full Tộc V4', price: 200000 }
+                    ]
+                },
+                { 
+                    name: 'Pet gag2', 
+                    img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
+                    packages: [
+                        { name: 'FIREFLY (ĐOM ĐÖM) - 8 CON', price: 15000 },
+                        { name: 'BLACK DRAGON - 1 CON', price: 600000 },
+                        { name: 'CHÓN RACCOON - 1 CON', price: 20000 },
+                        { name: 'VET ROBIN - 1 CON', price: 1000 },
+                        { name: 'KHI MONKEY - 1 CON', price: 5000 },
+                        { name: 'GAU BEAR - 8 CON', price: 16000 },
+                        { name: 'CHUỐN CHUÔN DRAGONFLY - 10 CON', price: 16000 },
+                        { name: 'KI LAN UNICORN EA - 10 CON', price: 16000 },
+                        { name: 'Rồng Bằng Ice Serpent - 1 con', price: 1200000 }
+                    ]
+                }
             ];
+
+            window.shopServicesData = services;
             serviceGrid.innerHTML = '';
             services.forEach(s => {
                 serviceGrid.innerHTML += `
                     <div class="acc-card">
-                        <span class="acc-tag">SẴN</span>
+                        <span class="acc-tag">HOT</span>
                         <img src="${s.img}" class="acc-img">
                         <div class="acc-body">
                             <div class="acc-title">${s.name}</div>
                             <div class="acc-footer">
-                                <div class="price" style="color: #38bdf8; font-size: 15px;">Sẵn Sàng</div>
+                                <div class="price" style="color: #38bdf8; font-size: 15px;">Nhiều gói chọn</div>
                                 <button class="btn btn-primary" onclick="openOrderServiceModal('${s.name}')"><i class="fa-solid fa-gamepad"></i> Thuê Ngay</button>
                             </div>
                         </div>
@@ -678,23 +675,34 @@
             });
         }
 
-        function openOrderServiceModal(defaultServiceName = '') {
+        function openOrderServiceModal(serviceName) {
             if (!currentUser) return openAuthModal('login');
-            if (defaultServiceName) {
-                const select = document.getElementById('serviceSelectMenu');
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].text.includes(defaultServiceName)) {
-                        select.selectedIndex = i;
-                        break;
-                    }
-                }
-                updateSelectedServicePrice();
+            activeOrderingService = serviceName;
+            
+            document.getElementById('orderModalTitle').innerHTML = `<i class="fa-solid fa-gamepad"></i> ĐẶT DỊCH VỤ: ${serviceName.toUpperCase()}`;
+            
+            const targetService = window.shopServicesData.find(s => s.name === serviceName);
+            const container = document.getElementById('serviceSpecificOptions');
+            
+            if (targetService && targetService.packages) {
+                let optionsHtml = `
+                    <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ:</label>
+                    <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
+                `;
+                targetService.packages.forEach(pkg => {
+                    optionsHtml += `<option value="${pkg.name}" data-price="${pkg.price}">${pkg.name} - ${pkg.price.toLocaleString('vi-VN')} đ</option>`;
+                });
+                optionsHtml += `</select>`;
+                container.innerHTML = optionsHtml;
             }
+
+            updateSelectedServicePrice();
             openModal('orderServiceModal');
         }
 
         function updateSelectedServicePrice() {
             const select = document.getElementById('serviceSelectMenu');
+            if (!select) return;
             const selectedOption = select.options[select.selectedIndex];
             const price = selectedOption.getAttribute('data-price');
             document.getElementById('displayServicePrice').innerText = Number(price).toLocaleString('vi-VN') + ' đ';
@@ -705,8 +713,10 @@
             if (!currentUser) return openAuthModal('login');
             
             const select = document.getElementById('serviceSelectMenu');
-            const serviceName = select.value;
+            const packageName = select.value;
             const price = Number(select.options[select.selectedIndex].getAttribute('data-price'));
+            const serviceFullName = `${activeOrderingService} - ${packageName}`;
+            
             const robloxUser = document.getElementById('robloxUser').value;
             const robloxPass = document.getElementById('robloxPass').value;
             const robloxPass3 = document.getElementById('robloxPass3').value;
@@ -720,7 +730,7 @@
             await supabaseClient.from('user_balances').upsert({ email: currentUser.email, balance: currentBalance - price });
             await supabaseClient.from('orders').insert([{
                 email: currentUser.email,
-                service_name: serviceName,
+                service_name: serviceFullName,
                 price: price,
                 roblox_user: robloxUser,
                 roblox_pass: robloxPass,
@@ -941,7 +951,7 @@
                     .upsert({ email: email, balance: newBal });
 
                 if (!balError) {
-                    showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
+                    showToast(`Duyệt thẻ thành công và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
                 } else {
                     showToast('Lỗi cộng số dư cho khách: ' + balError.message, 'error');
                 }
