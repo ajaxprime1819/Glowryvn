@@ -843,22 +843,24 @@
             if (data && data.length > 0) {
                 data.forEach(c => {
                     const cardValue = c.amount || 0;
+                    const isProcessed = c.status !== 'Chờ duyệt';
+                    
                     tbody.innerHTML += `
-                        <tr>
+                        <tr id="card-row-${c.id}">
                             <td>#${c.id}</td>
                             <td>${c.user_email}</td>
                             <td>${c.card_type}</td>
                             <td>${Number(cardValue).toLocaleString('vi-VN')} đ</td>
                             <td>${c.card_code}</td>
                             <td>${c.card_serial || ''}</td>
-                            <td><b>${c.status}</b></td>
-                            <td>
-                                ${c.status === 'Chờ duyệt' ? `
+                            <td><b id="card-status-${c.id}" style="color:${c.status === 'Thành công' ? '#22c55e' : (c.status === 'Thất bại' ? '#ef4444' : '#f59e0b')}">${c.status}</b></td>
+                            <td id="card-actions-${c.id}">
+                                ${isProcessed ? 'Đã xử lý' : `
                                     <div style="display:flex; gap:5px;">
                                         <button class="btn btn-success" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thành công')">Duyệt</button>
-                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Hủy</button>
+                                        <button class="btn btn-danger" style="padding:4px 6px; font-size:11px;" onclick="processCard('${c.id}', '${c.user_email}', ${cardValue}, 'Thất bại')">Thẻ lỗi</button>
                                     </div>
-                                ` : 'Đã xử lý'}
+                                `}
                             </td>
                         </tr>
                     `;
@@ -869,7 +871,19 @@
         }
 
         async function processCard(id, email, amount, status) {
-            await supabaseClient.from('card_transactions').update({ status: status }).eq('id', id);
+            // 1. Khóa ngay giao diện và chuyển trạng thái để chống bấm nhiều lần
+            const actionTd = document.getElementById(`card-actions-${id}`);
+            const statusB = document.getElementById(`card-status-${id}`);
+            
+            if (actionTd) actionTd.innerHTML = 'Đã xử lý';
+            if (statusB) {
+                statusB.innerText = status === 'Thành công' ? 'Thành công' : 'Thất bại';
+                statusB.style.color = status === 'Thành công' ? '#22c55e' : '#ef4444';
+            }
+
+            // 2. Gửi dữ liệu lên Supabase
+            const dbStatus = status === 'Thành công' ? 'Thành công' : 'Thất bại';
+            await supabaseClient.from('card_transactions').update({ status: dbStatus }).eq('id', id);
             
             if (status === 'Thành công') {
                 const currentBal = await getUserBalance(email);
@@ -877,10 +891,9 @@
                 await supabaseClient.from('user_balances').upsert({ email: email, balance: newBal });
                 showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
             } else {
-                showToast('Đã từ chối thẻ cào!', 'error');
+                showToast('Đã báo thẻ lỗi!', 'error');
             }
 
-            loadAdminCards();
             loadAdminUsersBalance();
             checkUserStatus();
         }
