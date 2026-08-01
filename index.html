@@ -223,9 +223,14 @@
 
             <div id="pane-qr" class="deposit-pane active">
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản tự động:</p>
-                    <img src="https://api.vietqr.io/image/970422-0391234567-xxxxxx.jpg?accountName=CHINGHIA&amount=50000&addInfo=NAP" alt="QR Code" style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
+                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản:</p>
+                    <img src="https://i.ibb.co/BK2tt8Pn/image.jpg" alt="QR Code" style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #3b82f6; background: #fff;">
+                    <p style="font-size: 14px; color: #38bdf8; margin-top: 10px; font-weight: bold;">STK: 8888392192506</p>
+                    <p style="font-size: 14px; color: #22c55e; margin-top: 4px; font-weight: bold;">Chủ TK: TRƯƠNG CHÍ NGHĨA</p>
                     <p style="font-size: 13px; color: #f59e0b; margin-top: 8px;">Nội dung chuyển khoản: <b style="color:#fff;" id="qrContentText">NAP TIEN</b></p>
+                    <p style="font-size: 12px; color: #cbd5e1; margin-top: 10px; line-height: 1.5; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #334155;">
+                        Sau khi chuyển khoản chụp bill chuyển tiền gửi cho admin qua zalo: <a href="https://zalo.me/0392192506" target="_blank" style="color: #3b82f6; text-decoration: underline;">0392192506</a> hoặc nhắn qua kênh tiktok
+                    </p>
                 </div>
                 <button class="btn btn-primary" style="width:100%;" onclick="showToast('Hệ thống đang kiểm tra giao dịch tự động!', 'success')">TÔI ĐÃ CHUYỂN KHOẢN</button>
             </div>
@@ -435,22 +440,20 @@
             }
             await checkUserStatus();
             await renderShopItems();
-            initRealtimeSync(); // Kích hoạt lắng nghe dữ liệu thời gian thực
+            initRealtimeSync();
         });
 
-        // Lắng nghe thay đổi realtime từ database để tự động cập nhật cho khách
         function initRealtimeSync() {
             supabaseClient
                 .channel('public-db-changes')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'card_transactions' }, payload => {
                     const updatedCard = payload.new;
-                    // Nếu modal lịch sử nạp thẻ đang mở, tự động load lại bảng lịch sử
                     if (currentUser && updatedCard.user_email === currentUser.email) {
                         const historyModal = document.getElementById('historyModal');
                         if (historyModal.style.display === 'flex') {
                             loadHistoryCards();
                         }
-                        checkUserStatus(); // Cập nhật lại số dư ví nếu vừa được duyệt thẻ
+                        checkUserStatus();
                         showToast(`Thẻ ${updatedCard.card_type} (${updatedCard.amount.toLocaleString('vi-VN')}đ) đã chuyển trạng thái: ${updatedCard.status}`, updatedCard.status === 'Thành công' ? 'success' : 'error');
                     }
                 })
@@ -533,7 +536,6 @@
             }
         }
 
-        /* --- AUTHENTICATION --- */
         function openAuthModal(mode) {
             authMode = mode;
             document.getElementById('modalTitle').innerText = mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ TÀI KHOẢN';
@@ -601,7 +603,6 @@
             closeModal('changePasswordModal');
         }
 
-        /* --- SỐ DƯ --- */
         async function getUserBalance(email) {
             const { data } = await supabaseClient.from('user_balances').select('balance').eq('email', email).single();
             return data ? data.balance : 0;
@@ -626,7 +627,6 @@
             }
         }
 
-        /* --- RENDER SẢN PHẨM & DỊCH VỤ CÀY THUÊ --- */
         async function renderShopItems() {
             const { data: accGameList } = await supabaseClient.from('acc_games').select('*');
             const accGameGrid = document.getElementById('accGameGrid');
@@ -817,7 +817,6 @@
             }
         }
 
-        /* --- ADMIN PANEL --- */
         async function openAdminDashboard() {
             if (!currentUser || currentUser.email !== 'admin@gmail.com') {
                 return showToast('Bạn không có quyền truy cập trang quản trị!', 'error');
@@ -912,46 +911,43 @@
             }
         }
 
-async function processCard(id, email, amount, status) {
-    const actionTd = document.getElementById(`card-actions-${id}`);
-    if (actionTd) actionTd.innerHTML = 'Đang xử lý...';
+        async function processCard(id, email, amount, status) {
+            const actionTd = document.getElementById(`card-actions-${id}`);
+            if (actionTd) actionTd.innerHTML = 'Đang xử lý...';
 
-    const dbStatus = (status === 'Thành công') ? 'Thành công' : 'Thất bại';
+            const dbStatus = (status === 'Thành công') ? 'Thành công' : 'Thất bại';
 
-    // 1. Cập nhật trạng thái thẻ trong cơ sở dữ liệu (Ép kiểu id sang số hoặc giữ nguyên tùy cấu trúc bảng)
-    const { error } = await supabaseClient
-        .from('card_transactions')
-        .update({ status: dbStatus })
-        .eq('id', id);
+            const { error } = await supabaseClient
+                .from('card_transactions')
+                .update({ status: dbStatus })
+                .eq('id', id);
 
-    if (error) {
-        showToast('Lỗi cập nhật CSDL: ' + error.message, 'error');
-        loadAdminCards();
-        return;
-    }
+            if (error) {
+                showToast('Lỗi cập nhật CSDL: ' + error.message, 'error');
+                loadAdminCards();
+                return;
+            }
 
-    // 2. Nếu duyệt thành công thì tiến hành cộng tiền vào ví của khách hàng
-    if (status === 'Thành công') {
-        const currentBal = await getUserBalance(email);
-        const newBal = currentBal + amount;
-        
-        const { error: balError } = await supabaseClient
-            .from('user_balances')
-            .upsert({ email: email, balance: newBal });
+            if (status === 'Thành công') {
+                const currentBal = await getUserBalance(email);
+                const newBal = currentBal + amount;
+                
+                const { error: balError } = await supabaseClient
+                    .from('user_balances')
+                    .upsert({ email: email, balance: newBal });
 
-        if (!balError) {
-            showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
-        } else {
-            showToast('Lỗi cộng số dư cho khách: ' + balError.message, 'error');
+                if (!balError) {
+                    showToast(`Đã duyệt thẻ và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
+                } else {
+                    showToast('Lỗi cộng số dư cho khách: ' + balError.message, 'error');
+                }
+            } else {
+                showToast('Đã cập nhật trạng thái thẻ thành Thất bại!', 'info');
+            }
+
+            loadAdminCards();
+            loadAdminUsersBalance();
         }
-    } else {
-        showToast('Đã cập nhật trạng thái thẻ thành Thất bại!', 'info');
-    }
-
-    // 3. Tải lại bảng quản trị thẻ và số dư
-    loadAdminCards();
-    loadAdminUsersBalance();
-}
 
         async function handleAddNewAccGame(e) {
             e.preventDefault();
