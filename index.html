@@ -253,17 +253,24 @@
                         <option value="500000">500.000 đ</option>
                     </select>
 
-                    <label style="font-size:13px; color:#cbd5e1;">Mã thẻ cào:</label>
-                    <input type="text" id="cardCode" class="form-input" placeholder="Nhập mã thẻ..." required>
-
-                    <label style="font-size:13px; color:#cbd5e1;">Số Seri:</label>
-                    <input type="text" id="cardSerial" class="form-input" placeholder="Nhập số seri..." required>
-
-                    <button type="submit" class="btn btn-success" style="width:100%; margin-top:5px;">GỬI THẺ CÀO</button>
-                </form>
-            </div>
-        </div>
-    </div>
+<!-- Phần hiển thị lịch sử nạp thẻ trong Modal lịch sử của khách -->
+<div style="margin-top: 20px;">
+    <h3 style="font-size: 16px; margin-bottom: 10px; color: #fff;">Lịch sử nạp thẻ cào</h3>
+    <table style="width: 100%; border-collapse: collapse; color: #fff; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid #334155; color: #94a3b8;">
+                <th style="padding: 8px;">Nhà mạng</th>
+                <th style="padding: 8px;">Mệnh giá</th>
+                <th style="padding: 8px;">Mã thẻ</th>
+                <th style="padding: 8px;">Số Seri</th>
+                <th style="padding: 8px;">Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody id="historyCardTableBody">
+            <!-- Dữ liệu thẻ cào sẽ tự động load vào đây -->
+        </tbody>
+    </table>
+</div>
 
     <!-- MODAL ĐỔI MẬT KHẨU -->
     <div class="modal" id="changePasswordModal">
