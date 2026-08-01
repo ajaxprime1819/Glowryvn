@@ -155,6 +155,10 @@
             <form onsubmit="handleConfirmOrder(event)">
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ cần thuê:</label>
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
+                    <option value="Pet gag2" data-price="20000">Pet gag2 - 20.000 đ</option>
+                    <option value="Tiền game gag2" data-price="20000">Tiền game gag2 - 20.000 đ</option>
+                    <option value="Hạt giống gag2" data-price="20000">Hạt giống gag2 - 20.000 đ</option>
+                    <option value="Shop gaer gag2" data-price="20000">Shop gaer gag2 - 20.000 đ</option>
                     <option value="Roblox Fruits" data-price="10000">Roblox Fruits - 10.000 đ</option>
                     <option value="Tushi" data-price="10000">Tushi - 10.000 đ</option>
                     <option value="Lấy xong Roblox Fruits + Tushi" data-price="40000">Lấy xong Roblox Fruits + Tushi - 40.000 đ</option>
@@ -182,7 +186,7 @@
 
                 <div style="background:#0f172a; padding:12px; border-radius:6px; margin: 12px 0; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
                     <span>Giá tiền thanh toán:</span>
-                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">10.000 đ</b>
+                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">20.000 đ</b>
                 </div>
 
                 <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
@@ -652,13 +656,12 @@
             }
 
             const serviceGrid = document.getElementById('serviceGrid');
-            // Đã thêm 4 mục mới vào mảng services bên dưới
+            // Cập nhật 4 dịch vụ hiển thị ngoài trang chủ theo yêu cầu
             const services = [
-                { name: 'Roblox Fruits', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Tam kiếm (CDK)', price: 25000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Godhuman', price: 30000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'V4 a-z cy quỷ (Bao all)', price: 55000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Cày Level 1500 - 2800', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { name: 'Pet gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Tiền game gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Hạt giống gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
+                { name: 'Shop gaer gag2', price: 20000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
             ];
             serviceGrid.innerHTML = '';
             services.forEach(s => {
