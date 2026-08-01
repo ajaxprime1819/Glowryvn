@@ -155,18 +155,6 @@
             <form onsubmit="handleConfirmOrder(event)">
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ cần thuê:</label>
                 <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
-                    <option value="Hạt Giống GAG2" data-price="10000">Hạt Giống GAG2 - 10.000 đ</option>
-                    <option value="Shop Gaer GAG2" data-price="10000">Shop Gaer GAG2 - 10.000 đ</option>
-                    <option value="Tiền Game GAG2" data-price="30000">Tiền Game GAG2 - 30.000 đ</option>
-                    <option value="FIREFLY (ĐOM ĐỎM) - 8 CON" data-price="15000">FIREFLY (ĐOM ĐỎM) - 8 CON - 15.000 đ</option>
-                    <option value="BLACK DRAGON - 1 CON" data-price="600000">BLACK DRAGON - 1 CON - 600.000 đ</option>
-                    <option value="CHÓN RACCOON - 1 CON" data-price="20000">CHÓN RACCOON - 1 CON - 20.000 đ</option>
-                    <option value="VET ROBIN - 1 CON" data-price="1000">VET ROBIN - 1 CON - 1.000 đ</option>
-                    <option value="KHI MONKEY - 1 CON" data-price="5000">KHI MONKEY - 1 CON - 5.000 đ</option>
-                    <option value="GAU BEAR - 8 CON" data-price="16000">GAU BEAR - 8 CON - 16.000 đ</option>
-                    <option value="CHUỐN CHUÔN DRAGONFLY - 10 CON" data-price="16000">CHUỐN CHUÔN DRAGONFLY - 10 CON - 16.000 đ</option>
-                    <option value="KI LAN UNICORN EA - 10 CON" data-price="16000">KI LAN UNICORN EA - 10 CON - 16.000 đ</option>
-                    <option value="Rồng Bằng Ice Serpent - 1 con" data-price="1200000">Rồng Bằng Ice Serpent - 1 con - 1.200.000 đ</option>
                     <option value="Roblox Fruits" data-price="10000">Roblox Fruits - 10.000 đ</option>
                     <option value="Tushi" data-price="10000">Tushi - 10.000 đ</option>
                     <option value="Lấy xong Roblox Fruits + Tushi" data-price="40000">Lấy xong Roblox Fruits + Tushi - 40.000 đ</option>
@@ -665,10 +653,7 @@
 
             const serviceGrid = document.getElementById('serviceGrid');
             const services = [
-                { name: 'Hạt Giống GAG2', img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Shop Gaer GAG2', img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Pet GAG2', img: 'https://i.ibb.co/4wcD0R4k/image.jpg' },
-                { name: 'Tiền Game GAG2', img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
+                { name: 'Roblox Fruits', price: 10000, img: 'https://i.ibb.co/4wcD0R4k/image.jpg' }
             ];
             serviceGrid.innerHTML = '';
             services.forEach(s => {
