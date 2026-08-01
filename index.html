@@ -313,7 +313,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Thẻ</th><th>Khách Hàng</th><th>Nhà Mạng</th><th>Mệnh Giá</th><th>Mã Thẻ</th><th>Số Seri</th><th>Trạng Thái</th><th>Thao Tác</th>
+                                <th>Mã Giao Dịch</th><th>Khách Hàng</th><th>Nhà Mạng</th><th>Mệnh Giá</th><th>Mã Thẻ</th><th>Số Seri</th><th>Trạng Thái</th><th>Thao Tác</th>
                             </tr>
                         </thead>
                         <tbody id="adminCardTableBody"></tbody>
@@ -470,46 +470,42 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-async function handleCardDeposit(e) {
-    e.preventDefault();
-    if (!currentUser) return openAuthModal('login');
+        async function handleCardDeposit(e) {
+            e.preventDefault();
+            if (!currentUser) return openAuthModal('login');
 
-    const telco = document.getElementById('cardTelco').value;       // VIETTEL, VINAPHONE, GARENA...
-    const amount = Number(document.getElementById('cardAmount').value); // 10000, 20000...
-    const code = document.getElementById('cardCode').value.trim();      // Mã thẻ
-    const serial = document.getElementById('cardSerial').value.trim();  // Số seri
-    
-    const requestId = 'CARD_' + Date.now();
-    showToast('Đang gửi thẻ lên hệ thống gachthefast...', 'info');
+            const telco = document.getElementById('cardTelco').value;       
+            const amount = Number(document.getElementById('cardAmount').value); 
+            const code = document.getElementById('cardCode').value.trim();      
+            const serial = document.getElementById('cardSerial').value.trim();  
+            
+            const requestId = 'CARD_' + Date.now();
+            showToast('Đang gửi thẻ lên hệ thống...', 'info');
 
-try {
-    showload('Đang gửi thẻ lên hệ thống...', 'Info');
+            try {
+                // Lưu trực tiếp vào bảng card_transactions trên Supabase để Admin duyệt
+                const { error } = await supabaseClient.from('card_transactions').insert([{
+                    user_email: currentUser.email,
+                    card_type: telco,
+                    amount: amount,
+                    card_code: code,
+                    card_serial: serial,
+                    status: 'Chờ duyệt',
+                    request_id: requestId
+                }]);
 
-    // === GỬI DỮ LIỆU THẺ VỀ DATABASE CỦA BẠN CHO ADMIN DUYỆT ===
-    const response = await fetch('/api/nap-the', { // Hoặc đường dẫn lưu thẻ của bạn
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            telco: telco,
-            amount: amount,
-            code: code,
-            serial: serial,
-            request_id: requestId
-        })
-    });
+                if (error) {
+                    showToast(error.message || 'Có lỗi xảy ra khi lưu thông tin thẻ!', 'error');
+                } else {
+                    showToast('Gửi thẻ thành công! Vui lòng chờ admin duyệt.', 'success');
+                    closeModal('depositModal');
+                    e.target.reset();
+                }
+            } catch (error) {
+                showToast('Lỗi kết nối tới hệ thống!', 'error');
+            }
+        }
 
-    const result = await response.json();
-
-    if (result.success || result.status === 1) {
-        shownotiv('Gửi thẻ thành công! Vui lòng chờ admin duyệt.', 'success');
-        // Reset form hoặc đóng popup nếu cần
-    } else {
-        shownotiv(result.message || 'Có lỗi xảy ra khi gửi thẻ!', 'error');
-    }
-
-} catch (error) {
-    shownotiv('Lỗi kết nối tới hệ thống!', 'error');
-}
         /* --- AUTHENTICATION --- */
         function openAuthModal(mode) {
             authMode = mode;
@@ -966,4 +962,3 @@ try {
     </script>
 </body>
 </html>
-
