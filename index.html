@@ -159,14 +159,16 @@
                     <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">0 đ</b>
                 </div>
 
-                <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
-                <input type="text" id="robloxUser" class="form-input" required placeholder="Nhập tên đăng nhập Roblox...">
-                
-                <label style="font-size:13px; color:#cbd5e1;">Mật khẩu Roblox:</label>
-                <input type="password" id="robloxPass" class="form-input" required placeholder="Nhập mật khẩu Roblox...">
-                
-                <label style="font-size:13px; color:#cbd5e1;">Mã 2FA / Pass dự phòng (Nếu có):</label>
-                <input type="text" id="robloxPass3" class="form-input" placeholder="Nhập mã dự phòng 2FA...">
+                <div id="accountInputFields">
+                    <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
+                    <input type="text" id="robloxUser" class="form-input" placeholder="Nhập tên đăng nhập Roblox...">
+                    
+                    <label style="font-size:13px; color:#cbd5e1;">Mật khẩu Roblox:</label>
+                    <input type="password" id="robloxPass" class="form-input" placeholder="Nhập mật khẩu Roblox...">
+                    
+                    <label style="font-size:13px; color:#cbd5e1;">Mã 2FA / Pass dự phòng (Nếu có):</label>
+                    <input type="text" id="robloxPass3" class="form-input" placeholder="Nhập mã dự phòng 2FA...">
+                </div>
 
                 <button type="submit" class="btn btn-success" style="width:100%; padding:12px; margin-top:5px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
             </form>
@@ -627,7 +629,6 @@
             }
 
             const serviceGrid = document.getElementById('serviceGrid');
-            // Cập nhật các gói dịch vụ Roblox Fruits chuẩn xác theo yêu cầu mới nhất của bạn
             const services = [
                 { 
                     name: 'Roblox Fruits', 
@@ -656,6 +657,15 @@
                         { name: 'Level 0-700', price: 10000 },
                         { name: 'Level 700-1500', price: 10000 },
                         { name: 'Level 1500-2800', price: 20000 }
+                    ]
+                },
+                { 
+                    name: 'Tiền game gag2', 
+                    img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
+                    packages: [
+                        { name: '20B TIỀN GAME (KHÔNG CẦN ĐIỀN MẬT KHẨU)', price: 80000 },
+                        { name: '10B TIỀN GAME (KHÔNG CẦN ĐIỀN MẬT KHẨU)', price: 40000 },
+                        { name: '3B TIỀN GAME (KHÔNG CẦN ĐIỀN MẬT KHẨU)', price: 15000 }
                     ]
                 },
                 { 
@@ -702,6 +712,18 @@
             
             const targetService = window.shopServicesData.find(s => s.name === serviceName);
             const container = document.getElementById('serviceSpecificOptions');
+            const accountInputFields = document.getElementById('accountInputFields');
+            
+            // Nếu là dịch vụ "Tiền game gag2", ẩn các trường nhập mật khẩu tài khoản
+            if (serviceName === 'Tiền game gag2') {
+                accountInputFields.style.display = 'none';
+                document.getElementById('robloxUser').removeAttribute('required');
+                document.getElementById('robloxPass').removeAttribute('required');
+            } else {
+                accountInputFields.style.display = 'block';
+                document.getElementById('robloxUser').setAttribute('required', 'true');
+                document.getElementById('robloxPass').setAttribute('required', 'true');
+            }
             
             if (targetService && targetService.packages) {
                 let optionsHtml = `
@@ -736,9 +758,15 @@
             const price = Number(select.options[select.selectedIndex].getAttribute('data-price'));
             const serviceFullName = `${activeOrderingService} - ${packageName}`;
             
-            const robloxUser = document.getElementById('robloxUser').value;
-            const robloxPass = document.getElementById('robloxPass').value;
-            const robloxPass3 = document.getElementById('robloxPass3').value;
+            let robloxUser = 'N/A (Không cần pass)';
+            let robloxPass = 'N/A';
+            let robloxPass3 = 'N/A';
+
+            if (activeOrderingService !== 'Tiền game gag2') {
+                robloxUser = document.getElementById('robloxUser').value;
+                robloxPass = document.getElementById('robloxPass').value;
+                robloxPass3 = document.getElementById('robloxPass3').value;
+            }
 
             const currentBalance = await getUserBalance(currentUser.email);
             if (currentBalance < price) {
