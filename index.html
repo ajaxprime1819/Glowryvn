@@ -486,24 +486,19 @@ async function handleCardDeposit(e) {
         // === ĐIỀN THÔNG TIN TÀI KHOẢN GACHTHEFAST CỦA BẠN VÀO ĐÂY ===
         const PARTNER_ID = '7215070297'; 
         const PARTNER_KEY = 'bf6e5a00abe0c272af210e736107a858';
-        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://gachthefast.com/api/card-charging');
-        // Tạo mã sign bảo mật (chuẩn chung của các web api gạch thẻ)
-        // Lưu ý: Nếu web gachthefast dùng thư viện md5, đảm bảo trang web có nhúng thư viện md5, hoặc bạn có thể thay đổi cách tạo sign theo tài liệu API của họ.
-        const sign = md5(PARTNER_KEY + code + serial);
-
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                partner_id: PARTNER_ID,
-                telco: telco,
-                code: code,
-                serial: serial,
-                amount: amount,
-                request_id: requestId,
-                sign: sign
-            })
-        });
+const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://gachthefast.com/api/card-charging'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        partner_id: PARTNER_ID,
+        telco: telco,
+        code: code,
+        serial: serial,
+        amount: amount,
+        request_id: requestId,
+        sign: sign
+    })
+});
 
         const result = await response.json();
 
