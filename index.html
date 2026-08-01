@@ -482,76 +482,33 @@ async function handleCardDeposit(e) {
     const requestId = 'CARD_' + Date.now();
     showToast('Đang gửi thẻ lên hệ thống gachthefast...', 'info');
 
-    try {
-        // === ĐIỀN THÔNG TIN TÀI KHOẢN GACHTHEFAST CỦA BẠN VÀO ĐÂY ===
-        const PARTNER_ID = '7215070297'; 
-        const PARTNER_KEY = 'bf6e5a00abe0c272af210e736107a858';
-const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://gachthefast.com/api/card-charging'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        partner_id: PARTNER_ID,
-        telco: telco,
-        code: code,
-        serial: serial,
-        amount: amount,
-        request_id: requestId,
-        sign: sign
-    })
-});
+try {
+    showload('Đang gửi thẻ lên hệ thống...', 'Info');
 
-        const result = await response.json();
+    // === GỬI DỮ LIỆU THẺ VỀ DATABASE CỦA BẠN CHO ADMIN DUYỆT ===
+    const response = await fetch('/api/nap-the', { // Hoặc đường dẫn lưu thẻ của bạn
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            telco: telco,
+            amount: amount,
+            code: code,
+            serial: serial,
+            request_id: requestId
+        })
+    });
 
-        // Kiểm tra kết quả trả về từ gachthefast (thường status = 1 là thành công)
-        if (result.status === 1 || result.success === true) {
-            // 1. Lưu giao dịch thành công vào Supabase
-            await supabaseClient.from('card_transactions').insert([{
-                request_id: requestId,
-                user_email: currentUser.email,
-                card_type: telco,
-                card_value: amount,     
-                card_code: code,        
-                card_seri: serial,      
-                status: 'Thành công'
-            }]);
+    const result = await response.json();
 
-            // 2. Tự động cộng tiền vào tài khoản khách trên Supabase
-            const { data: userBal } = await supabaseClient
-                .from('user_balances')
-                .select('*')
-                .eq('email', currentUser.email)
-                .single();
-
-            if (userBal) {
-                const newBalance = Number(userBal.balance) + amount;
-                await supabaseClient.from('user_balances').update({ balance: newBalance }).eq('email', currentUser.email);
-            } else {
-                await supabaseClient.from('user_balances').insert([{ email: currentUser.email, balance: amount }]);
-            }
-
-            showToast(`Nạp thẻ thành công! Đã cộng ${amount.toLocaleString()}đ vào tài khoản.`, 'success');
-            await checkUserStatus();
-        } else {
-            // Thẻ lỗi / Thẻ sai / Sai mệnh giá
-            await supabaseClient.from('card_transactions').insert([{
-                request_id: requestId,
-                user_email: currentUser.email,
-                card_type: telco,
-                card_value: amount,     
-                card_code: code,        
-                card_seri: serial,      
-                status: 'Thất bại: ' + (result.message || 'Thẻ lỗi')
-            }]);
-
-            showToast('Nạp thẻ thất bại: ' + (result.message || 'Thẻ sai hoặc không hợp lệ!'), 'error');
-        }
-
-        e.target.reset();
-        closeModal('depositModal');
-
-    } catch (err) {
-        showToast('Lỗi kết nối đến cổng gachthefast!', 'error');
+    if (result.success || result.status === 1) {
+        shownotiv('Gửi thẻ thành công! Vui lòng chờ admin duyệt.', 'success');
+        // Reset form hoặc đóng popup nếu cần
+    } else {
+        shownotiv(result.message || 'Có lỗi xảy ra khi gửi thẻ!', 'error');
     }
+
+} catch (error) {
+    shownotiv('Lỗi kết nối tới hệ thống!', 'error');
 }
         /* --- AUTHENTICATION --- */
         function openAuthModal(mode) {
