@@ -469,32 +469,36 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-        async function handleCardDeposit(e) {
-            e.preventDefault();
-            if (!currentUser) return openAuthModal('login');
+async function handleCardDeposit(e) {
+    e.preventDefault();
+    if (!currentUser) return openAuthModal('login');
 
-            const telco = document.getElementById('cardTelco').value;
-            const amount = Number(document.getElementById('cardAmount').value);
-            const code = document.getElementById('cardCode').value.trim();
-            const serial = document.getElementById('cardSerial').value.trim();
+    const telco = document.getElementById('cardTelco').value;
+    const amount = Number(document.getElementById('cardAmount').value);
+    const code = document.getElementById('cardCode').value.trim();
+    const serial = document.getElementById('cardSerial').value.trim();
+    
+    // Tạo mã request_id tự động ngẫu nhiên để không bị lỗi Not-Null
+    const requestId = 'CARD_' + Date.now();
 
-            const { error } = await supabaseClient.from('card_transactions').insert([{
-                user_email: currentUser.email,
-                card_type: telco,
-                amount: amount,
-                card_code: code,
-                card_serial: serial,
-                status: 'Chờ duyệt'
-            }]);
+    const { error } = await supabaseClient.from('card_transactions').insert([{
+        request_id: requestId,
+        user_email: currentUser.email,
+        card_type: telco,
+        card_value: amount,     
+        card_code: code,        
+        card_serial: serial,    
+        status: 'Chờ duyệt'
+    }]);
 
-            if (error) {
-                return showToast('Lỗi gửi thẻ: ' + error.message, 'error');
-            }
+    if (error) {
+        return showToast('Lỗi gửi thẻ: ' + error.message, 'error');
+    }
 
-            showToast('Gửi thẻ cào thành công! Đang chờ Admin duyệt.', 'success');
-            e.target.reset();
-            closeModal('depositModal');
-        }
+    showToast('Gửi thẻ cào thành công! Đang chờ Admin duyệt.', 'success');
+    e.target.reset();
+    closeModal('depositModal');
+}
 
         /* --- AUTHENTICATION --- */
         function openAuthModal(mode) {
