@@ -160,9 +160,6 @@
                 </div>
 
                 <div id="accountInputFields">
-                    <label style="font-size:13px; color:#cbd5e1;">Tên Tài Khoản Game:</label>
-                    <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản game...">
-                    
                     <div id="robloxExtraAuth">
                         <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
                         <input type="text" id="robloxUser" class="form-input" placeholder="Nhập tên đăng nhập Roblox...">
@@ -285,7 +282,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>Tên TK Game</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Thao Tác</th>
+                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Thao Tác</th>
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
@@ -368,7 +365,7 @@
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tên Tài Khoản</th><th>Trạng Thái</th></tr>
+                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản / Roblox</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="historyTableBody"></tbody>
                     </table>
@@ -675,7 +672,7 @@
                 },
                 { 
                     name: 'Hạt giống gag2', 
-                    img: 'https://i.ibb.co/VWcvMmQ7/image.png',
+                    img: 'https://i.ibb.co/0V96qn4p/image.png',
                     packages: [
                         { name: 'HAT MEGA - 50 HAT', price: 16000 },
                         { name: 'Hypno Bloom - 12 HAT', price: 15000 },
@@ -689,7 +686,7 @@
                 },
                 { 
                     name: 'Pet gag2', 
-                    img: 'https://i.ibb.co/FkxThHZx/FkxThHZx.jpg',
+                    img: 'https://i.ibb.co/VWcvMmQ7/image.png',
                     packages: [
                         { name: 'FIREFLY (ĐOM ĐỎM) - 8 CON', price: 15000 },
                         { name: 'BLACK DRAGON - 1 CON', price: 600000 },
@@ -704,7 +701,7 @@
                 },
                 { 
                     name: 'Shop gaer gag2', 
-                    img: 'https://i.ibb.co/0V96qn4p/image.png',
+                    img: 'https://i.ibb.co/rh0H4GX/rh0H4GX.jpg',
                     packages: [
                         { name: 'VÒI TƯỚI SUPER - 800 CÁI', price: 80000 },
                         { name: 'BÌNH TƯỚI SUPER - 400 CÁI', price: 80000 },
@@ -768,8 +765,6 @@
                 document.getElementById('robloxPass').setAttribute('required', 'true');
             }
 
-            document.getElementById('gameAccountName').value = '';
-
             updateSelectedServicePrice();
             openModal('orderServiceModal');
         }
@@ -790,19 +785,17 @@
             const packageName = select.value;
             const price = Number(select.options[select.selectedIndex].getAttribute('data-price'));
             const serviceFullName = `${activeOrderingService} - ${packageName}`;
-            const gameAccountName = document.getElementById('gameAccountName').value.trim();
             
-            let robloxUser = gameAccountName;
+            let robloxUser = 'Không yêu cầu';
             let robloxPass = 'N/A';
             let robloxPass3 = 'N/A';
 
             const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
 
             if (!noPasswordServices.includes(activeOrderingService)) {
-                const rUser = document.getElementById('robloxUser').value;
-                robloxUser = `Tên TK: ${gameAccountName} | Roblox: ${rUser}`;
-                robloxPass = document.getElementById('robloxPass').value;
-                robloxPass3 = document.getElementById('robloxPass3').value;
+                robloxUser = document.getElementById('robloxUser').value.trim();
+                robloxPass = document.getElementById('robloxPass').value.trim();
+                robloxPass3 = document.getElementById('robloxPass3').value.trim();
             }
 
             const currentBalance = await getUserBalance(currentUser.email);
@@ -1089,7 +1082,7 @@
 
         async function loadAdminUsersBalance() {
             const { data } = await supabaseClient.from('user_balances').select('*');
-            const tbody = document.getElementById('adminUserBalanceTableByte') || document.getElementById('adminUserBalanceTableBody');
+            const tbody = document.getElementById('adminUserBalanceTableBody');
             tbody.innerHTML = ``;
             if (data && data.length > 0) {
                 data.forEach(u => {
