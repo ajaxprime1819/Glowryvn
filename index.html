@@ -154,9 +154,9 @@
             <form onsubmit="handleConfirmOrder(event)">
                 <div id="serviceSpecificOptions"></div>
 
-                <div style="background:#0f172a; padding:12px; border-radius:6px; margin: 12px 0; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
-                    <span>Giá tiền thanh toán:</span>
-                    <b id="displayServicePrice" style="color:#22c55e; font-size:18px;">0 đ</b>
+                <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin: 12px 0; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#94a3b8;">Giá tiền thanh toán:</span>
+                    <b id="displayServicePrice" style="color:#22c55e; font-size:14px;">0 đ</b>
                 </div>
 
                 <div id="accountInputFields">
@@ -636,7 +636,7 @@
             const serviceGrid = document.getElementById('serviceGrid');
             const services = [
                 { 
-                    name: 'Cày thuê Roblox Fruits', 
+                    name: 'Roblox Fruits', 
                     img: 'https://i.ibb.co/LDbC3SXR/LDbC3SXR.jpg',
                     packages: [
                         { name: 'Yama', price: 10000 },
@@ -744,8 +744,8 @@
             const robloxExtraAuth = document.getElementById('robloxExtraAuth');
             
             let serviceHtml = `
-                <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ:</label>
-                <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6;" onchange="updateSelectedServicePrice()">
+                <label style="font-size:14px; color:#cbd5e1; font-weight:bold; display:block; margin-bottom:6px;">Chọn gói dịch vụ:</label>
+                <select id="serviceSelectMenu" class="form-input" style="cursor:pointer; font-weight:bold; color:#3b82f6; font-size:16px; padding:12px;" onchange="updateSelectedServicePrice()">
             `;
             if (targetService && targetService.packages) {
                 targetService.packages.forEach(pkg => {
@@ -756,7 +756,6 @@
 
             container.innerHTML = serviceHtml;
 
-            // Các danh mục KHÔNG cần mật khẩu / thông tin Roblox (chỉ cần tên tài khoản game)
             const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
 
             if (noPasswordServices.includes(serviceName)) {
