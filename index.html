@@ -160,8 +160,8 @@
                 </div>
 
                 <div id="accountInputFields">
-                    <label style="font-size:13px; color:#cbd5e1;">Tên Tài Khoản Game / Tên Nhân Vật:</label>
-                    <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản hoặc tên nhân vật trong game...">
+                    <label style="font-size:13px; color:#cbd5e1;">Tên Tài Khoản Game:</label>
+                    <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản game...">
                     
                     <div id="robloxExtraAuth">
                         <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
@@ -756,7 +756,7 @@
 
             container.innerHTML = serviceHtml;
 
-            // Danh sách các dịch vụ chỉ cần tên tài khoản / tên nhân vật (không cần mật khẩu hay thông tin Roblox phụ)
+            // Các danh mục KHÔNG cần mật khẩu / thông tin Roblox (chỉ cần tên tài khoản game)
             const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
 
             if (noPasswordServices.includes(serviceName)) {
@@ -801,7 +801,7 @@
 
             if (!noPasswordServices.includes(activeOrderingService)) {
                 const rUser = document.getElementById('robloxUser').value;
-                robloxUser = `Tên NV: ${gameAccountName} | Roblox: ${rUser}`;
+                robloxUser = `Tên TK: ${gameAccountName} | Roblox: ${rUser}`;
                 robloxPass = document.getElementById('robloxPass').value;
                 robloxPass3 = document.getElementById('robloxPass3').value;
             }
