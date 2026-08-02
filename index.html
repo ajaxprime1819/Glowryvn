@@ -160,14 +160,19 @@
                 </div>
 
                 <div id="accountInputFields">
-                    <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
-                    <input type="text" id="robloxUser" class="form-input" placeholder="Nhập tên đăng nhập Roblox...">
+                    <label style="font-size:13px; color:#cbd5e1;">Tên Tài Khoản Game / Tên Nhân Vật:</label>
+                    <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản hoặc tên nhân vật trong game...">
                     
-                    <label style="font-size:13px; color:#cbd5e1;">Mật khẩu Roblox:</label>
-                    <input type="password" id="robloxPass" class="form-input" placeholder="Nhập mật khẩu Roblox...">
-                    
-                    <label style="font-size:13px; color:#cbd5e1;">Mã 2FA / Pass dự phòng (Nếu có):</label>
-                    <input type="text" id="robloxPass3" class="form-input" placeholder="Nhập mã dự phòng 2FA...">
+                    <div id="robloxExtraAuth">
+                        <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
+                        <input type="text" id="robloxUser" class="form-input" placeholder="Nhập tên đăng nhập Roblox...">
+                        
+                        <label style="font-size:13px; color:#cbd5e1;">Mật khẩu Roblox:</label>
+                        <input type="password" id="robloxPass" class="form-input" placeholder="Nhập mật khẩu Roblox...">
+                        
+                        <label style="font-size:13px; color:#cbd5e1;">Mã 2FA / Pass dự phòng (Nếu có):</label>
+                        <input type="text" id="robloxPass3" class="form-input" placeholder="Nhập mã dự phòng 2FA...">
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-success" style="width:100%; padding:12px; margin-top:5px;"><i class="fa-solid fa-check"></i> XÁC NHẬN ĐẶT ĐƠN</button>
@@ -696,6 +701,16 @@
                         { name: 'KI LAN UNICORN EA - 10 CON', price: 16000 },
                         { name: 'Rồng Bằng Ice Serpent - 1 con', price: 1200000 }
                     ]
+                },
+                { 
+                    name: 'Shop gaer gag2', 
+                    img: 'https://i.ibb.co/4wcD0R4k/image.jpg',
+                    packages: [
+                        { name: 'VÒI TƯỚI SUPER - 800 CÁI', price: 80000 },
+                        { name: 'BÌNH TƯỚI SUPER - 400 CÁI', price: 80000 },
+                        { name: 'VÒI TƯỚI SUPER - 80 CÁI', price: 16000 },
+                        { name: 'BÌNH TƯỚI SUPER - 60 CÁI', price: 16000 }
+                    ]
                 }
             ];
 
@@ -726,7 +741,7 @@
             
             const targetService = window.shopServicesData.find(s => s.name === serviceName);
             const container = document.getElementById('serviceSpecificOptions');
-            const accountInputFields = document.getElementById('accountInputFields');
+            const robloxExtraAuth = document.getElementById('robloxExtraAuth');
             
             let serviceHtml = `
                 <label style="font-size:13px; color:#cbd5e1; font-weight:bold;">Chọn gói dịch vụ:</label>
@@ -739,23 +754,22 @@
             }
             serviceHtml += `</select>`;
 
-            serviceHtml += `
-                <label style="font-size:13px; color:#cbd5e1; font-weight:bold; margin-top:5px; display:block;">Tên Tài Khoản:</label>
-                <input type="text" id="gameAccountName" class="form-input" placeholder="Nhập tên tài khoản..." required>
-            `;
-
             container.innerHTML = serviceHtml;
 
-            // Kiểm tra ẩn/hiện trường mật khẩu (chỉ áp dụng cho các dịch vụ cần mật khẩu Roblox, các dịch vụ như Tiền game, Hạt giống, Pet... không cần mật khẩu)
-            if (serviceName === 'Tiền game gag2' || serviceName === 'Hạt giống gag2' || serviceName === 'Pet gag2') {
-                accountInputFields.style.display = 'none';
+            // Danh sách các dịch vụ chỉ cần tên tài khoản / tên nhân vật (không cần mật khẩu hay thông tin Roblox phụ)
+            const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
+
+            if (noPasswordServices.includes(serviceName)) {
+                robloxExtraAuth.style.display = 'none';
                 document.getElementById('robloxUser').removeAttribute('required');
                 document.getElementById('robloxPass').removeAttribute('required');
             } else {
-                accountInputFields.style.display = 'block';
+                robloxExtraAuth.style.display = 'block';
                 document.getElementById('robloxUser').setAttribute('required', 'true');
                 document.getElementById('robloxPass').setAttribute('required', 'true');
             }
+
+            document.getElementById('gameAccountName').value = '';
 
             updateSelectedServicePrice();
             openModal('orderServiceModal');
@@ -783,9 +797,11 @@
             let robloxPass = 'N/A';
             let robloxPass3 = 'N/A';
 
-            if (activeOrderingService !== 'Tiền game gag2' && activeOrderingService !== 'Hạt giống gag2' && activeOrderingService !== 'Pet gag2') {
+            const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
+
+            if (!noPasswordServices.includes(activeOrderingService)) {
                 const rUser = document.getElementById('robloxUser').value;
-                robloxUser = `TK Game: ${gameAccountName} | Roblox: ${rUser}`;
+                robloxUser = `Tên NV: ${gameAccountName} | Roblox: ${rUser}`;
                 robloxPass = document.getElementById('robloxPass').value;
                 robloxPass3 = document.getElementById('robloxPass3').value;
             }
