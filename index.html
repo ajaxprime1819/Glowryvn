@@ -80,6 +80,18 @@
         .deposit-pane { display: none; }
         .deposit-pane.active { display: block; }
 
+        /* CSS cho phần hiển thị thực nhận nạp thẻ */
+        .card-real-amount-box {
+            background: #0f172a;
+            border: 1px dashed #3b82f6;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         footer { background: #090d16; padding: 30px 20px; margin-top: 50px; border-top: 1px solid #1e293b; text-align: center; color: #64748b; }
     </style>
 </head>
@@ -105,11 +117,9 @@
     </section>
 
     <div class="container">
-        <!-- Đã chuyển Dịch vụ cày thuê hot lên trước -->
         <h2 class="section-title"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> DỊCH VỤ CÀY THUÊ HOT</h2>
         <div class="shop-grid" id="serviceGrid"></div>
 
-        <!-- Danh sách acc game được chuyển xuống dưới -->
         <h2 class="section-title"><i class="fa-solid fa-store" style="color:#ef4444;"></i> DANH SÁCH ACC GAME ĐANG BÁN</h2>
         <div class="shop-grid" id="accGameGrid"></div>
     </div>
@@ -197,7 +207,7 @@
             
             <div class="deposit-methods">
                 <div class="deposit-tab active" onclick="switchDepositTab(event, 'pane-qr')"><i class="fa-solid fa-qrcode"></i> Quét Mã QR Momo/Bank</div>
-                <div class="deposit-tab" onclick="switchDepositTab(event, 'pane-card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào Điện Thoại</div>
+                <div class="deposit-tab" onclick="switchDepositTab(event, 'pane-card')"><i class="fa-solid fa-credit-card"></i> Thẻ Cào Điện Thoại <span style="color:#ef4444; font-size:11px;">(-20%)</span></div>
             </div>
 
             <div id="pane-qr" class="deposit-pane active">
@@ -227,14 +237,20 @@
                     </select>
 
                     <label style="font-size:13px; color:#cbd5e1;">Mệnh giá:</label>
-                    <select id="cardAmount" class="form-input" required>
+                    <select id="cardAmount" class="form-input" onchange="updateCardRealAmount()" required>
                         <option value="10000">10.000 đ</option>
                         <option value="20000">20.000 đ</option>
                         <option value="50000">50.000 đ</option>
-                        <option value="100000">100.000 đ</option>
+                        <option value="100000" selected>100.000 đ</option>
                         <option value="200000">200.000 đ</option>
                         <option value="500000">500.000 đ</option>
                     </select>
+
+                    <!-- Khung hiển thị tiền thực nhận sau chiết khấu 20% -->
+                    <div class="card-real-amount-box">
+                        <span style="font-size: 13px; color: #94a3b8;">Thực nhận (Chiết khấu 20%):</span>
+                        <b id="cardRealAmountDisplay" style="color: #22c55e; font-size: 15px;">80.000 đ</b>
+                    </div>
 
                     <label style="font-size:13px; color:#cbd5e1;">Mã thẻ cào:</label>
                     <input type="text" id="cardCode" class="form-input" placeholder="Nhập mã thẻ..." required>
@@ -419,8 +435,20 @@
             }
             await checkUserStatus();
             await renderShopItems();
+            updateCardRealAmount(); // Khởi tạo tính sẵn tiền thực nhận cho thẻ cào mặc định
             initRealtimeSync();
         });
+
+        // Hàm cập nhật số tiền thực nhận tự động khi chọn mệnh giá thẻ nạp
+        function updateCardRealAmount() {
+            const amountSelect = document.getElementById('cardAmount');
+            const displayEl = document.getElementById('cardRealAmountDisplay');
+            if (!amountSelect || !displayEl) return;
+
+            const selectedAmount = Number(amountSelect.value) || 0;
+            const realAmount = selectedAmount * 0.8; // Chiết khấu 20%
+            displayEl.innerText = realAmount.toLocaleString('vi-VN') + ' đ';
+        }
 
         function initRealtimeSync() {
             supabaseClient
@@ -464,6 +492,7 @@
         function openDepositModal() {
             if (!currentUser) return openAuthModal('login');
             document.getElementById('qrContentText').innerText = `NAPADMIN`;
+            updateCardRealAmount();
             openModal('depositModal');
         }
 
@@ -508,6 +537,7 @@
                 } else {
                     showToast('Gửi thẻ thành công! Vui lòng chờ admin duyệt.', 'success');
                     e.target.reset();
+                    updateCardRealAmount();
                     closeModal('depositModal');
                 }
             } catch (err) {
@@ -1030,15 +1060,17 @@
             }
 
             if (status === 'Thành công') {
+                const realAmount = amount * 0.8;
+
                 const currentBal = await getUserBalance(email);
-                const newBal = currentBal + amount;
+                const newBal = currentBal + realAmount;
                 
                 const { error: balError } = await supabaseClient
                     .from('user_balances')
                     .upsert({ email: email, balance: newBal });
 
                 if (!balError) {
-                    showToast(`Duyệt thẻ thành công và cộng ${amount.toLocaleString('vi-VN')}đ cho ${email}!`, 'success');
+                    showToast(`Duyệt thẻ thành công! Đã cộng ${realAmount.toLocaleString('vi-VN')}đ (trừ 20% chiết khấu) cho ${email}`, 'success');
                 } else {
                     showToast('Lỗi cộng số dư cho khách: ' + balError.message, 'error');
                 }
