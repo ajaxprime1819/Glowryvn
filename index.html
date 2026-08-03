@@ -162,7 +162,7 @@
                 <div id="accountInputFields">
                     <div id="robloxExtraAuth">
                         <label style="font-size:13px; color:#cbd5e1;">Tài khoản Roblox:</label>
-                        <input type="text" id="robloxUser" class="form-input" placeholder="Nhập tên đăng nhập Roblox...">
+                        <input type="text" id="robloxUser" class="form-input" placeholder="Nhập tên tài khoản...">
                         
                         <label style="font-size:13px; color:#cbd5e1;">Mật khẩu Roblox:</label>
                         <input type="password" id="robloxPass" class="form-input" placeholder="Nhập mật khẩu Roblox...">
@@ -282,7 +282,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>TK Roblox</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Thao Tác</th>
+                                <th>Mã Đơn</th><th>Khách Hàng</th><th>Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản / Tên Game</th><th>MK Roblox</th><th>2FA</th><th>Trạng Thái</th><th>Thao Tác</th>
                             </tr>
                         </thead>
                         <tbody id="adminOrderTableBody"></tbody>
@@ -365,7 +365,7 @@
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
                         <thead>
-                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản / Roblox</th><th>Trạng Thái</th></tr>
+                            <tr><th>Loại Đơn</th><th>Tên Dịch Vụ / Gói Cày</th><th>Giá Tiền</th><th>Tài Khoản / Tên Game</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="historyTableBody"></tbody>
                     </table>
@@ -665,9 +665,9 @@
                     name: 'Tiền game gag2', 
                     img: 'https://i.ibb.co/tTpNR6m5/image.png',
                     packages: [
-                        { name: '20B TIỀN GAME (KHÔNG CẦN ĐIỀN MẬT KHẨU)', price: 80000 },
-                        { name: '10B TIỀN GAME (KHÔNG CẦN ĐIỀN MẬT KHẨU)', price: 40000 },
-                        { name: '3B TIỀN GAME (KHÔNG CẦN ĐIỀN MẬT KHẨU)', price: 15000 }
+                        { name: '20B TIỀN GAME', price: 80000 },
+                        { name: '10B TIỀN GAME', price: 40000 },
+                        { name: '3B TIỀN GAME', price: 15000 }
                     ]
                 },
                 { 
@@ -753,16 +753,28 @@
 
             container.innerHTML = serviceHtml;
 
-            const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
-
-            if (noPasswordServices.includes(serviceName)) {
-                robloxExtraAuth.style.display = 'none';
-                document.getElementById('robloxUser').removeAttribute('required');
-                document.getElementById('robloxPass').removeAttribute('required');
+            if (serviceName === 'Roblox Fruits') {
+                robloxExtraAuth.style.display = 'block';
+                document.getElementById('robloxUser').previousElementSibling.innerText = 'Tài khoản Roblox:';
+                document.getElementById('robloxUser').placeholder = 'Nhập tên tài khoản...';
+                document.getElementById('robloxUser').setAttribute('required', 'true');
+                document.getElementById('robloxPass').style.display = 'block';
+                document.getElementById('robloxPass').previousElementSibling.style.display = 'block';
+                document.getElementById('robloxPass').setAttribute('required', 'true');
+                document.getElementById('robloxPass3').style.display = 'block';
+                document.getElementById('robloxPass3').previousElementSibling.style.display = 'block';
             } else {
                 robloxExtraAuth.style.display = 'block';
+                document.getElementById('robloxUser').previousElementSibling.innerText = 'Tên tài khoản trong game:';
+                document.getElementById('robloxUser').placeholder = 'Nhập tên tài khoản của bạn...';
                 document.getElementById('robloxUser').setAttribute('required', 'true');
-                document.getElementById('robloxPass').setAttribute('required', 'true');
+                
+                document.getElementById('robloxPass').style.display = 'none';
+                document.getElementById('robloxPass').previousElementSibling.style.display = 'none';
+                document.getElementById('robloxPass').removeAttribute('required');
+                
+                document.getElementById('robloxPass3').style.display = 'none';
+                document.getElementById('robloxPass3').previousElementSibling.style.display = 'none';
             }
 
             updateSelectedServicePrice();
@@ -786,14 +798,11 @@
             const price = Number(select.options[select.selectedIndex].getAttribute('data-price'));
             const serviceFullName = `${activeOrderingService} - ${packageName}`;
             
-            let robloxUser = 'Không yêu cầu';
-            let robloxPass = 'N/A';
+            let robloxUser = document.getElementById('robloxUser').value.trim();
+            let robloxPass = 'Không yêu cầu';
             let robloxPass3 = 'N/A';
 
-            const noPasswordServices = ['Tiền game gag2', 'Hạt giống gag2', 'Pet gag2', 'Shop gaer gag2'];
-
-            if (!noPasswordServices.includes(activeOrderingService)) {
-                robloxUser = document.getElementById('robloxUser').value.trim();
+            if (activeOrderingService === 'Roblox Fruits') {
                 robloxPass = document.getElementById('robloxPass').value.trim();
                 robloxPass3 = document.getElementById('robloxPass3').value.trim();
             }
