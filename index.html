@@ -209,7 +209,7 @@
         </div>
     </div>
 
-    <!-- MODAL NẠP TIỀN (ĐÃ PHÓNG TO QR VỪA KHUNG) -->
+    <!-- MODAL NẠP TIỀN (ĐÃ PHÓNG TO & CẮT VIỀN TRẮNG MÃ QR) -->
     <div class="modal" id="depositModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
@@ -224,9 +224,9 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản:</p>
                     
-                    <!-- Khung ảnh QR Code phóng to vừa khung -->
-                    <div style="display: inline-block; padding: 8px; background: #0f172a; border-radius: 10px; border: 2px solid #3b82f6; margin-bottom: 10px; max-width: 300px; width: 100%;">
-                        <img src="https://i.ibb.co/jvXMCndq/image.jpg" alt="QR Code" style="width: 100%; height: auto; display: block; border-radius: 6px;">
+                    <!-- Khung chứa QR đã được phóng to tối đa -->
+                    <div style="display: inline-block; padding: 5px; background: #0f172a; border-radius: 10px; border: 2px solid #3b82f6; margin-bottom: 10px; width: 230px; height: 230px; overflow: hidden; position: relative;">
+                        <img src="https://i.ibb.co/jvXMCndq/image.jpg" alt="QR Code" style="width: 135%; max-width: none; display: block; border-radius: 6px; margin: -15% 0px -15% -17.5%;">
                     </div>
 
                     <!-- Thông tin STK & Chủ TK -->
