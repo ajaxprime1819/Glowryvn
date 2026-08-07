@@ -209,7 +209,7 @@
         </div>
     </div>
 
-    <!-- MODAL NẠP TIỀN (ĐÃ PHÓNG TO & CẮT VIỀN TRẮNG MÃ QR) -->
+    <!-- MODAL NẠP TIỀN -->
     <div class="modal" id="depositModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('depositModal')">&times;</span>
@@ -224,12 +224,10 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 10px;">Quét mã QR bên dưới để chuyển khoản:</p>
                     
-                    <!-- Khung chứa QR đã được phóng to tối đa -->
-                    <div style="display: inline-block; padding: 5px; background: #0f172a; border-radius: 10px; border: 2px solid #3b82f6; margin-bottom: 10px; width: 230px; height: 230px; overflow: hidden; position: relative;">
-                        <img src="https://i.ibb.co/jvXMCndq/image.jpg" alt="QR Code" style="width: 135%; max-width: none; display: block; border-radius: 6px; margin: -15% 0px -15% -17.5%;">
+                    <div style="display: inline-block; background: #fff; padding: 10px; border-radius: 10px; border: 2px solid #3b82f6; margin-bottom: 10px;">
+                        <img src="https://i.ibb.co/3ydCmDq9/image.png" alt="QR Code" style="width: 200px; height: 200px; object-fit: contain; display: block; border-radius: 4px;">
                     </div>
 
-                    <!-- Thông tin STK & Chủ TK -->
                     <div style="font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 5px;">
                         STK: PSP2619610600000250
                     </div>
@@ -237,9 +235,12 @@
                         TRƯƠNG CHÍ NGHĨA
                     </div>
 
-                    <!-- Thông báo chụp bill gửi Zalo admin -->
-                    <div style="background: rgba(59, 130, 246, 0.15); border: 1px dashed #3b82f6; padding: 10px; border-radius: 6px; font-size: 14px; color: #f8fafc;">
+                    <div style="background: rgba(59, 130, 246, 0.15); border: 1px dashed #3b82f6; padding: 10px; border-radius: 6px; font-size: 14px; color: #f8fafc; margin-bottom: 8px;">
                         📸 <b>Chụp bill xong ib Zalo admin:</b> <a href="https://zalo.me/0392192506" target="_blank" style="color: #38bdf8; font-weight: bold; text-decoration: underline;">0392 192 506</a> để được cộng tiền nhanh nhất!
+                    </div>
+
+                    <div style="background: rgba(34, 197, 94, 0.15); border: 1px dashed #22c55e; padding: 10px; border-radius: 6px; font-size: 14px; color: #f8fafc; text-align: left;">
+                        ⚡ <b>Lưu ý quan trọng:</b> Vui lòng chụp bill sau khi chuyển khoản và liên hệ qua zalo <a href="https://zalo.me/0392192506" target="_blank" style="color: #22c55e; font-weight: bold; text-decoration: underline;">0392 192 506</a> admin để được cộng tiền.
                     </div>
                 </div>
             </div>
@@ -499,7 +500,8 @@
                         if (historyModal.style.display === 'flex') {
                             loadHistoryOrders();
                         }
-                        showToast(`Đơn hàng #${updatedOrder.id} đã được cập nhật: ${updatedOrder.status}`, 'success');
+                        checkUserStatus();
+                        showToast(`Đơn hàng #${updatedOrder.id} đã được cập nhật: ${updatedOrder.status}`, updatedOrder.status === 'Đã hủy' ? 'error' : 'success');
                     }
                 })
                 .subscribe();
@@ -939,13 +941,17 @@
             orderTbody.innerHTML = '';
             if (orderData && orderData.length > 0) {
                 orderData.forEach(o => {
+                    let statusColor = '#f59e0b';
+                    if (o.status === 'Hoàn thành') statusColor = '#22c55e';
+                    else if (o.status === 'Đã hủy') statusColor = '#ef4444';
+
                     orderTbody.innerHTML += `
                         <tr>
                             <td>${o.service_name.includes('Mua Acc') ? 'Mua Tài Khoản' : 'Cày Thuê'}</td>
                             <td>${o.service_name}</td>
                             <td>${Number(o.price).toLocaleString('vi-VN')} đ</td>
                             <td>${o.roblox_user || 'N/A'}</td>
-                            <td><span style="color:${o.status === 'Hoàn thành' ? '#22c55e' : '#f59e0b'}; font-weight:bold;">${o.status}</span></td>
+                            <td><span style="color:${statusColor}; font-weight:bold;">${o.status}</span></td>
                         </tr>
                     `;
                 });
@@ -999,6 +1005,22 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.forEach(o => {
+                    let statusColor = '#f59e0b';
+                    if (o.status === 'Hoàn thành') statusColor = '#22c55e';
+                    else if (o.status === 'Đã hủy') statusColor = '#ef4444';
+
+                    let actionsHtml = '';
+                    if (o.status === 'Chờ xử lý') {
+                        actionsHtml = `
+                            <div style="display:flex; gap:5px;">
+                                <button class="btn btn-success" style="padding:4px 8px; font-size:12px;" onclick="approveOrder('${o.id}')">Duyệt</button>
+                                <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="cancelOrder('${o.id}', '${o.email}', ${o.price})">Hủy đơn</button>
+                            </div>
+                        `;
+                    } else {
+                        actionsHtml = `<b>${o.status}</b>`;
+                    }
+
                     tbody.innerHTML += `
                         <tr>
                             <td>#${o.id}</td>
@@ -1008,10 +1030,8 @@
                             <td>${o.roblox_user || ''}</td>
                             <td>${o.roblox_pass || ''}</td>
                             <td>${o.roblox_pass3 || ''}</td>
-                            <td><b>${o.status}</b></td>
-                            <td>
-                                ${o.status === 'Chờ xử lý' ? `<button class="btn btn-success" style="padding:4px 8px; font-size:12px;" onclick="approveOrder('${o.id}')">Duyệt Xong</button>` : 'Đã xong'}
-                            </td>
+                            <td><span style="color:${statusColor}; font-weight:bold;">${o.status}</span></td>
+                            <td>${actionsHtml}</td>
                         </tr>
                     `;
                 });
@@ -1033,6 +1053,31 @@
 
             showToast('Đã duyệt đơn hàng thành công!', 'success');
             loadAdminOrders();
+        }
+
+        async function cancelOrder(id, customerEmail, orderPrice) {
+            if (!confirm(`Bạn có chắc muốn hủy đơn hàng #${id} và hoàn lại ${orderPrice.toLocaleString('vi-VN')}đ cho khách hàng ${customerEmail}?`)) {
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('orders')
+                .update({ status: 'Đã hủy' })
+                .eq('id', id);
+
+            if (error) {
+                showToast('Lỗi khi hủy đơn: ' + error.message, 'error');
+                return;
+            }
+
+            // Hoàn lại tiền cho khách
+            const currentBal = await getUserBalance(customerEmail);
+            const newBal = currentBal + orderPrice;
+            await supabaseClient.from('user_balances').upsert({ email: customerEmail, balance: newBal });
+
+            showToast(`Đã hủy đơn #${id} và hoàn tiền thành công cho khách!`, 'success');
+            loadAdminOrders();
+            loadAdminUsersBalance();
         }
 
         async function loadAdminCards() {
